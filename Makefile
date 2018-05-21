@@ -36,6 +36,7 @@ OBJS = \
 	$(OBJ_DIR)/bsp_node.o  \
 	$(OBJ_DIR)/bsp_util.o  \
 	$(OBJ_DIR)/lib_util.o  \
+	$(OBJ_DIR)/lib_file.o  \
 	$(OBJ_DIR)/main.o      \
 	$(OBJ_DIR)/m_nodes.o   \
 	$(OBJ_DIR)/w_wad.o
