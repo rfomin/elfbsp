@@ -2,10 +2,9 @@
 //  MAIN DEFINITIONS
 //------------------------------------------------------------------------
 //
-//  Eureka DOOM Editor
-//
-//  Copyright (C) 2001-2017 Andrew Apted
-//  Copyright (C) 1997-2003 André Majorel et al
+//  AJ-BSP  Copyright (C) 2001-2018  Andrew Apted
+//          Copyright (C) 1994-1998  Colin Reed
+//          Copyright (C) 1997-1998  Lee Killough
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,17 +17,12 @@
 //  GNU General Public License for more details.
 //
 //------------------------------------------------------------------------
-//
-//  Based on Yadex which incorporated code from DEU 5.21 that was put
-//  in the public domain in 1994 by Raphaël Quinet and Brendon Wyber.
-//
-//------------------------------------------------------------------------
 
 #ifndef __AJBSP_MAIN_H__
 #define __AJBSP_MAIN_H__
 
 
-#define AJBSP_TITLE  "Eureka DOOM Editor"
+#define AJBSP_TITLE  "AJBSP"
 
 #define AJBSP_VERSION  "0.50"
 

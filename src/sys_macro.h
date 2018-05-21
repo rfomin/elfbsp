@@ -2,8 +2,6 @@
 //  Macros
 //------------------------------------------------------------------------
 //
-//  Eureka DOOM Editor
-//
 //  Copyright (C) 2006-2008 Andrew Apted
 //  Copyright (C) 2005      Simon Howard
 //

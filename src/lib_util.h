@@ -2,8 +2,6 @@
 //  UTILITIES
 //------------------------------------------------------------------------
 //
-//  Eureka DOOM Editor
-//
 //  Copyright (C) 2001-2013 Andrew Apted
 //  Copyright (C) 1997-2003 André Majorel et al
 //
@@ -18,14 +16,9 @@
 //  GNU General Public License for more details.
 //
 //------------------------------------------------------------------------
-//
-//  Based on Yadex which incorporated code from DEU 5.21 that was put
-//  in the public domain in 1994 by Raphaël Quinet and Brendon Wyber.
-//
-//------------------------------------------------------------------------
 
-#ifndef __AJBSP_LIB_UTIL_H__
-#define __AJBSP_LIB_UTIL_H__
+#ifndef __LIB_UTIL_H__
+#define __LIB_UTIL_H__
 
 
 int y_stricmp (const char *s1, const char *s2);
@@ -154,7 +147,7 @@ inline bool y_isprint (char c)
 }
 
 
-#endif  /* __AJBSP_YUTIL_H__ */
+#endif  /* __LIB_UTIL_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

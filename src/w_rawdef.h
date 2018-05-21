@@ -2,9 +2,7 @@
 //  RAWDEF : Doom structures, raw on-disk layout
 //------------------------------------------------------------------------
 //
-//  Eureka DOOM Editor
-//
-//  Copyright (C) 2007-2016 Andrew Apted
+//  AJ-BSP  Copyright (C) 2007-2018  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -537,6 +535,7 @@ hexen_option_e;
 #define ZDOOM_PO_ANCHOR_TYPE      9300
 #define ZDOOM_PO_SPAWN_TYPE       9301
 #define ZDOOM_PO_SPAWNCRUSH_TYPE  9302
+
 
 #endif  /* __AJBSP_W_RAWDEF_H__ */
 

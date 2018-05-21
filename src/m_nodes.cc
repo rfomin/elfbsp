@@ -1,10 +1,8 @@
 //------------------------------------------------------------------------
-//  BUILDING NODES / PLAY THE MAP
+//  BUILDING NODES
 //------------------------------------------------------------------------
 //
-//  Eureka DOOM Editor
-//
-//  Copyright (C) 2012-2016 Andrew Apted
+//  AJ-BSP  Copyright (C) 2012-2018  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
