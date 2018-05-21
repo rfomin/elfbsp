@@ -2304,7 +2304,7 @@ void UpdateGLMarker(Lump_c *marker)
 		marker->Printf("LEVEL=%s\n", lev_current_name);
 	}
 
-	marker->Printf("BUILDER=%s\n", "Eureka " EUREKA_VERSION);
+	marker->Printf("BUILDER=%s\n", "AJBSP " AJBSP_VERSION);
 
 	marker->Printf("OPTIONS=%s\n", CalcOptionsString());
 

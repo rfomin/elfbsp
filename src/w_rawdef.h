@@ -18,8 +18,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __EUREKA_W_RAWDEF_H__
-#define __EUREKA_W_RAWDEF_H__
+#ifndef __AJBSP_W_RAWDEF_H__
+#define __AJBSP_W_RAWDEF_H__
 
 
 /* ----- The wad structures ---------------------- */
@@ -538,7 +538,7 @@ hexen_option_e;
 #define ZDOOM_PO_SPAWN_TYPE       9301
 #define ZDOOM_PO_SPAWNCRUSH_TYPE  9302
 
-#endif  /* __EUREKA_W_RAWDEF_H__ */
+#endif  /* __AJBSP_W_RAWDEF_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

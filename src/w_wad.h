@@ -24,8 +24,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __EUREKA_W_WAD_H__
-#define __EUREKA_W_WAD_H__
+#ifndef __AJBSP_W_WAD_H__
+#define __AJBSP_W_WAD_H__
 
 class Wad_file;
 
@@ -334,7 +334,7 @@ bool MasterDir_HaveFilename(const char *chk_path);
 void MasterDir_CloseAll();
 
 
-#endif  /* __EUREKA_W_WAD_H__ */
+#endif  /* __AJBSP_W_WAD_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

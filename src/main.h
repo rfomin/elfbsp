@@ -24,15 +24,13 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __EUREKA_MAIN_H__
-#define __EUREKA_MAIN_H__
+#ifndef __AJBSP_MAIN_H__
+#define __AJBSP_MAIN_H__
 
 
-#define EUREKA_TITLE  "Eureka DOOM Editor"
+#define AJBSP_TITLE  "Eureka DOOM Editor"
 
-#define EUREKA_VERSION  "1.22"
-
-#define EUREKA_LUMP  "__EUREKA"
+#define AJBSP_VERSION  "0.50"
 
 
 /*
@@ -175,7 +173,7 @@ void Status_Set(const char *fmt, ...);
 void Status_Clear();
 
 
-#endif  /* __EUREKA_MAIN_H__ */
+#endif  /* __AJBSP_MAIN_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

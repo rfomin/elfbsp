@@ -557,7 +557,7 @@ static void Main_OpenWindow()
 {
 	main_win = new UI_MainWindow();
 
-	main_win->label("Eureka v" EUREKA_VERSION);
+	main_win->label("Eureka v" AJBSP_VERSION);
 
 	// show window (pass some dummy arguments)
 	{
@@ -802,7 +802,7 @@ void Main_LoadResources()
 static void ShowHelp()
 {
 	printf(	"\n"
-			"*** " EUREKA_TITLE " v" EUREKA_VERSION " (C) 2018 Andrew Apted, et al ***\n"
+			"*** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ***\n"
 			"\n");
 
 	printf(	"Eureka is free software, under the terms of the GNU General\n"
@@ -822,7 +822,7 @@ static void ShowHelp()
 
 static void ShowVersion()
 {
-	printf("Eureka version " EUREKA_VERSION " (" __DATE__ ")\n");
+	printf("Eureka version " AJBSP_VERSION " (" __DATE__ ")\n");
 
 	fflush(stdout);
 }
@@ -886,7 +886,7 @@ int main(int argc, char *argv[])
 
 
 	LogPrintf("\n");
-	LogPrintf("*** " EUREKA_TITLE " v" EUREKA_VERSION " (C) 2018 Andrew Apted, et al ***\n");
+	LogPrintf("*** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ***\n");
 	LogPrintf("\n");
 
 	// sanity checks type sizes (useful when porting)
@@ -955,23 +955,6 @@ int main(int argc, char *argv[])
 		if (M_TryOpenMostRecent())
 		{
 			MasterDir_Add(edit_wad);
-		}
-	}
-
-
-	// Handle the '__EUREKA' lump.  It is almost equivalent to using the
-	// -iwad, -merge and -port command line options, but with extra
-	// checks (to allow editing a wad containing dud information).
-	//
-	// Note: there is logic in M_ParseEurekaLump() to ensure that command
-	// line arguments can override the EUREKA_LUMP values.
-
-	if (edit_wad)
-	{
-		if (! M_ParseEurekaLump(edit_wad, true /* keep_cmd_line_args */))
-		{
-			// user cancelled the load
-			RemoveEditWad();
 		}
 	}
 

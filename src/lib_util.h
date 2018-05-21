@@ -24,8 +24,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __EUREKA_LIB_UTIL_H__
-#define __EUREKA_LIB_UTIL_H__
+#ifndef __AJBSP_LIB_UTIL_H__
+#define __AJBSP_LIB_UTIL_H__
 
 
 int y_stricmp (const char *s1, const char *s2);
@@ -154,7 +154,7 @@ inline bool y_isprint (char c)
 }
 
 
-#endif  /* __EUREKA_YUTIL_H__ */
+#endif  /* __AJBSP_YUTIL_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

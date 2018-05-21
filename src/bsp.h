@@ -18,8 +18,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __EUREKA_BSP_H__
-#define __EUREKA_BSP_H__
+#ifndef __AJBSP_BSP_H__
+#define __AJBSP_BSP_H__
 
 class Lump_c;
 
@@ -798,7 +798,7 @@ void FreeQuickAllocSupers(void);
 }  // namespace ajbsp
 
 
-#endif /* __EUREKA_BSP_H__ */
+#endif /* __AJBSP_BSP_H__ */
 
 
 //--- editor settings ---
