@@ -19,10 +19,6 @@
 //------------------------------------------------------------------------
 
 #include "main.h"
-#include "bsp.h"
-
-#include "w_rawdef.h"
-#include "w_wad.h"
 
 #include <zlib.h>
 

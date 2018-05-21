@@ -19,12 +19,6 @@
 //------------------------------------------------------------------------
 
 #include "main.h"
-#include "m_loadsave.h"
-#include "w_wad.h"
-
-#include "ui_window.h"
-
-#include "bsp.h"
 
 
 // config items

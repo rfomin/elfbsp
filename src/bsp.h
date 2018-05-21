@@ -21,8 +21,6 @@
 #ifndef __EUREKA_BSP_H__
 #define __EUREKA_BSP_H__
 
-#include "lib_util.h"
-
 class Lump_c;
 
 

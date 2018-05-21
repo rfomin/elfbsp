@@ -62,30 +62,17 @@
 
 
 /*
- *  Additional libraries
- */
-
-#include "hdr_fltk.h"
-
-
-/*
- *  Commonly-used headers
+ *  Source headers
  */
 #include "sys_type.h"
 #include "sys_macro.h"
 #include "sys_endian.h"
-#include "sys_debug.h"
-
-#include "objid.h"
-#include "m_bitvec.h"
-#include "m_select.h"
 
 #include "lib_util.h"
-#include "lib_file.h"
+#include "w_rawdef.h"
+#include "w_wad.h"
 
-#include "e_basis.h"
-#include "m_keys.h"
-#include "e_objects.h"
+#include "bsp.h"
 
 
 /*

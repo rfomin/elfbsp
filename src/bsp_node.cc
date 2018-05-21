@@ -38,7 +38,6 @@
 //
 
 #include "main.h"
-#include "bsp.h"
 
 
 namespace ajbsp
