@@ -4,7 +4,7 @@
 //
 //  Eureka DOOM Editor
 //
-//  Copyright (C) 2001-2016 Andrew Apted
+//  Copyright (C) 2001-2018 Andrew Apted
 //  Copyright (C) 1997-2003 André Majorel et al
 //
 //  This program is free software; you can redistribute it and/or
@@ -131,7 +131,6 @@ private:
 
 	int dir_start;
 	int dir_count;
-	u32_t dir_crc;
 
 	// these are lump indices (into 'directory' vector)
 	std::vector<short> levels;

@@ -4,7 +4,7 @@
 //
 //  Eureka DOOM Editor
 //
-//  Copyright (C) 2001-2016 Andrew Apted
+//  Copyright (C) 2001-2018 Andrew Apted
 //  Copyright (C) 1997-2003 André Majorel et al
 //
 //  This program is free software; you can redistribute it and/or
@@ -191,7 +191,7 @@ bool Lump_c::Finish()
 Wad_file::Wad_file(const char *_name, char _mode, FILE * _fp) :
 	mode(_mode), fp(_fp), kind('P'),
 	total_size(0), directory(),
-	dir_start(0), dir_count(0), dir_crc(0),
+	dir_start(0), dir_count(0),
 	levels(), patches(), sprites(), flats(), tx_tex(),
 	begun_write(false), insert_point(-1)
 {
@@ -556,8 +556,6 @@ void Wad_file::ReadDirectory()
 	if (dir_count < 0 || dir_count > 32000)
 		FatalError("Bad WAD header, too many entries (%d)\n", dir_count);
 
-	crc32_c checksum;
-
 	if (fseek(fp, dir_start, SEEK_SET) != 0)
 		FatalError("Error seeking to WAD directory.\n");
 
@@ -568,19 +566,12 @@ void Wad_file::ReadDirectory()
 		if (fread(&entry, sizeof(entry), 1, fp) != 1)
 			FatalError("Error reading WAD directory.\n");
 
-		// update the checksum with each _RAW_ entry
-		checksum.AddBlock((u8_t *) &entry, sizeof(entry));
-
 		Lump_c *lump = new Lump_c(this, &entry);
 
 		// TODO: check if entry is valid
 
 		directory.push_back(lump);
 	}
-
-	dir_crc = checksum.raw;
-
-	DebugPrintf("Loaded directory. crc = %08x\n", dir_crc);
 }
 
 
@@ -765,41 +756,8 @@ void Wad_file::ProcessNamespaces()
 
 bool Wad_file::WasExternallyModified()
 {
-	if (fseek(fp, 0, SEEK_END) != 0)
-		FatalError("Error determining WAD size.\n");
-
-	if (total_size != (int)ftell(fp))
-		return true;
-
-	rewind(fp);
-
-	raw_wad_header_t header;
-
-	if (fread(&header, sizeof(header), 1, fp) != 1)
-		FatalError("Error reading WAD header.\n");
-
-	if (dir_start != LE_S32(header.dir_start) ||
-		dir_count != LE_S32(header.num_entries))
-		return true;
-
-	fseek(fp, dir_start, SEEK_SET);
-
-	crc32_c checksum;
-
-	for (short i = 0 ; i < dir_count ; i++)
-	{
-		raw_wad_entry_t entry;
-
-		if (fread(&entry, sizeof(entry), 1, fp) != 1)
-			FatalError("Error reading WAD directory.\n");
-
-		checksum.AddBlock((u8_t *) &entry, sizeof(entry));
-
-	}
-
-	DebugPrintf("New CRC : %08x\n", checksum.raw);
-
-	return (dir_crc != checksum.raw);
+	// this method is an unused stub
+	return false;
 }
 
 
@@ -1210,8 +1168,6 @@ void Wad_file::WriteDirectory()
 	DebugPrintf("WriteDirectory...\n");
 	DebugPrintf("dir_start:%d  dir_count:%d\n", dir_start, dir_count);
 
-	crc32_c checksum;
-
 	for (short k = 0 ; k < dir_count ; k++)
 	{
 		Lump_c *lump = directory[k];
@@ -1221,15 +1177,9 @@ void Wad_file::WriteDirectory()
 
 		lump->MakeEntry(&entry);
 
-		// update the CRC
-		checksum.AddBlock((u8_t *) &entry, sizeof(entry));
-
 		if (fwrite(&entry, sizeof(entry), 1, fp) != 1)
 			FatalError("Error writing WAD directory.\n");
 	}
-
-	dir_crc = checksum.raw;
-	DebugPrintf("dir_crc: %08x\n", dir_crc);
 
 	fflush(fp);
 
