@@ -79,22 +79,8 @@
 
 
 /*
- *  Miscellaneous
- */
-
-typedef std::vector< const char * > string_list_t;
-
-
-// for this, set/clear/test bits using (1 << MAPF_xxx)
-typedef int map_format_bitset_t;
-
-
-/*
  *  Interfile global variables
  */
-
-extern int  init_progress;
-extern bool want_quit;
 
 extern const char *install_dir;  // install dir (e.g. /usr/share/eureka)
 extern const char *home_dir;     // home dir (e.g. $HOME/.eureka)
@@ -113,37 +99,15 @@ extern const char *Iwad_name;   // Filename of the iwad
 extern const char *Pwad_name;   // Filename of current wad, or NULL
 
 extern std::vector< const char * > Pwad_list;
-extern std::vector< const char * > Resource_list;
-
-
-extern int	default_floor_h;
-extern int	default_ceil_h;
-extern int	default_light_level;
-extern int	default_thing;
-
-extern const char * default_wall_tex;
-extern const char * default_floor_tex;
-extern const char * default_ceil_tex;
 
 
 extern int   show_help;		// Print usage message and exit.
 extern int   show_version;	// Print version info and exit.
 
 
-extern int KF;  // Kromulent Factor
-extern int KF_fonth;  // default font size
-
-
-extern int MadeChanges;
-
-
 /*
  *  Various global functions
  */
-
-bool Main_ConfirmQuit(const char *action);
-void Main_LoadResources();
-void Main_Quit();
 
 #ifdef __GNUC__
 __attribute__((noreturn))
@@ -152,17 +116,6 @@ void FatalError(const char *fmt, ...);
 
 #define BugError  FatalError
 
-
-void DLG_ShowError(const char *msg, ...);
-void DLG_Notify(const char *msg, ...);
-int  DLG_Confirm(const char *buttons, const char *msg, ...);
-
-const char * DetermineGame(const char *iwad_name);
-
-const char * Main_FileOpFolder();
-
-
-void Beep(const char *msg, ...);
 
 void Status_Set(const char *fmt, ...);
 void Status_Clear();
