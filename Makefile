@@ -26,7 +26,7 @@ CXXFLAGS=$(OPTIMISE) -Wall -D$(OS)  \
 
 LDFLAGS=-L/usr/X11R6/lib
 
-LIBS=-lm
+LIBS=-lm -lz
 
 
 #----- Object files ----------------------------------------------
