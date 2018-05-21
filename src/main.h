@@ -74,7 +74,7 @@
 #define LogPrintf(...)   do {} while (0)
 #define DebugPrintf(...) do {} while (0)
 
-#define FL_PATH_MAX  4096
+#define AJ_PATH_MAX  4096
 #define MSG_BUF_LEN  1024
 
 

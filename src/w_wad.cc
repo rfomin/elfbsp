@@ -151,7 +151,7 @@ bool Lump_c::Write(const void *data, int len)
 
 void Lump_c::Printf(const char *msg, ...)
 {
-	static char buffer[FL_PATH_MAX];
+	static char buffer[MSG_BUF_LEN];
 
 	va_list args;
 

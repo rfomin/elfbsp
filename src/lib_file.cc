@@ -34,10 +34,6 @@
 #include <mach-o/dyld.h> // _NSGetExecutablePath
 #endif
 
-#ifndef PATH_MAX
-#define PATH_MAX  2048
-#endif
-
 
 bool FileExists(const char *filename)
 {
@@ -595,11 +591,11 @@ const char *GetExecutablePath(const char *argv0)
 	char *path;
 
 #ifdef WIN32
-	path = StringNew(PATH_MAX+2);
+	path = StringNew(AJ_PATH_MAX+2);
 
-	int length = GetModuleFileName(GetModuleHandle(NULL), path, PATH_MAX);
+	int length = GetModuleFileName(GetModuleHandle(NULL), path, AJ_PATH_MAX);
 
-	if (length > 0 && length < PATH_MAX)
+	if (length > 0 && length < AJ_PATH_MAX)
 	{
 		if (access(path, 0) == 0)  // sanity check
 		{
@@ -613,9 +609,9 @@ const char *GetExecutablePath(const char *argv0)
 #endif
 
 #ifdef UNIX
-	path = StringNew(PATH_MAX+2);
+	path = StringNew(AJ_PATH_MAX+2);
 
-	int length = readlink("/proc/self/exe", path, PATH_MAX);
+	int length = readlink("/proc/self/exe", path, AJ_PATH_MAX);
 
 	if (length > 0)
 	{
@@ -644,7 +640,7 @@ const char *GetExecutablePath(const char *argv0)
 	   enough, -1 is returned and the expected buffer size is
 	   copied in *bufsize.
 	 */
-	uint32_t pathlen = PATH_MAX * 2;
+	uint32_t pathlen = AJ_PATH_MAX * 2;
 
 	path = StringNew(pathlen+2);
 

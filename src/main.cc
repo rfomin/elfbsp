@@ -153,7 +153,7 @@ static void CreateHomeDirs()
 {
 	SYS_ASSERT(home_dir);
 
-	static char dir_name[FL_PATH_MAX];
+	static char dir_name[AJ_PATH_MAX];
 
 #ifdef __APPLE__
    // IOANCH 20130825: modified to use name-independent calls
@@ -184,8 +184,8 @@ static void CreateHomeDirs()
 
 	for (int i = 0 ; subdirs[i] ; i++)
 	{
-		snprintf(dir_name, FL_PATH_MAX, "%s/%s", (i < 2) ? cache_dir : home_dir, subdirs[i]);
-		dir_name[FL_PATH_MAX-1] = 0;
+		snprintf(dir_name, AJ_PATH_MAX, "%s/%s", (i < 2) ? cache_dir : home_dir, subdirs[i]);
+		dir_name[AJ_PATH_MAX-1] = 0;
 
 		FileMakeDir(dir_name);
 	}
@@ -226,7 +226,7 @@ static void Determine_HomeDir(const char *argv0)
 	StringFree(path);
 
 #elif defined(__APPLE__)
-	char * path = StringNew(FL_PATH_MAX + 4);
+	char * path = StringNew(AJ_PATH_MAX + 4);
 
    fl_filename_expand(path, OSX_UserDomainDirectory(osx_LibAppSupportDir, "eureka-editor"));
    home_dir = StringDup(path);
@@ -237,7 +237,7 @@ static void Determine_HomeDir(const char *argv0)
 	StringFree(path);
 
 #else  // UNIX
-	char * path = StringNew(FL_PATH_MAX + 4);
+	char * path = StringNew(AJ_PATH_MAX + 4);
 
 	if (fl_filename_expand(path, "$HOME/.eureka"))
 		home_dir = path;
@@ -316,7 +316,7 @@ static void Determine_InstallPath(const char *argv0)
 
 const char * DetermineGame(const char *iwad_name)
 {
-	static char game_name[FL_PATH_MAX];
+	static char game_name[AJ_PATH_MAX];
 
 	strcpy(game_name, fl_filename_name(iwad_name));
 
@@ -639,7 +639,7 @@ bool Main_ConfirmQuit(const char *action)
 //
 const char * Main_FileOpFolder()
 {
-	static char folder[FL_PATH_MAX];
+	static char folder[AJ_PATH_MAX];
 
 	if (Pwad_name)
 	{
