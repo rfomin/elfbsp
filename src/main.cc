@@ -31,46 +31,17 @@
 //  global variables
 //
 
-bool want_quit = false;
-
-const char *config_file = NULL;
-const char *log_file;
-
-const char *install_dir;
-const char *home_dir;
-const char *cache_dir;
-
-
-const char *Iwad_name = NULL;
 const char *Pwad_name = NULL;
 
 std::vector< const char * > Pwad_list;
 
-const char *Game_name;
-const char *Port_name;
 const char *Level_name;
 
 map_format_e Level_format;
 
 
-int  init_progress;
-
 int show_help     = 0;
 int show_version  = 0;
-
-
-static void RemoveSingleNewlines(char *buffer)
-{
-	for (char *p = buffer ; *p ; p++)
-	{
-		if (*p == '\n' && p[1] == '\n')
-			while (*p == '\n')
-				p++;
-
-		if (*p == '\n')
-			*p = ' ';
-	}
-}
 
 
 //
@@ -88,37 +59,14 @@ void FatalError(const char *fmt, ...)
 
 	buffer[MSG_BUF_LEN-1] = 0;
 
-	if (init_progress < 1 || Quiet || log_file)
+	if (true)
 	{
 		fprintf(stderr, "\nFATAL ERROR: %s", buffer);
 	}
-
-	if (init_progress >= 1)
+	else //???
 	{
 		LogPrintf("\nFATAL ERROR: %s", buffer);
 	}
-
-	if (init_progress >= 2)
-	{
-		RemoveSingleNewlines(buffer);
-
-		DLG_ShowError("%s", buffer);
-
-		init_progress = 1;
-	}
-#ifdef WIN32
-	else
-	{
-		MessageBox(NULL, buffer, "Eureka : Error",
-		           MB_ICONEXCLAMATION | MB_OK |
-				   MB_SYSTEMMODAL | MB_SETFOREGROUND);
-	}
-#endif
-
-	init_progress = 0;
-
-	MasterDir_CloseAll();
-	LogClose();
 
 	exit(2);
 }
@@ -132,16 +80,16 @@ static void ShowHelp()
 			"*** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ***\n"
 			"\n");
 
-	printf(	"Eureka is free software, under the terms of the GNU General\n"
+	printf(	"AJBSP is free software, under the terms of the GNU General\n"
 			"Public License (GPL), and comes with ABSOLUTELY NO WARRANTY.\n"
-			"Home page: http://eureka-editor.sf.net/\n"
+	//		"Home page: https://gitlab.com/andwj/ajbsp\n"
 			"\n");
 
-	printf( "USAGE: eureka [options...] [FILE...]\n"
+	printf( "USAGE: ajbsp [options...] [FILE...]\n"
 			"\n"
 			"Available options are:\n");
 
-	M_PrintCommandLineOptions(stdout);
+//FIXME	M_PrintCommandLineOptions(stdout);
 
 	fflush(stdout);
 }
@@ -149,7 +97,7 @@ static void ShowHelp()
 
 static void ShowVersion()
 {
-	printf("Eureka version " AJBSP_VERSION " (" __DATE__ ")\n");
+	printf("AJBSP version " AJBSP_VERSION " (" __DATE__ ")\n");
 
 	fflush(stdout);
 }
@@ -191,12 +139,9 @@ static void ShowTime()
 //
 int main(int argc, char *argv[])
 {
-	init_progress = 0;
-
-
 	// a quick pass through the command line arguments
 	// to handle special options, like --help, --install, --config
-	M_ParseCommandLine(argc - 1, argv + 1, 1);
+// FIXME	M_ParseCommandLine(argc - 1, argv + 1);
 
 	if (show_help)
 	{
@@ -209,8 +154,6 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	init_progress = 1;
-
 
 	LogPrintf("\n");
 	LogPrintf("**** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ****\n");
@@ -222,14 +165,14 @@ int main(int argc, char *argv[])
 	ShowTime();
 
 
-	// load all the config settings
-	M_ParseConfigFile();
-
+// FIXME
+#if 0
 	// environment variables can override them
 	M_ParseEnvironmentVars();
 
 	// and command line arguments will override both
 	M_ParseCommandLine(argc - 1, argv + 1, 2);
+#endif
 
 
 	// open a specified PWAD now
@@ -237,48 +180,18 @@ int main(int argc, char *argv[])
 
 	if (Pwad_list.size() > 0)
 	{
-		// this fatal errors on any missing file
-		// [ hence the Open() below is very unlikely to fail ]
-		M_ValidateGivenFiles();
-
-		Pwad_name = Pwad_list[0];
-
-		edit_wad = Wad_file::Open(Pwad_name, 'a');
-		if (! edit_wad)
-			FatalError("Cannot load pwad: %s\n", Pwad_name);
-
-		// Note: the Main_LoadResources() call will ensure this gets
-		//       placed at the correct spot (at the end)
-		MasterDir_Add(edit_wad);
+		// FIXME
 	}
-	// don't auto-load when --iwad or --warp was used on the command line
-	else if (auto_load_recent && ! (Iwad_name || Level_name))
+	else
 	{
-		if (M_TryOpenMostRecent())
-		{
-			MasterDir_Add(edit_wad);
-		}
+		// FIXME
 	}
-
-
-
-	// config file parsing can depend on the map format, so get it now
-	GetLevelFormat(edit_wad ? edit_wad : game_wad, Level_name);
-
-
-	// load the initial level
-	LogPrintf("Loading initial map : %s\n", Level_name);
-
 
 
 quit:
 	/* that's all folks! */
 
 	LogPrintf("Quit\n");
-
-	init_progress = 0;
-
-	LogClose();
 
 	return 0;
 }

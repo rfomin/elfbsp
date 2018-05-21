@@ -79,23 +79,13 @@
 
 
 /*
- *  Interfile global variables
+ *  Global variables
  */
 
-extern const char *install_dir;  // install dir (e.g. /usr/share/eureka)
-extern const char *home_dir;     // home dir (e.g. $HOME/.eureka)
-extern const char *cache_dir;    // for caches and backups, can be same as home_dir
-
-extern const char *Game_name;   // Name of game "doom", "doom2", "heretic", ...
-extern const char *Port_name;   // Name of source port "vanilla", "boom", ...
 extern const char *Level_name;  // Name of map lump we are editing
 
 extern map_format_e Level_format; // format of current map
 
-extern const char *config_file; // Name of the configuration file, or NULL
-extern const char *log_file;    // Name of log file, or NULL
-
-extern const char *Iwad_name;   // Filename of the iwad
 extern const char *Pwad_name;   // Filename of current wad, or NULL
 
 extern std::vector< const char * > Pwad_list;
@@ -106,7 +96,7 @@ extern int   show_version;	// Print version info and exit.
 
 
 /*
- *  Various global functions
+ *  Global functions
  */
 
 #ifdef __GNUC__
@@ -116,9 +106,7 @@ void FatalError(const char *fmt, ...);
 
 #define BugError  FatalError
 
-
-void Status_Set(const char *fmt, ...);
-void Status_Clear();
+#define Status_Set  LogPrintf
 
 
 #endif  /* __AJBSP_MAIN_H__ */

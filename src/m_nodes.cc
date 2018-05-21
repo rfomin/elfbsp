@@ -156,7 +156,7 @@ void CMD_BuildAllNodes()
 {
 	if (! edit_wad)
 	{
-		DLG_Notify("Cannot build nodes unless you are editing a PWAD.");
+		FatalError("Cannot build nodes unless you are editing a PWAD.");
 		return;
 	}
 
@@ -164,7 +164,7 @@ void CMD_BuildAllNodes()
 	// this probably cannot happen, but check anyway
 	if (edit_wad->LevelCount() == 0)
 	{
-		DLG_Notify("Cannot build nodes: no levels found!");
+		FatalError("Cannot build nodes: no levels found!");
 		return;
 	}
 
