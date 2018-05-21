@@ -49,8 +49,7 @@ $(OBJ_DIR)/%.o: src/%.cc
 all: $(PROGRAM)
 
 clean:
-	rm -f $(PROGRAM) $(OBJ_DIR)/*.* core core.*
-	rm -f ERRS LOG.txt update.log
+	rm -f $(PROGRAM) $(OBJ_DIR)/*.* core core.* ERRS
 
 $(PROGRAM): $(OBJS)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LIBS)
