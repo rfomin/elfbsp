@@ -20,16 +20,14 @@
 
 
 // config items
-bool bsp_on_save	= true;
-bool bsp_fast		= false;
-bool bsp_warnings	= false;
+bool opt_fast		= false;
+bool opt_verbose	= false;
 
-int  bsp_split_factor	= DEFAULT_FACTOR;
+bool opt_no_gl		= false;
+bool opt_force_v5	= false;
+bool opt_force_xnod	= false;
 
-bool bsp_gl_nodes		= true;
-bool bsp_force_v5		= false;
-bool bsp_force_zdoom	= false;
-bool bsp_compressed		= false;
+int  opt_factor		= DEFAULT_FACTOR;
 
 
 extern bool inhibit_node_build;
@@ -80,15 +78,15 @@ void GB_PrintMsg(const char *str, ...)
 
 static void PrepareInfo(nodebuildinfo_t *info)
 {
-	info->factor	= CLAMP(1, bsp_split_factor, 31);
+	info->factor	= CLAMP(1, opt_factor, 31);
 
-	info->gl_nodes	= bsp_gl_nodes;
-	info->fast		= bsp_fast;
-	info->warnings	= bsp_warnings;
+	info->gl_nodes	= ! opt_no_gl;
+	info->fast		= opt_fast;
+	info->warnings	= opt_verbose;
 
-	info->force_v5			= bsp_force_v5;
-	info->force_xnod		= bsp_force_zdoom;
-	info->force_compress	= bsp_compressed;
+	info->force_v5			= opt_force_v5;
+	info->force_xnod		= opt_force_xnod;
+	info->force_compress	= false;
 
 	info->total_failed_maps    = 0;
 	info->total_warnings       = 0;
