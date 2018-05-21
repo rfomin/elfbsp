@@ -316,31 +316,10 @@ extern Wad_file * game_wad;
 // when present it is also at master_dir.back()
 extern Wad_file * edit_wad;
 
-extern std::vector<Wad_file *> master_dir;
-
-
-// find a lump in any loaded wad (later ones tried first),
-// returning NULL if not found.
-Lump_c * W_FindLump(const char *name);
-
-// find a lump that only exists in a certain namespace (sprite,
-// or patch) of a loaded wad (later ones tried first).
-Lump_c * W_FindSpriteLump(const char *name);
-Lump_c * W_FindPatchLump(const char *name);
 
 // load the lump into memory, returning the size
 int  W_LoadLumpData(Lump_c *lump, byte ** buf_ptr);
 void W_FreeLumpData(byte ** buf_ptr);
-
-
-int W_FilenameAbsCompare(const char *A, const char *B);
-
-
-void MasterDir_Add   (Wad_file *wad);
-void MasterDir_Remove(Wad_file *wad);
-
-bool MasterDir_HaveFilename(const char *chk_path);
-void MasterDir_CloseAll();
 
 
 #endif  /* __AJBSP_W_WAD_H__ */

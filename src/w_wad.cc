@@ -32,8 +32,6 @@
 Wad_file * game_wad;
 Wad_file * edit_wad;
 
-std::vector<Wad_file *> master_dir;
-
 
 #define MAX_LUMPS_IN_A_LEVEL	21
 
@@ -1220,52 +1218,6 @@ bool Wad_file::Backup(const char *filename)
 //------------------------------------------------------------------------
 
 
-Lump_c * W_FindLump(const char *name)
-{
-	for (short i = (int)master_dir.size()-1 ; i >= 0 ; i--)
-	{
-		Lump_c *L = master_dir[i]->FindLump(name);
-		if (L)
-			return L;
-	}
-
-	return NULL;  // not found
-}
-
-
-Lump_c * W_FindSpriteLump(const char *name)
-{
-	for (short i = (int)master_dir.size()-1 ; i >= 0 ; i--)
-	{
-		Lump_c *L = master_dir[i]->FindLumpInNamespace(name, 'S');
-		if (L)
-			return L;
-	}
-
-	return NULL;  // not found
-}
-
-
-Lump_c * W_FindPatchLump(const char *name)
-{
-	for (short i = (int)master_dir.size()-1 ; i >= 0 ; i--)
-	{
-		Lump_c *L = master_dir[i]->FindLumpInNamespace(name, 'P');
-		if (L)
-			return L;
-	}
-
-	// Fallback: try free-standing lumps
-	Lump_c *L = W_FindLump(name);
-
-	// TODO: verify lump is OK (size etc)
-	if (L)
-		return L;
-
-	return NULL;  // not found
-}
-
-
 int W_LoadLumpData(Lump_c *lump, byte ** buf_ptr)
 {
 	// include an extra byte, used to NUL-terminate a text buffer
@@ -1291,67 +1243,6 @@ void W_FreeLumpData(byte ** buf_ptr)
 		delete[] *buf_ptr;
 		*buf_ptr = NULL;
 	}
-}
-
-
-//------------------------------------------------------------------------
-
-void MasterDir_Add(Wad_file *wad)
-{
-	DebugPrintf("MasterDir: adding '%s'\n", wad->PathName());
-
-	master_dir.push_back(wad);
-}
-
-
-void MasterDir_Remove(Wad_file *wad)
-{
-	DebugPrintf("MasterDir: removing '%s'\n", wad->PathName());
-
-	std::vector<Wad_file *>::iterator ENDP;
-
-	ENDP = std::remove(master_dir.begin(), master_dir.end(), wad);
-
-	master_dir.erase(ENDP, master_dir.end());
-}
-
-
-void MasterDir_CloseAll()
-{
-	while (master_dir.size() > 0)
-	{
-		Wad_file *wad = master_dir.back();
-
-		master_dir.pop_back();
-
-		delete wad;
-	}
-}
-
-
-int W_FilenameAbsCompare(const char *A, const char *B)
-{
-	static char A_buffer[FL_PATH_MAX];
-	static char B_buffer[FL_PATH_MAX];
-
-	fl_filename_absolute(A_buffer, sizeof(A_buffer), A);
-	fl_filename_absolute(B_buffer, sizeof(B_buffer), B);
-
-	return y_stricmp(A_buffer, B_buffer);
-}
-
-
-bool MasterDir_HaveFilename(const char *chk_path)
-{
-	for (unsigned int k = 0 ; k < master_dir.size() ; k++)
-	{
-		const char *wad_path = master_dir[k]->PathName();
-
-		if (W_FilenameAbsCompare(wad_path, chk_path) == 0)
-			return true;
-	}
-
-	return false;
 }
 
 
