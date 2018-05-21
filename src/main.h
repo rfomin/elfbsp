@@ -73,21 +73,21 @@
 #include "bsp.h"
 
 
+// !!!! FIXME !!!!
+
+#define SYS_ASSERT(...)  do {} while (0)
+#define LogPrintf(...)   do {} while (0)
+#define DebugPrintf(...) do {} while (0)
+
+#define FL_PATH_MAX  4096
+#define MSG_BUF_LEN  1024
+
+
 /*
  *  Miscellaneous
  */
 
 typedef std::vector< const char * > string_list_t;
-
-
-typedef enum
-{
-	MAPF_INVALID = 0,
-
-	MAPF_Doom,
-	MAPF_Hexen
-
-} map_format_e;
 
 
 // for this, set/clear/test bits using (1 << MAPF_xxx)
