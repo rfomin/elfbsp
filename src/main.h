@@ -22,8 +22,6 @@
 #define __AJBSP_MAIN_H__
 
 
-#define AJBSP_TITLE  "AJBSP"
-
 #define AJBSP_VERSION  "0.50"
 
 
@@ -71,7 +69,7 @@
 // !!!! FIXME !!!!
 
 #define SYS_ASSERT(...)  do {} while (0)
-#define LogPrintf(...)   do {} while (0)
+#define LogPrintf        printf
 #define DebugPrintf(...) do {} while (0)
 
 #define AJ_PATH_MAX  4096

@@ -31,10 +31,10 @@
 //  global variables
 //
 
-bool opt_fast		= false;
 bool opt_quiet		= false;
 bool opt_verbose	= false;
 bool opt_backup		= false;
+bool opt_fast		= false;
 
 bool opt_no_gl		= false;
 bool opt_force_v5	= false;
@@ -60,7 +60,6 @@ typedef struct map_range_s
 } map_range_t;
 
 std::vector< map_range_t > map_list;
-
 
 
 //
@@ -173,7 +172,7 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 	// loop over each level in the wad
 	for (int n = 0 ; n < num_levels ; n++)
 	{
-		// TODO : support a limited set of maps
+		// FIXME : support map_list
 
 		ret = AJBSP_BuildLevel(info, n);
 
@@ -210,29 +209,29 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 }
 
 
-void CMD_BuildAllNodes()
+void BackupFile(const char *filename)
 {
+	// FIXME
+}
+
+
+void VisitFile(unsigned int idx, const char *filename)
+{
+	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
-	{
-		FatalError("Cannot build nodes unless you are editing a PWAD.");
-		return;
-	}
+		FatalError("Cannot open pwad: %s\n", filename);
 
-
-	// this probably cannot happen, but check anyway
 	if (edit_wad->LevelCount() == 0)
 	{
-		FatalError("Cannot build nodes: no levels found!");
+		// FIXME : display something
 		return;
 	}
-
 
 	nb_info = new nodebuildinfo_t;
 
 	PrepareInfo(nb_info);
 
 	build_result_e ret = BuildAllNodes(nb_info);
-
 
 	if (ret == BUILD_OK)
 	{
@@ -248,12 +247,9 @@ void CMD_BuildAllNodes()
 	}
 
 	delete nb_info; nb_info = NULL;
-}
 
-
-void VisitFile(unsigned int idx, const char *filename)
-{
-	// FIXME !!!
+	// this closes the file
+	delete edit_wad; edit_wad = NULL;
 }
 
 
@@ -554,9 +550,7 @@ void ParseCommandLine(int argc, char *argv[])
 		}
 
 		if (strcmp(arg, "-") == 0)
-		{
-			// FIXME : bad option error
-		}
+			FatalError("illegal option '-'\n");
 
 		if (strcmp(arg, "--") == 0)
 		{
@@ -590,9 +584,8 @@ void ParseCommandLine(int argc, char *argv[])
 //
 int main(int argc, char *argv[])
 {
-	// sanity checks type sizes (useful when porting)
+	// sanity check on type sizes (useful when porting)
 	CheckTypeSizes();
-
 
 	ParseCommandLine(argc, argv);
 
@@ -603,7 +596,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("+-----------------------------------------------+\n");
-	printf("|   " AJBSP_TITLE " " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
+	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
 	printf("+-----------------------------------------------+\n");
 
 	if (opt_help || argc <= 1)
@@ -618,15 +611,26 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
+	{
+		const char *filename = wad_list[i];
+
+		//FIXME
+		// CheckInputFilename(filename);
+
+		if (! FileExists(filename))
+			FatalError("no such file: %s\n", filename);
+
+		if (opt_backup)
+			BackupFile(filename);
+	}
 
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
 	{
 		VisitFile(i, wad_list[i]);
 	}
 
-
 	// that's all folks!
-
 	return 0;
 }
 
