@@ -38,7 +38,7 @@ bool opt_no_gl		= false;
 bool opt_force_v5	= false;
 bool opt_force_xnod	= false;
 
-int  opt_factor		= DEFAULT_FACTOR;
+int  opt_split_cost	= DEFAULT_FACTOR;
 
 bool opt_help		= false;
 bool opt_version	= false;
@@ -125,7 +125,7 @@ void GB_PrintMsg(const char *str, ...)
 
 static void PrepareInfo(nodebuildinfo_t *info)
 {
-	info->factor	= CLAMP(1, opt_factor, 31);
+	info->factor	= CLAMP(1, opt_split_cost, 31);
 
 	info->gl_nodes	= ! opt_no_gl;
 	info->fast		= opt_fast;
@@ -255,7 +255,7 @@ static void ShowHelp()
 	//		"Home page: https://gitlab.com/andwj/ajbsp\n"
 			"\n");
 
-	printf( "USAGE: ajbsp [options...] FILE...\n"
+	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
 			"Available options are:\n");
 
@@ -273,13 +273,81 @@ static void ShowVersion()
 }
 
 
+void ParseShortArgument(const char *arg)
+{
+	// skip the leading '-'
+	arg++;
+
+	// FIXME
+}
+
+
+int ParseLongArgument(const char *name, int argc, char *argv[])
+{
+	// FIXME
+
+	return 0;
+}
+
+
 void ParseCommandLine(int argc, char *argv[])
 {
 	// skip program name
 	argc--;
 	argv++;
 
-	// FIXME !!!
+	bool rest_are_files = false;
+
+	while (argc > 0)
+	{
+		const char *arg = *argv++;
+		argc--;
+
+#ifdef __APPLE__
+		// ignore MacOS X rubbish
+		if (strncmp(arg, "-psn_", 5) == 0)
+			continue;
+#endif
+
+		if (strlen(arg) == 0)
+			continue;
+
+		// a normal filename?
+		if (arg[0] != '-' || rest_are_files)
+		{
+			wad_list.push_back(arg);
+			continue;
+		}
+
+		if (strcmp(arg, "-") == 0)
+		{
+			// FIXME : bad option error
+		}
+
+		if (strcmp(arg, "--") == 0)
+		{
+			rest_are_files = true;
+			continue;
+		}
+
+		// handle short args which are isolate and require a value
+		if (strcmp(arg, "-c") == 0) arg = "--cost";
+		if (strcmp(arg, "-m") == 0) arg = "--map";
+
+		if (arg[1] != '-')
+		{
+			ParseShortArgument(arg);
+			continue;
+		}
+
+		int count = ParseLongArgument(arg, argc, argv);
+
+		if (count > 0)
+		{
+			argc -= count;
+			argv += count;
+		}
+	}
 }
 
 
