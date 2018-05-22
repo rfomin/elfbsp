@@ -251,10 +251,13 @@ void VisitFile(unsigned int idx, const char *filename)
 
 static void ShowHelp()
 {
+	/*
 	printf(	"AJBSP is free software, under the terms of the GNU GPL\n"
 			"(General Public License), and has ABSOLUTELY NO WARRANTY.\n"
-	//		"Home page: https://gitlab.com/andwj/ajbsp\n"
 			"\n");
+	*/
+
+	printf("\n");
 
 	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
@@ -277,13 +280,15 @@ static void ShowHelp()
 			"and/or ranges can be specified, such as: MAP01,MAP04-MAP07\n"
 			);
 
+	//	"Home page: https://gitlab.com/andwj/ajbsp\n"
+
 	fflush(stdout);
 }
 
 
 static void ShowVersion()
 {
-	printf("ajbsp " AJBSP_VERSION " (" __DATE__ ")\n");
+	printf("ajbsp " AJBSP_VERSION "  (" __DATE__ ")\n");
 
 	fflush(stdout);
 }
@@ -484,13 +489,19 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	LogPrintf("\n");
-	LogPrintf("**** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ****\n");
-	LogPrintf("\n");
+	printf("+-----------------------------------------------+\n");
+	printf("|   " AJBSP_TITLE " " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
+	printf("+-----------------------------------------------+\n");
 
-	if (opt_help || wad_list.size() == 0)
+	if (opt_help || argc <= 1)
 	{
 		ShowHelp();
+		return 0;
+	}
+
+	if (wad_list.size() == 0)
+	{
+		FatalError("no files to process\n");
 		return 0;
 	}
 
@@ -502,8 +513,6 @@ int main(int argc, char *argv[])
 
 
 	// that's all folks!
-
-	LogPrintf("Quit\n");
 
 	return 0;
 }
