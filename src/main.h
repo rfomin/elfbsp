@@ -86,14 +86,6 @@ extern const char *Level_name;  // Name of map lump we are editing
 
 extern map_format_e Level_format; // format of current map
 
-extern const char *Pwad_name;   // Filename of current wad, or NULL
-
-extern std::vector< const char * > Pwad_list;
-
-
-extern int   show_help;		// Print usage message and exit.
-extern int   show_version;	// Print version info and exit.
-
 
 /*
  *  Global functions

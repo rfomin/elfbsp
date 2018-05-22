@@ -40,13 +40,11 @@ bool opt_force_xnod	= false;
 
 int  opt_factor		= DEFAULT_FACTOR;
 
-int show_help     = 0;
-int show_version  = 0;
+bool opt_help		= false;
+bool opt_version	= false;
 
 
-const char *Pwad_name = NULL;
-
-std::vector< const char * > Pwad_list;
+std::vector< const char * > wad_list;
 
 const char *Level_name;
 
@@ -242,20 +240,22 @@ void CMD_BuildAllNodes()
 }
 
 
+void VisitFile(unsigned int idx, const char *filename)
+{
+	// FIXME !!!
+}
+
+
 // ----- user information -----------------------------
 
 static void ShowHelp()
 {
-	printf(	"\n"
-			"*** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ***\n"
-			"\n");
-
 	printf(	"AJBSP is free software, under the terms of the GNU General\n"
 			"Public License (GPL), and comes with ABSOLUTELY NO WARRANTY.\n"
 	//		"Home page: https://gitlab.com/andwj/ajbsp\n"
 			"\n");
 
-	printf( "USAGE: ajbsp [options...] [FILE...]\n"
+	printf( "USAGE: ajbsp [options...] FILE...\n"
 			"\n"
 			"Available options are:\n");
 
@@ -267,40 +267,19 @@ static void ShowHelp()
 
 static void ShowVersion()
 {
-	printf("AJBSP version " AJBSP_VERSION " (" __DATE__ ")\n");
+	printf("ajbsp " AJBSP_VERSION " (" __DATE__ ")\n");
 
 	fflush(stdout);
 }
 
 
-static void ShowTime()
+void ParseCommandLine(int argc, char *argv[])
 {
-#ifdef WIN32
-	SYSTEMTIME sys_time;
+	// skip program name
+	argc--;
+	argv++;
 
-	GetSystemTime(&sys_time);
-
-	LogPrintf("Current time: %02d:%02d on %04d/%02d/%02d\n",
-			  sys_time.wHour, sys_time.wMinute,
-			  sys_time.wYear, sys_time.wMonth, sys_time.wDay);
-
-#else // LINUX or MACOSX
-
-	time_t epoch_time;
-	struct tm *calend_time;
-
-	if (time(&epoch_time) == (time_t)-1)
-		return;
-
-	calend_time = localtime(&epoch_time);
-	if (! calend_time)
-		return;
-
-	LogPrintf("Current time: %02d:%02d on %04d/%02d/%02d\n",
-			  calend_time->tm_hour, calend_time->tm_min,
-			  calend_time->tm_year + 1900, calend_time->tm_mon + 1,
-			  calend_time->tm_mday);
-#endif
+	// FIXME !!!
 }
 
 
@@ -309,57 +288,36 @@ static void ShowTime()
 //
 int main(int argc, char *argv[])
 {
-	// a quick pass through the command line arguments
-	// to handle special options, like --help, --install, --config
-// FIXME	M_ParseCommandLine(argc - 1, argv + 1);
+	// sanity checks type sizes (useful when porting)
+	CheckTypeSizes();
 
-	if (show_help)
-	{
-		ShowHelp();
-		return 0;
-	}
-	else if (show_version)
+
+	ParseCommandLine(argc, argv);
+
+	if (opt_version)
 	{
 		ShowVersion();
 		return 0;
 	}
 
-
 	LogPrintf("\n");
 	LogPrintf("**** " AJBSP_TITLE " v" AJBSP_VERSION " (C) 2018 Andrew Apted, et al ****\n");
 	LogPrintf("\n");
 
-	// sanity checks type sizes (useful when porting)
-	CheckTypeSizes();
-
-	ShowTime();
-
-
-// FIXME
-#if 0
-	// environment variables can override them
-	M_ParseEnvironmentVars();
-
-	// and command line arguments will override both
-	M_ParseCommandLine(argc - 1, argv + 1, 2);
-#endif
-
-
-	// open a specified PWAD now
-	// [ the map is loaded later.... ]
-
-	if (Pwad_list.size() > 0)
+	if (opt_help || wad_list.size() == 0)
 	{
-		// FIXME
-	}
-	else
-	{
-		// FIXME
+		ShowHelp();
+		return 0;
 	}
 
 
-quit:
-	/* that's all folks! */
+	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
+	{
+		VisitFile(i, wad_list[i]);
+	}
+
+
+	// that's all folks!
 
 	LogPrintf("Quit\n");
 
