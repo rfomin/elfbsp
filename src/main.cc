@@ -264,7 +264,7 @@ static void ShowHelp()
 			"\n"
 			"    -b --backup        Backup input files (.bak extension)\n"
 			"    -f --fast          Faster partition selection\n"
-			"    -m --map    XXX    Limit which map(s) are built\n"
+			"    -m --map    XXX    Control which map(s) are built\n"
 			"\n"
 			"    -n --nogl          Disable creation of GL-Nodes\n"
 			"    -x --xnod          Use XNOD format for normal nodes\n"
@@ -303,8 +303,8 @@ void ParseShortArgument(const char *arg)
 		{
 			case 'b': opt_backup = true; continue;
 			case 'f': opt_fast = true; continue;
+			case 'h': opt_help = true; continue;
 			case 'n': opt_no_gl = true; continue;
-
 			case 'q': opt_quiet = true; continue;
 			case 'v': opt_verbose = true; continue;
 			case 'x': opt_force_xnod = true; continue;
@@ -335,13 +335,9 @@ void ParseShortArgument(const char *arg)
 
 			default:
 				if (isprint(c) && !isspace(c))
-				{
 					FatalError("unknown short option: '-%c'\n", c);
-				}
 				else
-				{
 					FatalError("illegal short option (ascii code %d)\n", (int)(unsigned char)c);
-				}
 				return;
 		}
 	}
@@ -350,9 +346,63 @@ void ParseShortArgument(const char *arg)
 
 int ParseLongArgument(const char *name, int argc, char *argv[])
 {
-	// FIXME
+	int used = 0;
 
-	return 0;
+	if (strcmp(name, "--help") == 0)
+	{
+		opt_help = true;
+	}
+	else if (strcmp(name, "--version") == 0)
+	{
+		opt_version = true;
+	}
+	else if (strcmp(name, "--quiet") == 0)
+	{
+		opt_quiet = true;
+	}
+	else if (strcmp(name, "--verbose") == 0)
+	{
+		opt_verbose = true;
+	}
+	else if (strcmp(name, "--backup") == 0 || strcmp(name, "--backups") == 0)
+	{
+		opt_backup = true;
+	}
+	else if (strcmp(name, "--fast") == 0)
+	{
+		opt_fast = true;
+	}
+	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
+	{
+		// FIXME
+	}
+	else if (strcmp(name, "--nogl") == 0 || strcmp(name, "--no-gl") == 0)
+	{
+		opt_no_gl = true;
+	}
+	else if (strcmp(name, "--xnod") == 0)
+	{
+		opt_force_xnod = true;
+	}
+	else if (strcmp(name, "--cost") == 0)
+	{
+		if (argc < 1 || ! isdigit(argv[0][0]))
+			FatalError("missing value for '--cost' option\n");
+
+		int val = atoi(argv[0]);
+
+		if (val < 1 || val > 32)
+			FatalError("illegal value for '--cost' option\n");
+
+		opt_split_cost = val;
+		used = 1;
+	}
+	else
+	{
+		FatalError("unknown long option: '%s'\n", name);
+	}
+
+	return used;
 }
 
 
