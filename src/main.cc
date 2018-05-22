@@ -126,7 +126,7 @@ void GB_PrintMsg(const char *str, ...)
 
 static void PrepareInfo(nodebuildinfo_t *info)
 {
-	info->factor	= CLAMP(1, opt_split_cost, 31);
+	info->factor	= CLAMP(1, opt_split_cost, 32);
 
 	info->gl_nodes	= ! opt_no_gl;
 	info->fast		= opt_fast;
@@ -251,16 +251,31 @@ void VisitFile(unsigned int idx, const char *filename)
 
 static void ShowHelp()
 {
-	printf(	"AJBSP is free software, under the terms of the GNU General\n"
-			"Public License (GPL), and comes with ABSOLUTELY NO WARRANTY.\n"
+	printf(	"AJBSP is free software, under the terms of the GNU GPL\n"
+			"(General Public License), and has ABSOLUTELY NO WARRANTY.\n"
 	//		"Home page: https://gitlab.com/andwj/ajbsp\n"
 			"\n");
 
 	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
-			"Available options are:\n");
-
-//FIXME	M_PrintCommandLineOptions(stdout);
+			"Available options are:\n"
+			"    -q --quiet         Quiet output, only show errors\n"
+			"    -v --verbose       Verbose output, show all warnings\n"
+			"\n"
+			"    -b --backup        Backup input files (.bak extension)\n"
+			"    -f --fast          Faster partition selection\n"
+			"    -m --map    XXX    Limit which map(s) are built\n"
+			"\n"
+			"    -n --nogl          Disable creation of GL-Nodes\n"
+			"    -x --xnod          Use XNOD format for normal nodes\n"
+			"    -c --cost   ###    Cost assigned to seg splits (1-32)\n"
+			"\n"
+			"Short options may be mixed, for example: -fbc23\n"
+			"Long options must always begin with a double hyphen\n"
+			"\n"
+			"Map names should be full, like E1M3 or MAP24, but a list\n"
+			"and/or ranges can be specified, such as: MAP01,MAP04-MAP07\n"
+			);
 
 	fflush(stdout);
 }
@@ -312,7 +327,7 @@ void ParseShortArgument(const char *arg)
 					arg++;
 				}
 
-				if (val < 1 || val > 31)
+				if (val < 1 || val > 32)
 					FatalError("illegal value for '-c' option\n");
 
 				opt_split_cost = val;
