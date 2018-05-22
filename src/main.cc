@@ -32,12 +32,13 @@
 //
 
 bool opt_fast		= false;
+bool opt_quiet		= false;
 bool opt_verbose	= false;
+bool opt_backup		= false;
 
 bool opt_no_gl		= false;
 bool opt_force_v5	= false;
 bool opt_force_xnod	= false;
-
 int  opt_split_cost	= DEFAULT_FACTOR;
 
 bool opt_help		= false;
@@ -278,7 +279,57 @@ void ParseShortArgument(const char *arg)
 	// skip the leading '-'
 	arg++;
 
-	// FIXME
+	while (*arg)
+	{
+		char c = *arg++;
+		int val = 0;
+
+		switch (c)
+		{
+			case 'b': opt_backup = true; continue;
+			case 'f': opt_fast = true; continue;
+			case 'n': opt_no_gl = true; continue;
+
+			case 'q': opt_quiet = true; continue;
+			case 'v': opt_verbose = true; continue;
+			case 'x': opt_force_xnod = true; continue;
+
+			case 'm':
+				FatalError("cannot use option '-m' like that\n");
+				return;
+
+			case 'c':
+				if (*arg == 0 || ! isdigit(*arg))
+					FatalError("missing value for '-c' option\n");
+
+				// we only accept one or two digits here
+				val = *arg - '0';
+				arg++;
+
+				if (*arg && isdigit(*arg))
+				{
+					val = (val * 10) + (*arg - '0');
+					arg++;
+				}
+
+				if (val < 1 || val > 31)
+					FatalError("illegal value for '-c' option\n");
+
+				opt_split_cost = val;
+				continue;
+
+			default:
+				if (isprint(c) && !isspace(c))
+				{
+					FatalError("unknown short option: '-%c'\n", c);
+				}
+				else
+				{
+					FatalError("illegal short option (ascii code %d)\n", (int)(unsigned char)c);
+				}
+				return;
+		}
+	}
 }
 
 
