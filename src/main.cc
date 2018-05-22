@@ -52,6 +52,16 @@ const char *Level_name;
 map_format_e Level_format;
 
 
+typedef struct map_range_s
+{
+	const char *low;
+	const char *high;
+
+} map_range_t;
+
+std::vector< map_range_t > map_list;
+
+
 
 //
 //  show an error message and terminate the program
@@ -294,6 +304,104 @@ static void ShowVersion()
 }
 
 
+bool ValidateMapName(char *name)
+{
+	if (strlen(name) < 2 || strlen(name) > 8)
+		return false;
+
+	if (! isalpha(name[0]))
+		return false;
+
+	for (const char *p = name ; *p ; p++)
+	{
+		if (! (isalnum(*p) || *p == '_'))
+			return false;
+	}
+
+	// Ok, convert to upper case
+	for (char *s = name ; *s ; s++)
+	{
+		*s = toupper(*s);
+	}
+
+	return true;
+}
+
+
+void ParseMapRange(char *tok)
+{
+	char *low  = tok;
+	char *high = tok;
+
+	// look for '-' separator
+	char *p = strchr(tok, '-');
+
+	if (p)
+	{
+		*p++ = 0;
+
+		high = p;
+	}
+
+	if (! ValidateMapName(low))
+		FatalError("illegal map name: '%s'\n", low);
+
+	if (! ValidateMapName(high))
+		FatalError("illegal map name: '%s'\n", high);
+
+	if (strlen(low) < strlen(high))
+		FatalError("bad map range (%s shorter than %s)\n", low, high);
+
+	if (strlen(low) > strlen(high))
+		FatalError("bad map range (%s longer than %s)\n", low, high);
+
+	if (low[0] != high[0])
+		FatalError("bad map range (%s and %s start with different letters)\n", low, high);
+
+	if (strcmp(low, high) > 0)
+		FatalError("bad map range (%s comes after %s)\n", low, high);
+
+	// Ok
+
+	map_range_t range;
+
+	range.low  = low;
+	range.high = high;
+
+	map_list.push_back(range);
+}
+
+
+void ParseMapList(const char *from_arg)
+{
+	// create a mutable copy of the string
+	// [ we will keep long-term pointers into this buffer ]
+	char *buf = StringDup(from_arg);
+
+	char *arg = buf;
+
+	while (*arg)
+	{
+		if (*arg == ',')
+			FatalError("bad map list (empty element)\n");
+
+		// find next comma
+		char *tok = arg;
+		arg++;
+
+		while (*arg && *arg != ',')
+			arg++;
+
+		if (*arg == ',')
+		{
+			*arg++ = 0;
+		}
+
+		ParseMapRange(tok);
+	}
+}
+
+
 void ParseShortArgument(const char *arg)
 {
 	// skip the leading '-'
@@ -379,7 +487,12 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
-		// FIXME
+		if (argc < 1 || argv[0][0] == '-')
+			FatalError("missing value(s) for '--map' option\n");
+
+		ParseMapList(argv[0]);
+
+		used = 1;
 	}
 	else if (strcmp(name, "--nogl") == 0 || strcmp(name, "--no-gl") == 0)
 	{
