@@ -69,7 +69,6 @@
 // !!!! FIXME !!!!
 
 #define LogPrintf        printf
-#define DebugPrintf(...) do {} while (0)
 
 #define AJ_PATH_MAX  4096
 #define MSG_BUF_LEN  1024
@@ -95,9 +94,9 @@ __attribute__((noreturn))
 #endif
 void FatalError(const char *fmt, ...);
 
-#define BugError  FatalError
+void DebugPrintf(const char *fmt, ...);
 
-#define Status_Set  LogPrintf
+#define BugError  FatalError
 
 
 /*

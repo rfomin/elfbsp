@@ -83,6 +83,12 @@ void FatalError(const char *fmt, ...)
 }
 
 
+void DebugPrintf(const char *str, ...)
+{
+	(void) str;
+}
+
+
 //------------------------------------------------------------------------
 
 
