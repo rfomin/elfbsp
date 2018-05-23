@@ -128,7 +128,8 @@ void GB_PrintMsg(const char *str, ...)
 
 	message_buf[MSG_BUF_LEN-1] = 0;
 
-	LogPrintf("BSP: %s", message_buf);
+	printf("    %s", message_buf);
+	fflush(stdout);
 }
 
 
@@ -155,8 +156,6 @@ static void PrepareInfo(nodebuildinfo_t *info)
 
 static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 {
-	LogPrintf("\n");
-
 	// sanity check
 
 	SYS_ASSERT(1 <= info->factor && info->factor <= 32);
@@ -290,24 +289,17 @@ void VisitFile(unsigned int idx, const char *filename)
 
 		build_result_e ret = BuildAllNodes(nb_info);
 
-		if (ret == BUILD_OK)
-		{
-			LogPrintf("OK\n");
-		}
-		else if (nb_info->cancelled)
-		{
-			LogPrintf("Cancelled!");
-		}
-		else
-		{
-			LogPrintf("Error(s) occurred!\n");
-		}
+		if (ret != BUILD_OK)
+		{ /* TODO */ }
 
 		delete nb_info; nb_info = NULL;
 	}
 
 	// this closes the file
 	delete edit_wad; edit_wad = NULL;
+
+	// FIXME
+	// if build failed, FatalError()
 }
 
 
@@ -335,7 +327,7 @@ static void ShowHelp()
 			"    -x --xnod          Use XNOD format for normal nodes\n"
 			"    -c --cost   ###    Cost assigned to seg splits (1-32)\n"
 			"\n"
-			"Short options may be mixed, for example: -fbc23\n"
+			"Short options may be mixed, for example: -fbv\n"
 			"Long options must always begin with a double hyphen\n"
 			"\n"
 			"Map names should be full, like E1M3 or MAP24, but a list\n"

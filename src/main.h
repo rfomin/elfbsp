@@ -52,8 +52,9 @@
 
 
 /*
- *  Source headers
+ *  code headers
  */
+
 #include "sys_type.h"
 #include "sys_macro.h"
 #include "sys_endian.h"
@@ -66,11 +67,12 @@
 #include "bsp.h"
 
 
-// !!!! FIXME !!!!
-
-#define LogPrintf        printf
+/*
+ *  Misc constants
+ */
 
 #define AJ_PATH_MAX  4096
+
 #define MSG_BUF_LEN  1024
 
 
@@ -102,6 +104,7 @@ void DebugPrintf(const char *fmt, ...);
 /*
  *  Assertions
  */
+
 #if defined(__GNUC__)
 #define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
         BugError("Assertion (%s) failed\nIn function %s (%s:%d)\n", #cond , __func__, __FILE__, __LINE__))
