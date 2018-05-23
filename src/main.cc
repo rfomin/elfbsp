@@ -188,7 +188,7 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 	if (ret == BUILD_OK)
 	{
 		GB_PrintMsg("\n");
-		GB_PrintMsg("Total filed maps: %d\n", info->total_failed_maps);
+		GB_PrintMsg("Total failed maps: %d\n", info->total_failed_maps);
 		GB_PrintMsg("Total warnings: %d serious, %d minor\n", info->total_warnings,
 					info->total_minor_warnings);
 	}
@@ -247,42 +247,57 @@ void ValidateInputFilename(const char *filename)
 
 void BackupFile(const char *filename)
 {
-	// FIXME
+	const char *dest_name = ReplaceExtension(filename, "bak");
+
+	if (! FileCopy(filename, dest_name))
+		FatalError("failed to create backup: %s\n", dest_name);
+
+	// TODO : REVIEW THIS
+	printf("Created backup: %s\n", dest_name);
+	fflush(stdout);
 }
 
 
 void VisitFile(unsigned int idx, const char *filename)
 {
+	if (opt_backup)
+		BackupFile(filename);
+
 	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
 		FatalError("Cannot open pwad: %s\n", filename);
 
+	// FIXME: REVIEW THIS  [ wad code prints a message, grrr!! ]
+//??	printf("Opened file: %s\n", filename);
+//??	fflush(stdout);
+
 	if (edit_wad->LevelCount() == 0)
 	{
-		// FIXME : display something
-		return;
-	}
-
-	nb_info = new nodebuildinfo_t;
-
-	PrepareInfo(nb_info);
-
-	build_result_e ret = BuildAllNodes(nb_info);
-
-	if (ret == BUILD_OK)
-	{
-		Status_Set("Built nodes OK");
-	}
-	else if (nb_info->cancelled)
-	{
-		Status_Set("Cancelled");
+		// display something?
 	}
 	else
 	{
-		Status_Set("Error building nodes");
-	}
+		nb_info = new nodebuildinfo_t;
 
-	delete nb_info; nb_info = NULL;
+		PrepareInfo(nb_info);
+
+		build_result_e ret = BuildAllNodes(nb_info);
+
+		if (ret == BUILD_OK)
+		{
+			LogPrintf("OK\n");
+		}
+		else if (nb_info->cancelled)
+		{
+			LogPrintf("Cancelled!");
+		}
+		else
+		{
+			LogPrintf("Error(s) occurred!\n");
+		}
+
+		delete nb_info; nb_info = NULL;
+	}
 
 	// this closes the file
 	delete edit_wad; edit_wad = NULL;
@@ -647,6 +662,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	// validate all filenames before processing any of them
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
 	{
 		const char *filename = wad_list[i];
@@ -655,9 +671,6 @@ int main(int argc, char *argv[])
 
 		if (! FileExists(filename))
 			FatalError("no such file: %s\n", filename);
-
-		if (opt_backup)
-			BackupFile(filename);
 	}
 
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
