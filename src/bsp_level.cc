@@ -2279,10 +2279,19 @@ static const char *CalcOptionsString()
 {
 	static char buffer[256];
 
-	sprintf(buffer, "--factor %d", cur_info->factor);
+	sprintf(buffer, "--cost %d", cur_info->factor);
 
 	if (cur_info->fast)
 		strcat(buffer, " --fast");
+
+	if (! cur_info->gl_nodes)
+		strcat(buffer, " --nogl");
+
+	if (cur_info->force_v5)
+		strcat(buffer, " --v5");
+
+	if (cur_info->force_xnod)
+		strcat(buffer, " --xnod");
 
 	return buffer;
 }
