@@ -28,6 +28,12 @@ Wad_file * edit_wad;
 #define MAX_LUMPS_IN_A_LEVEL	21
 
 
+void LumpWarning(const char *str, ...)
+{
+	(void) str;
+}
+
+
 //------------------------------------------------------------------------
 //  LUMP Handling
 //------------------------------------------------------------------------
@@ -650,7 +656,7 @@ void Wad_file::ProcessNamespaces()
 		if (y_stricmp(name, "P_START") == 0 || y_stricmp(name, "PP_START") == 0)
 		{
 			if (active && active != 'P')
-				LogPrintf("WARNING: missing %c_END marker.\n", active);
+				LumpWarning("missing %c_END marker.\n", active);
 
 			active = 'P';
 			continue;
@@ -658,7 +664,7 @@ void Wad_file::ProcessNamespaces()
 		else if (y_stricmp(name, "P_END") == 0 || y_stricmp(name, "PP_END") == 0)
 		{
 			if (active != 'P')
-				LogPrintf("WARNING: stray P_END marker found.\n");
+				LumpWarning("stray P_END marker found.\n");
 
 			active = 0;
 			continue;
@@ -667,7 +673,7 @@ void Wad_file::ProcessNamespaces()
 		if (y_stricmp(name, "S_START") == 0 || y_stricmp(name, "SS_START") == 0)
 		{
 			if (active && active != 'S')
-				LogPrintf("WARNING: missing %c_END marker.\n", active);
+				LumpWarning("missing %c_END marker.\n", active);
 
 			active = 'S';
 			continue;
@@ -675,7 +681,7 @@ void Wad_file::ProcessNamespaces()
 		else if (y_stricmp(name, "S_END") == 0 || y_stricmp(name, "SS_END") == 0)
 		{
 			if (active != 'S')
-				LogPrintf("WARNING: stray S_END marker found.\n");
+				LumpWarning("stray S_END marker found.\n");
 
 			active = 0;
 			continue;
@@ -684,7 +690,7 @@ void Wad_file::ProcessNamespaces()
 		if (y_stricmp(name, "F_START") == 0 || y_stricmp(name, "FF_START") == 0)
 		{
 			if (active && active != 'F')
-				LogPrintf("WARNING: missing %c_END marker.\n", active);
+				LumpWarning("missing %c_END marker.\n", active);
 
 			active = 'F';
 			continue;
@@ -692,7 +698,7 @@ void Wad_file::ProcessNamespaces()
 		else if (y_stricmp(name, "F_END") == 0 || y_stricmp(name, "FF_END") == 0)
 		{
 			if (active != 'F')
-				LogPrintf("WARNING: stray F_END marker found.\n");
+				LumpWarning("stray F_END marker found.\n");
 
 			active = 0;
 			continue;
@@ -701,7 +707,7 @@ void Wad_file::ProcessNamespaces()
 		if (y_stricmp(name, "TX_START") == 0)
 		{
 			if (active && active != 'T')
-				LogPrintf("WARNING: missing %c_END marker.\n", active);
+				LumpWarning("missing %c_END marker.\n", active);
 
 			active = 'T';
 			continue;
@@ -709,7 +715,7 @@ void Wad_file::ProcessNamespaces()
 		else if (y_stricmp(name, "TX_END") == 0)
 		{
 			if (active != 'T')
-				LogPrintf("WARNING: stray TX_END marker found.\n");
+				LumpWarning("stray TX_END marker found.\n");
 
 			active = 0;
 			continue;
@@ -719,7 +725,7 @@ void Wad_file::ProcessNamespaces()
 		{
 			if (directory[k]->Length() == 0)
 			{
-				LogPrintf("WARNING: skipping empty lump %s in %c_START\n",
+				LumpWarning("skipping empty lump %s in %c_START\n",
 						  name, active);
 				continue;
 			}
@@ -740,7 +746,7 @@ void Wad_file::ProcessNamespaces()
 	}
 
 	if (active)
-		LogPrintf("WARNING: Missing %c_END marker (at EOF)\n", active);
+		LumpWarning("Missing %c_END marker (at EOF)\n", active);
 }
 
 
