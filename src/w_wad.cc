@@ -33,6 +33,11 @@ void LumpWarning(const char *str, ...)
 	(void) str;
 }
 
+void FileMessage(const char *str, ...)
+{
+	(void) str;
+}
+
 
 //------------------------------------------------------------------------
 //  LUMP Handling
@@ -196,7 +201,7 @@ Wad_file::Wad_file(const char *_name, char _mode, FILE * _fp) :
 
 Wad_file::~Wad_file()
 {
-	LogPrintf("Closing WAD file: %s\n", filename);
+	FileMessage("Closing WAD file: %s\n", filename);
 
 	fclose(fp);
 
@@ -217,7 +222,7 @@ Wad_file * Wad_file::Open(const char *filename, char mode)
 	if (mode == 'w')
 		return Create(filename, mode);
 
-	LogPrintf("Opening WAD file: %s\n", filename);
+	FileMessage("Opening WAD file: %s\n", filename);
 
 	FILE *fp = NULL;
 
@@ -233,13 +238,13 @@ retry:
 		// if file is read-only, open in 'r' mode instead
 		if (mode == 'a' && (errno == EACCES || errno == EROFS))
 		{
-			LogPrintf("Open r/w failed, trying again in read mode...\n");
+			FileMessage("Open r/w failed, trying again in read mode...\n");
 			mode = 'r';
 			goto retry;
 		}
 
 		int what = errno;
-		LogPrintf("Open failed: %s\n", strerror(what));
+		FileMessage("Open file failed: %s\n", strerror(what));
 		return NULL;
 	}
 
@@ -266,7 +271,7 @@ retry:
 
 Wad_file * Wad_file::Create(const char *filename, char mode)
 {
-	LogPrintf("Creating new WAD file: %s\n", filename);
+	FileMessage("Creating new WAD file: %s\n", filename);
 
 	FILE *fp = fopen(filename, "w+b");
 	if (! fp)
