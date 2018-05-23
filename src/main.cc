@@ -258,7 +258,15 @@ void VisitFile(unsigned int idx, const char *filename)
 
 	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
-		FatalError("Cannot open pwad: %s\n", filename);
+		FatalError("Cannot open file: %s\n", filename);
+
+	if (edit_wad->IsReadOnly())
+	{
+		delete edit_wad; edit_wad = NULL;
+
+		FatalError("file is read only: %s\n", filename);
+	}
+
 
 	// FIXME: REVIEW THIS  [ wad code prints a message, grrr!! ]
 //??	printf("Opened file: %s\n", filename);
