@@ -77,14 +77,7 @@ void FatalError(const char *fmt, ...)
 
 	buffer[MSG_BUF_LEN-1] = 0;
 
-	if (true)
-	{
-		fprintf(stderr, "\nFATAL ERROR: %s", buffer);
-	}
-	else //???
-	{
-		LogPrintf("\nFATAL ERROR: %s", buffer);
-	}
+	fprintf(stderr, "\nFATAL ERROR: %s", buffer);
 
 	exit(2);
 }
