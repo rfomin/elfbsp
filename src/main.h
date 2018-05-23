@@ -68,7 +68,6 @@
 
 // !!!! FIXME !!!!
 
-#define SYS_ASSERT(...)  do {} while (0)
 #define LogPrintf        printf
 #define DebugPrintf(...) do {} while (0)
 
@@ -97,6 +96,19 @@ void FatalError(const char *fmt, ...);
 #define BugError  FatalError
 
 #define Status_Set  LogPrintf
+
+
+/*
+ *  Assertions
+ */
+#if defined(__GNUC__)
+#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
+        BugError("Assertion (%s) failed\nIn function %s (%s:%d)\n", #cond , __func__, __FILE__, __LINE__))
+
+#else
+#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
+        BugError("Assertion (%s) failed\nIn file %s:%d\n", #cond , __FILE__, __LINE__))
+#endif
 
 
 #endif  /* __AJBSP_MAIN_H__ */
