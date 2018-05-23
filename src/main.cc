@@ -209,6 +209,42 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 }
 
 
+void ValidateInputFilename(const char *filename)
+{
+	// NOTE: these checks are case-insensitive
+
+	// files with ".bak" extension cannot be backed up, so refuse them
+	if (MatchExtension(filename, "bak"))
+		FatalError("cannot process a backup file: %s\n", filename);
+
+	// GWA files only contain GL-nodes, never any maps
+	if (MatchExtension(filename, "gwa"))
+		FatalError("cannot process a GWA file: %s\n", filename);
+
+	// we do not support packages
+	if (MatchExtension(filename, "pak") || MatchExtension(filename, "pk2") ||
+		MatchExtension(filename, "pk3") || MatchExtension(filename, "pk4") ||
+		MatchExtension(filename, "pk7") ||
+		MatchExtension(filename, "epk") || MatchExtension(filename, "pack") ||
+		MatchExtension(filename, "zip") || MatchExtension(filename, "rar"))
+	{
+		FatalError("package files (like PK3) are not supported: %s\n", filename);
+	}
+
+	// check some very common formats
+	if (MatchExtension(filename, "exe") || MatchExtension(filename, "dll") ||
+		MatchExtension(filename, "com") || MatchExtension(filename, "bat") ||
+		MatchExtension(filename, "txt") || MatchExtension(filename, "doc") ||
+		MatchExtension(filename, "deh") || MatchExtension(filename, "bex") ||
+		MatchExtension(filename, "lmp") || MatchExtension(filename, "cfg") ||
+		MatchExtension(filename, "gif") || MatchExtension(filename, "png") ||
+		MatchExtension(filename, "jpg") || MatchExtension(filename, "jpeg"))
+	{
+		FatalError("not a wad file: %s\n", filename);
+	}
+}
+
+
 void BackupFile(const char *filename)
 {
 	// FIXME
@@ -615,8 +651,7 @@ int main(int argc, char *argv[])
 	{
 		const char *filename = wad_list[i];
 
-		//FIXME
-		// CheckInputFilename(filename);
+		ValidateInputFilename(filename);
 
 		if (! FileExists(filename))
 			FatalError("no such file: %s\n", filename);
