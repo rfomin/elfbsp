@@ -31,8 +31,8 @@
 //  global variables
 //
 
-bool opt_quiet		= false;
-bool opt_verbose	= false;
+int opt_verbosity = 1;  // 0 is quiet, 1 is normal, 2+ is verbose
+
 bool opt_backup		= false;
 bool opt_fast		= false;
 
@@ -139,7 +139,7 @@ static void PrepareInfo(nodebuildinfo_t *info)
 
 	info->gl_nodes	= ! opt_no_gl;
 	info->fast		= opt_fast;
-	info->warnings	= opt_verbose;
+	info->warnings	= (opt_verbosity >= 2);
 
 	info->force_v5			= opt_force_v5;
 	info->force_xnod		= opt_force_xnod;
@@ -314,8 +314,6 @@ static void ShowHelp()
 			"\n");
 	*/
 
-	printf("\n");
-
 	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
 			"Available options are:\n"
@@ -348,6 +346,15 @@ static void ShowVersion()
 	printf("ajbsp " AJBSP_VERSION "  (" __DATE__ ")\n");
 
 	fflush(stdout);
+}
+
+
+static void ShowBanner()
+{
+	printf("+-----------------------------------------------+\n");
+	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
+	printf("+-----------------------------------------------+\n");
+	printf("\n");
 }
 
 
@@ -461,12 +468,13 @@ void ParseShortArgument(const char *arg)
 
 		switch (c)
 		{
+			case 'q': opt_verbosity = 0; continue;
+			case 'v': opt_verbosity += 1; continue;
+
 			case 'b': opt_backup = true; continue;
 			case 'f': opt_fast = true; continue;
 			case 'h': opt_help = true; continue;
 			case 'n': opt_no_gl = true; continue;
-			case 'q': opt_quiet = true; continue;
-			case 'v': opt_verbose = true; continue;
 			case 'x': opt_force_xnod = true; continue;
 
 			case 'm':
@@ -518,11 +526,11 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--quiet") == 0)
 	{
-		opt_quiet = true;
+		opt_verbosity = 0;
 	}
 	else if (strcmp(name, "--verbose") == 0)
 	{
-		opt_verbose = true;
+		opt_verbosity += 1;
 	}
 	else if (strcmp(name, "--backup") == 0 || strcmp(name, "--backups") == 0)
 	{
@@ -646,12 +654,9 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	printf("+-----------------------------------------------+\n");
-	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
-	printf("+-----------------------------------------------+\n");
-
 	if (opt_help || argc <= 1)
 	{
+		ShowBanner();
 		ShowHelp();
 		return 0;
 	}
@@ -661,6 +666,9 @@ int main(int argc, char *argv[])
 		FatalError("no files to process\n");
 		return 0;
 	}
+
+	if (opt_verbosity >= 1)
+		ShowBanner();
 
 	// validate all filenames before processing any of them
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
