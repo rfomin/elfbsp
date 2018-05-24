@@ -203,12 +203,16 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 	int num_levels = edit_wad->LevelCount();
 	SYS_ASSERT(num_levels > 0);
 
-	build_result_e ret;
+	int visited = 0;
+
+	build_result_e ret = BUILD_OK;
 
 	// loop over each level in the wad
 	for (int n = 0 ; n < num_levels ; n++)
 	{
 		// FIXME : support map_list
+
+		visited += 1;
 
 		ret = AJBSP_BuildLevel(info, n);
 
@@ -221,7 +225,11 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 		}
 	}
 
-	if (ret == BUILD_OK)
+	if (visited == 0)
+	{
+		PrintMsg("  No matching levels\n");
+	}
+	else if (ret == BUILD_OK)
 	{
 		PrintMsg("  Total failed maps: %d\n", info->total_failed_maps);
 		PrintMsg("  Total warnings: %d serious, %d minor\n", info->total_warnings,
@@ -312,7 +320,7 @@ void VisitFile(unsigned int idx, const char *filename)
 
 	if (edit_wad->LevelCount() == 0)
 	{
-		// display something?
+		PrintMsg("  No levels in wad\n");
 	}
 	else
 	{
