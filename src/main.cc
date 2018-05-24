@@ -31,7 +31,7 @@
 //  global variables
 //
 
-int opt_verbosity = 1;  // 0 is quiet, 1 is normal, 2+ is verbose
+int opt_verbosity = 0;  // 0 is normal, 1+ is verbose
 
 bool opt_backup		= false;
 bool opt_fast		= false;
@@ -139,7 +139,7 @@ static void PrepareInfo(nodebuildinfo_t *info)
 
 	info->gl_nodes	= ! opt_no_gl;
 	info->fast		= opt_fast;
-	info->warnings	= (opt_verbosity >= 2);
+	info->warnings	= (opt_verbosity >= 1);
 
 	info->force_v5			= opt_force_v5;
 	info->force_xnod		= opt_force_xnod;
@@ -316,9 +316,7 @@ static void ShowHelp()
 	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
 			"Available options are:\n"
-			"    -q --quiet         Quiet output, only show errors\n"
 			"    -v --verbose       Verbose output, show all warnings\n"
-			"\n"
 			"    -b --backup        Backup input files (.bak extension)\n"
 			"    -f --fast          Faster partition selection\n"
 			"    -m --map    XXX    Control which map(s) are built\n"
@@ -467,9 +465,7 @@ void ParseShortArgument(const char *arg)
 
 		switch (c)
 		{
-			case 'q': opt_verbosity = 0; continue;
 			case 'v': opt_verbosity += 1; continue;
-
 			case 'b': opt_backup = true; continue;
 			case 'f': opt_fast = true; continue;
 			case 'h': opt_help = true; continue;
@@ -522,10 +518,6 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	else if (strcmp(name, "--version") == 0)
 	{
 		opt_version = true;
-	}
-	else if (strcmp(name, "--quiet") == 0)
-	{
-		opt_verbosity = 0;
 	}
 	else if (strcmp(name, "--verbose") == 0)
 	{
@@ -666,8 +658,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if (opt_verbosity >= 1)
-		ShowBanner();
+	ShowBanner();
 
 	// validate all filenames before processing any of them
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
