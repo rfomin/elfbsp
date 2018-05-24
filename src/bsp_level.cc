@@ -2288,7 +2288,7 @@ static const char *CalcOptionsString()
 		strcat(buffer, " --nogl");
 
 	if (cur_info->force_v5)
-		strcat(buffer, " --v5");
+		strcat(buffer, " --gl5");
 
 	if (cur_info->force_xnod)
 		strcat(buffer, " --xnod");

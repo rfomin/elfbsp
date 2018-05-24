@@ -319,11 +319,12 @@ static void ShowHelp()
 			"    -v --verbose       Verbose output, show all warnings\n"
 			"    -b --backup        Backup input files (.bak extension)\n"
 			"    -f --fast          Faster partition selection\n"
-			"    -m --map    XXX    Control which map(s) are built\n"
+			"    -m --map   XXXX    Control which map(s) are built\n"
 			"\n"
 			"    -n --nogl          Disable creation of GL-Nodes\n"
+			"    -g --gl5           Use V5 format for GL-nodes\n"
 			"    -x --xnod          Use XNOD format for normal nodes\n"
-			"    -c --cost   ###    Cost assigned to seg splits (1-32)\n"
+			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
 			"\n"
 			"Short options may be mixed, for example: -fbv\n"
 			"Long options must always begin with a double hyphen\n"
@@ -465,11 +466,12 @@ void ParseShortArgument(const char *arg)
 
 		switch (c)
 		{
+			case 'h': opt_help = true; continue;
 			case 'v': opt_verbosity += 1; continue;
 			case 'b': opt_backup = true; continue;
 			case 'f': opt_fast = true; continue;
-			case 'h': opt_help = true; continue;
 			case 'n': opt_no_gl = true; continue;
+			case 'g': opt_force_v5 = true; continue;
 			case 'x': opt_force_xnod = true; continue;
 
 			case 'm':
@@ -547,6 +549,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	else if (strcmp(name, "--xnod") == 0)
 	{
 		opt_force_xnod = true;
+	}
+	else if (strcmp(name, "--gl5") == 0)
+	{
+		opt_force_v5 = true;
 	}
 	else if (strcmp(name, "--cost") == 0)
 	{
