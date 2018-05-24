@@ -371,7 +371,7 @@ static void ShowHelp()
 			"Long options must always begin with a double hyphen\n"
 			"\n"
 			"Map names should be full, like E1M3 or MAP24, but a list\n"
-			"and/or ranges can be specified, such as: MAP01,MAP04-MAP07\n"
+			"and/or ranges can be specified: MAP01,MAP04-MAP07,MAP12\n"
 			);
 
 	//	"Home page: https://gitlab.com/andwj/ajbsp\n"
