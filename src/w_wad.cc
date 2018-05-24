@@ -28,14 +28,14 @@ Wad_file * edit_wad;
 #define MAX_LUMPS_IN_A_LEVEL	21
 
 
-void LumpWarning(const char *str, ...)
+void LumpWarning(const char *fmt, ...)
 {
-	(void) str;
+	(void) fmt;
 }
 
-void FileMessage(const char *str, ...)
+void FileMessage(const char *fmt, ...)
 {
-	(void) str;
+	(void) fmt;
 }
 
 

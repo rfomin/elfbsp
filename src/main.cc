@@ -83,9 +83,66 @@ void FatalError(const char *fmt, ...)
 }
 
 
-void DebugPrintf(const char *str, ...)
+void PrintMsg(const char *fmt, ...)
 {
-	(void) str;
+	va_list arg_ptr;
+
+	static char buffer[MSG_BUF_LEN];
+
+	va_start(arg_ptr, fmt);
+	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+	va_end(arg_ptr);
+
+	buffer[MSG_BUF_LEN-1] = 0;
+
+	printf("%s", buffer);
+	fflush(stdout);
+}
+
+
+void PrintVerbose(const char *fmt, ...)
+{
+	if (opt_verbosity < 1)
+		return;
+
+	va_list arg_ptr;
+
+	static char buffer[MSG_BUF_LEN];
+
+	va_start(arg_ptr, fmt);
+	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+	va_end(arg_ptr);
+
+	buffer[MSG_BUF_LEN-1] = 0;
+
+	printf("%s", buffer);
+	fflush(stdout);
+}
+
+
+void PrintDetail(const char *fmt, ...)
+{
+	if (opt_verbosity < 2)
+		return;
+
+	va_list arg_ptr;
+
+	static char buffer[MSG_BUF_LEN];
+
+	va_start(arg_ptr, fmt);
+	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+	va_end(arg_ptr);
+
+	buffer[MSG_BUF_LEN-1] = 0;
+
+	printf("%s", buffer);
+	fflush(stdout);
+}
+
+
+void DebugPrintf(const char *fmt, ...)
+{
+	(void) fmt;
 }
 
 
@@ -258,6 +315,9 @@ void BackupFile(const char *filename)
 
 void VisitFile(unsigned int idx, const char *filename)
 {
+	printf("Building %s\n", filename);
+	fflush(stdout);
+
 	if (opt_backup)
 		BackupFile(filename);
 

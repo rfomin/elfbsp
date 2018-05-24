@@ -75,6 +75,8 @@
 
 #define MSG_BUF_LEN  1024
 
+#define WARN  "Warning: "
+
 
 /*
  *  Global variables
@@ -95,6 +97,10 @@ extern map_format_e Level_format; // format of current map
 __attribute__((noreturn))
 #endif
 void FatalError(const char *fmt, ...);
+
+void PrintMsg(const char *fmt, ...);
+void PrintVerbose(const char *fmt, ...);
+void PrintDetail(const char *fmt, ...);
 
 void DebugPrintf(const char *fmt, ...);
 
