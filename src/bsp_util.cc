@@ -49,7 +49,7 @@ void Warning(const char *str, ...)
 	va_end(args);
 
 	if (cur_info->warnings)
-		GB_PrintMsg("Warning: %s", message_buf);
+		PrintMsg("Warning: %s", message_buf);
 
 	cur_info->total_warnings++;
 

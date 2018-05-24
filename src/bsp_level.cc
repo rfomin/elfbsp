@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2016  Andrew Apted, et al
+//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -2180,7 +2180,7 @@ void LoadLevel()
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
-	GB_PrintMsg("Building nodes on %s\n", lev_current_name);
+	PrintMsg("  %s\n", lev_current_name);
 
 	num_new_vert = 0;
 	num_complete_seg = 0;
@@ -2447,7 +2447,8 @@ void SaveLevel(node_t *root_node)
 	if (lev_hard_failures > 0)
 	{
 		cur_info->total_failed_maps++;
-		GB_PrintMsg("FAILED with %d hard failures\n", lev_hard_failures);
+		// TODO : REVIEW THIS (maybe do this in main.cc)
+		PrintMsg("    FAILED with %d hard failures\n", lev_hard_failures);
 	}
 }
 

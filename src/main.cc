@@ -151,8 +151,6 @@ void DebugPrintf(const char *fmt, ...)
 
 static nodebuildinfo_t * nb_info;
 
-static char message_buf[MSG_BUF_LEN];
-
 
 static const char *build_ErrorString(build_result_e ret)
 {
@@ -172,21 +170,6 @@ static const char *build_ErrorString(build_result_e ret)
 
 		default: return "Unknown Error";
 	}
-}
-
-
-void GB_PrintMsg(const char *str, ...)
-{
-	va_list args;
-
-	va_start(args, str);
-	vsnprintf(message_buf, MSG_BUF_LEN, str, args);
-	va_end(args);
-
-	message_buf[MSG_BUF_LEN-1] = 0;
-
-	printf("    %s", message_buf);
-	fflush(stdout);
 }
 
 
@@ -220,8 +203,6 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 	int num_levels = edit_wad->LevelCount();
 	SYS_ASSERT(num_levels > 0);
 
-	GB_PrintMsg("\n");
-
 	build_result_e ret;
 
 	// loop over each level in the wad
@@ -242,22 +223,21 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 
 	if (ret == BUILD_OK)
 	{
-		GB_PrintMsg("\n");
-		GB_PrintMsg("Total failed maps: %d\n", info->total_failed_maps);
-		GB_PrintMsg("Total warnings: %d serious, %d minor\n", info->total_warnings,
+		PrintMsg("  Total failed maps: %d\n", info->total_failed_maps);
+		PrintMsg("  Total warnings: %d serious, %d minor\n", info->total_warnings,
 					info->total_minor_warnings);
 	}
 	else if (ret == BUILD_Cancelled)
 	{
-		GB_PrintMsg("\n");
-		GB_PrintMsg("Building CANCELLED.\n\n");
+		PrintMsg("\n");
+		PrintMsg("Building CANCELLED.\n\n");
 	}
 	else
 	{
 		// build nodes failed
-		GB_PrintMsg("\n");
-		GB_PrintMsg("Building FAILED: %s\n", build_ErrorString(ret));
-		GB_PrintMsg("Reason: %s\n\n", nb_info->message);
+		PrintMsg("\n");
+		PrintMsg("  Building FAILED: %s\n", build_ErrorString(ret));
+		PrintMsg("  Reason: %s\n\n", nb_info->message);
 	}
 
 	return ret;
@@ -307,19 +287,16 @@ void BackupFile(const char *filename)
 	if (! FileCopy(filename, dest_name))
 		FatalError("failed to create backup: %s\n", dest_name);
 
-	// TODO : REVIEW THIS
-	printf("Created backup: %s\n", dest_name);
-	fflush(stdout);
+	PrintVerbose("Created backup: %s\n", dest_name);
 }
 
 
 void VisitFile(unsigned int idx, const char *filename)
 {
-	printf("Building %s\n", filename);
-	fflush(stdout);
-
 	if (opt_backup)
 		BackupFile(filename);
+
+	PrintMsg("Building %s\n", filename);
 
 	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
@@ -332,10 +309,6 @@ void VisitFile(unsigned int idx, const char *filename)
 		FatalError("file is read only: %s\n", filename);
 	}
 
-
-	// FIXME: REVIEW THIS  [ wad code prints a message, grrr!! ]
-//??	printf("Opened file: %s\n", filename);
-//??	fflush(stdout);
 
 	if (edit_wad->LevelCount() == 0)
 	{
@@ -413,6 +386,8 @@ static void ShowBanner()
 	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
 	printf("+-----------------------------------------------+\n");
 	printf("\n");
+
+	fflush(stdout);
 }
 
 
@@ -739,6 +714,9 @@ int main(int argc, char *argv[])
 
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
 	{
+		if (i > 0)
+			PrintMsg("\n");
+
 		VisitFile(i, wad_list[i]);
 	}
 

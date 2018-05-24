@@ -24,11 +24,6 @@
 class Lump_c;
 
 
-/* external funcs */
-
-void GB_PrintMsg(const char *str, ...);
-
-
 // Node Build Information Structure
 //
 // Memory note: when changing the string values here (and in
