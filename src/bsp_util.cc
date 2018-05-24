@@ -34,10 +34,12 @@ namespace ajbsp
 static char message_buf[SYS_MSG_BUFLEN];
 
 
+/* this is not needed in AJBSP
 void PrintVerbose(const char *str, ...)
 {
 	(void) str;
 }
+*/
 
 
 void Warning(const char *str, ...)
@@ -575,7 +577,7 @@ void PruneVerticesAtEnd(void)
 	{
 		int unused = num_vertices - new_num;
 
-		PrintVerbose("Pruned %d unused vertices at end\n", unused);
+		PrintDetail("    Pruned %d unused vertices at end\n", unused);
 
 		num_vertices = new_num;
 	}
@@ -685,7 +687,7 @@ void DetectOverlappingLines(void)
 
 	if (count > 0)
 	{
-		PrintVerbose("Detected %d overlapped linedefs\n", count);
+		PrintDetail("    Detected %d overlapped linedefs\n", count);
 	}
 
 	UtilFree(array);

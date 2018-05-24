@@ -541,7 +541,7 @@ void InitBlockmap()
 	// find limits of linedefs, and store as map limits
 	FindBlockmapLimits(&map_bbox);
 
-	PrintVerbose("Map goes from (%d,%d) to (%d,%d)\n",
+	PrintDetail("    Map limits: (%d,%d) to (%d,%d)\n",
 			map_bbox.minx, map_bbox.miny, map_bbox.maxx, map_bbox.maxy);
 
 	block_x = map_bbox.minx - (map_bbox.minx & 0x7);
@@ -589,7 +589,7 @@ void PutBlockmap()
 	{
 		WriteBlockmap();
 
-		PrintVerbose("Completed blockmap, size %dx%d (compression: %d%%)\n",
+		PrintDetail("    Blockmap size: %dx%d (compression: %d%%)\n",
 				block_w, block_h, block_compression);
 	}
 
@@ -794,7 +794,7 @@ void PutReject()
 	Reject_WriteLump();
 	Reject_Free();
 
-	PrintVerbose("Added simple reject lump\n");
+	PrintDetail("    Reject size: %d\n", rej_total_size);
 }
 
 
@@ -2201,8 +2201,8 @@ void LoadLevel()
 		GetThings();
 	}
 
-	PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
-			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
+	PrintDetail("    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
+				num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
 	// always prune vertices at end of lump, otherwise all the
 	// unused vertices from seg splits would keep accumulating.
@@ -2668,14 +2668,14 @@ build_result_e BuildNodesForLevel(nodebuildinfo_t *info, short lev_idx)
 
 	if (ret == BUILD_OK)
 	{
-		PrintVerbose("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
+		PrintDetail("    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
 					num_nodes, num_subsecs, num_segs, num_old_vert + num_new_vert);
 
 		if (root_node)
 		{
-			PrintVerbose("Heights of left and right subtrees = (%d,%d)\n",
-					ComputeBspHeight(root_node->r.node),
-					ComputeBspHeight(root_node->l.node));
+			PrintDetail("    Heights of subtrees: %d / %d\n",
+						ComputeBspHeight(root_node->r.node),
+						ComputeBspHeight(root_node->l.node));
 		}
 
 		ClockwiseBspTree();

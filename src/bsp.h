@@ -139,9 +139,6 @@ typedef double angle_g;  // degrees, 0 is E, 90 is N
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
 
-// send normal messages & warnings to the log file
-void PrintVerbose(const char *str, ...);
-
 void Warning(const char *str, ...);
 void MinorWarning(const char *str, ...);
 
