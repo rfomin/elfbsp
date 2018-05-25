@@ -830,8 +830,8 @@ int lev_overflows;
 
 
 #define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
-    TYPE ** BASEVAR = NULL;  \
-    int NUMVAR = 0;
+	TYPE ** BASEVAR = NULL;  \
+	int NUMVAR = 0;
 
 
 LEVELARRAY(vertex_t,  lev_vertices,   num_vertices)
@@ -856,13 +856,13 @@ int num_real_lines = 0;
 
 #define ALLIGATOR(TYPE, BASEVAR, NUMVAR)  \
 {  \
-  if ((NUMVAR % ALLOC_BLKNUM) == 0)  \
-  {  \
-    BASEVAR = (TYPE **) UtilRealloc(BASEVAR, (NUMVAR + ALLOC_BLKNUM) * sizeof(TYPE *));  \
-  }  \
-  BASEVAR[NUMVAR] = (TYPE *) UtilCalloc(sizeof(TYPE));  \
-  NUMVAR += 1;  \
-  return BASEVAR[NUMVAR - 1];  \
+	if ((NUMVAR % ALLOC_BLKNUM) == 0)  \
+	{  \
+		BASEVAR = (TYPE **) UtilRealloc(BASEVAR, (NUMVAR + ALLOC_BLKNUM) * sizeof(TYPE *));  \
+	}  \
+	BASEVAR[NUMVAR] = (TYPE *) UtilCalloc(sizeof(TYPE));  \
+	NUMVAR += 1;  \
+	return BASEVAR[NUMVAR - 1];  \
 }
 
 
@@ -898,12 +898,12 @@ wall_tip_t *NewWallTip(void)
 
 #define FREEMASON(TYPE, BASEVAR, NUMVAR)  \
 {  \
-  int i;  \
-  for (i=0 ; i < NUMVAR ; i++)  \
-    UtilFree(BASEVAR[i]);  \
-  if (BASEVAR)  \
-    UtilFree(BASEVAR);  \
-  BASEVAR = NULL; NUMVAR = 0;  \
+	int i;  \
+	for (i=0 ; i < NUMVAR ; i++)  \
+		UtilFree(BASEVAR[i]);  \
+	if (BASEVAR)  \
+		UtilFree(BASEVAR);  \
+	BASEVAR = NULL; NUMVAR = 0;  \
 }
 
 
@@ -939,10 +939,9 @@ void FreeWallTips(void)
 
 #define LOOKERUPPER(BASEVAR, NUMVAR, NAMESTR)  \
 {  \
-  if (index < 0 || index >= NUMVAR)  \
-    FatalError("No such %s number #%d\n", NAMESTR, index);  \
-    \
-  return BASEVAR[index];  \
+	if (index < 0 || index >= NUMVAR)  \
+		BugError("No such %s number #%d\n", NAMESTR, index);  \
+	return BASEVAR[index];  \
 }
 
 vertex_t *LookupVertex(int index)

@@ -169,12 +169,10 @@ angle_g UtilComputeAngle(double dx, double dy);
 // line to a point.
 //
 #define UtilParallelDist(part,x,y)  \
-    (((x) * (part)->pdx + (y) * (part)->pdy + (part)->p_para)  \
-     / (part)->p_length)
+	(((x)*(part)->pdx + (y)*(part)->pdy + (part)->p_para) / (part)->p_length)
 
 #define UtilPerpDist(part,x,y)  \
-    (((x) * (part)->pdy - (y) * (part)->pdx + (part)->p_perp)  \
-     / (part)->p_length)
+	(((x)*(part)->pdy - (y)*(part)->pdx + (part)->p_perp) / (part)->p_length)
 
 // checksum functions
 void Adler32_Begin(u32_t *crc);
@@ -534,7 +532,7 @@ typedef struct superblock_s
 superblock_t;
 
 #define SUPER_IS_LEAF(s)  \
-    ((s)->x2-(s)->x1 <= 256 && (s)->y2-(s)->y1 <= 256)
+	((s)->x2 - (s)->x1 <= 256 && (s)->y2 - (s)->y1 <= 256)
 
 
 /* ----- Level data arrays ----------------------- */
