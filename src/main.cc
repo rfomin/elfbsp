@@ -62,6 +62,22 @@ typedef struct map_range_s
 std::vector< map_range_t > map_list;
 
 
+// this is > 0 when PrintMapName() is used and the current line
+// has not been terminated with a new-line ('\n') character.
+static int hanging_pos;
+
+static void StopHanging()
+{
+	if (hanging_pos > 0)
+	{
+		hanging_pos = 0;
+
+		printf("\n");
+		fflush(stdout);
+	}
+}
+
+
 //
 //  show an error message and terminate the program
 //
@@ -76,6 +92,8 @@ void FatalError(const char *fmt, ...)
 	va_end(arg_ptr);
 
 	buffer[MSG_BUF_LEN-1] = 0;
+
+	StopHanging();
 
 	fprintf(stderr, "\nFATAL ERROR: %s", buffer);
 
@@ -94,6 +112,8 @@ void PrintMsg(const char *fmt, ...)
 	va_end(arg_ptr);
 
 	buffer[MSG_BUF_LEN-1] = 0;
+
+	StopHanging();
 
 	printf("%s", buffer);
 	fflush(stdout);
@@ -115,6 +135,8 @@ void PrintVerbose(const char *fmt, ...)
 
 	buffer[MSG_BUF_LEN-1] = 0;
 
+	StopHanging();
+
 	printf("%s", buffer);
 	fflush(stdout);
 }
@@ -135,8 +157,30 @@ void PrintDetail(const char *fmt, ...)
 
 	buffer[MSG_BUF_LEN-1] = 0;
 
+	StopHanging();
+
 	printf("%s", buffer);
 	fflush(stdout);
+}
+
+
+void PrintMapName(const char *name)
+{
+	if (opt_verbosity > 0)
+	{
+		PrintMsg("  %s\n", name);
+		return;
+	}
+
+	// display the map names across the terminal
+
+	if (hanging_pos >= 68)
+		StopHanging();
+
+	printf("  %s", name);
+	fflush(stdout);
+
+	hanging_pos += strlen(name) + 2;
 }
 
 
@@ -224,6 +268,8 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 			nb_info->cancelled = true;
 		}
 	}
+
+	StopHanging();
 
 	if (visited == 0)
 	{
