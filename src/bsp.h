@@ -45,7 +45,7 @@ public:
 	bool do_reject;
 
 	bool fast;
-	bool warnings;
+	bool warnings;	// NOTE: not currently used
 
 	bool force_v5;
 	bool force_xnod;
@@ -139,11 +139,11 @@ typedef double angle_g;  // degrees, 0 is E, 90 is N
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
 
-void Warning(const char *str, ...);
-void MinorWarning(const char *str, ...);
+void Warning(const char *fmt, ...);
+void MinorWarning(const char *fmt, ...);
 
 // set message for certain errors
-void SetErrorMsg(const char *str, ...);
+void SetErrorMsg(const char *fmt, ...);
 
 // allocate and clear some memory.  guaranteed not to fail.
 void *UtilCalloc(int size);

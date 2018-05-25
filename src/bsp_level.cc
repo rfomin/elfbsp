@@ -2447,8 +2447,9 @@ void SaveLevel(node_t *root_node)
 	if (lev_hard_failures > 0)
 	{
 		cur_info->total_failed_maps++;
-		// TODO : REVIEW THIS (maybe do this in main.cc)
-		PrintMsg("    FAILED with %d hard failures\n", lev_hard_failures);
+
+		// FIXME : IMPROVE THIS (maybe do this in main.cc)
+		PrintVerbose("    FAILED with %d hard failures\n", lev_hard_failures);
 	}
 }
 

@@ -42,49 +42,44 @@ void PrintVerbose(const char *str, ...)
 */
 
 
-void Warning(const char *str, ...)
+void Warning(const char *fmt, ...)
 {
 	va_list args;
 
-	va_start(args, str);
-	vsnprintf(message_buf, sizeof(message_buf), str, args);
+	va_start(args, fmt);
+	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	if (cur_info->warnings)
-		PrintMsg("Warning: %s", message_buf);
+	PrintVerbose("    " WARN "%s", message_buf);
 
 	cur_info->total_warnings++;
-
-#if DEBUG_ENABLED
-	DebugPrintf("Warning: %s", message_buf);
-#endif
 }
 
 
-void MinorWarning(const char *str, ...)
+void MinorWarning(const char *fmt, ...)
 {
-	(void) str;
+	(void) fmt;
 
-#if DEBUG_ENABLED
+#if 0
 	va_list args;
 
 	va_start(args, str);
 	vsnprintf(message_buf, sizeof(message_buf), str, args);
 	va_end(args);
 
-	DebugPrintf("MinorWarn: %s", message_buf);
+	PrintVerbose("    " WARN "%s", message_buf);
 #endif
 
 	cur_info->total_minor_warnings++;
 }
 
 
-void SetErrorMsg(const char *str, ...)
+void SetErrorMsg(const char *fmt, ...)
 {
 	va_list args;
 
-	va_start(args, str);
-	vsnprintf(message_buf, sizeof(message_buf), str, args);
+	va_start(args, fmt);
+	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
 	SYS_ASSERT(cur_info);
