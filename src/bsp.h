@@ -105,11 +105,7 @@ typedef enum
 	BUILD_BadFile,
 
 	// when saving the map, one or more lumps overflowed
-	BUILD_LumpOverflow,
-
-	// file errors
-	BUILD_ReadError,
-	BUILD_WriteError
+	BUILD_LumpOverflow
 }
 build_result_e;
 

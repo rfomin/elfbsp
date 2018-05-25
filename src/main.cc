@@ -205,15 +205,11 @@ static const char *build_ErrorString(build_result_e res)
 		// building was cancelled
 		case BUILD_Cancelled: return "Cancelled by User";
 
-		// one or more lumps overflowed the limit
-		case BUILD_LumpOverflow: return "Lump Overflow";
-
 		// the WAD file was corrupt / empty / bad filename
 		case BUILD_BadFile: return "Bad File";
 
-		// file errors
-		case BUILD_ReadError:  return "Read Error";
-		case BUILD_WriteError: return "Write Error";
+		// one or more lumps overflowed the limit
+		case BUILD_LumpOverflow: return "Lump Overflow";
 
 		default: return "Unknown Error";
 	}
