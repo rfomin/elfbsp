@@ -989,7 +989,7 @@ void GetVertices(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to vertices.\n");
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1023,7 +1023,7 @@ void GetSectors(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to sectors.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetSectors: num = %d\n", count);
@@ -1073,7 +1073,7 @@ void GetThings(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetThings: num = %d\n", count);
@@ -1112,7 +1112,7 @@ void GetThingsHexen(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetThingsHexen: num = %d\n", count);
@@ -1151,7 +1151,7 @@ void GetSidedefs(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to sidedefs.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetSidedefs: num = %d\n", count);
@@ -1209,7 +1209,7 @@ void GetLinedefs(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetLinedefs: num = %d\n", count);
@@ -1285,7 +1285,7 @@ void GetLinedefsHexen(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to a lump\n");
+		FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
 	DebugPrintf("GetLinedefsHexen: num = %d\n", count);
