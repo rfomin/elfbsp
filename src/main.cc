@@ -27,6 +27,9 @@
 #endif
 
 
+#define MAX_SPLIT_COST  32
+
+
 //
 //  global variables
 //
@@ -193,12 +196,9 @@ void DebugPrintf(const char *fmt, ...)
 //------------------------------------------------------------------------
 
 
-static nodebuildinfo_t * nb_info;
-
-
-static const char *build_ErrorString(build_result_e ret)
+static const char *build_ErrorString(build_result_e res)
 {
-	switch (ret)
+	switch (res)
 	{
 		case BUILD_OK: return "OK";
 
@@ -217,39 +217,24 @@ static const char *build_ErrorString(build_result_e ret)
 }
 
 
-static void PrepareInfo(nodebuildinfo_t *info)
+static build_result_e BuildAllNodes()
 {
-	info->factor	= CLAMP(1, opt_split_cost, 32);
-
-	info->gl_nodes	= ! opt_no_gl;
-	info->fast		= opt_fast;
-	info->warnings	= (opt_verbosity >= 1);
-
-	info->force_v5			= opt_force_v5;
-	info->force_xnod		= opt_force_xnod;
-	info->force_compress	= false;
-
-	info->total_failed_maps    = 0;
-	info->total_warnings       = 0;
-	info->total_minor_warnings = 0;
-
-	// clear cancelled flag
-	info->cancelled = false;
-}
-
-
-static build_result_e BuildAllNodes(nodebuildinfo_t *info)
-{
-	// sanity check
-
-	SYS_ASSERT(1 <= info->factor && info->factor <= 32);
-
 	int num_levels = edit_wad->LevelCount();
 	SYS_ASSERT(num_levels > 0);
 
 	int visited = 0;
 
-	build_result_e ret = BUILD_OK;
+	// prepare the build info struct
+	nodebuildinfo_t nb_info;
+
+	nb_info.factor		= opt_split_cost;
+	nb_info.gl_nodes	= ! opt_no_gl;
+	nb_info.fast		= opt_fast;
+
+	nb_info.force_v5	= opt_force_v5;
+	nb_info.force_xnod	= opt_force_xnod;
+
+	build_result_e res = BUILD_OK;
 
 	// loop over each level in the wad
 	for (int n = 0 ; n < num_levels ; n++)
@@ -258,15 +243,10 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 
 		visited += 1;
 
-		ret = AJBSP_BuildLevel(info, n);
+		res = AJBSP_BuildLevel(&nb_info, n);
 
-		if (ret != BUILD_OK)
+		if (res != BUILD_OK)
 			break;
-
-		if (false /* WantCancel() */)
-		{
-			nb_info->cancelled = true;
-		}
 	}
 
 	StopHanging();
@@ -275,26 +255,27 @@ static build_result_e BuildAllNodes(nodebuildinfo_t *info)
 	{
 		PrintMsg("  No matching levels\n");
 	}
-	else if (ret == BUILD_OK)
+	// TODO : REVIEW THIS CRUD
+	else if (res == BUILD_OK)
 	{
-		PrintMsg("  Total failed maps: %d\n", info->total_failed_maps);
-		PrintMsg("  Total warnings: %d serious, %d minor\n", info->total_warnings,
-					info->total_minor_warnings);
+		PrintMsg("  Total failed maps: %d\n", nb_info.total_failed_maps);
+		PrintMsg("  Total warnings: %d serious, %d minor\n", nb_info.total_warnings,
+					nb_info.total_minor_warnings);
 	}
-	else if (ret == BUILD_Cancelled)
+	else if (res == BUILD_Cancelled)
 	{
 		PrintMsg("\n");
-		PrintMsg("Building CANCELLED.\n\n");
+		PrintMsg("CANCELLED\n\n");
 	}
 	else
 	{
 		// build nodes failed
 		PrintMsg("\n");
-		PrintMsg("  Building FAILED: %s\n", build_ErrorString(ret));
-		PrintMsg("  Reason: %s\n\n", nb_info->message);
+		PrintMsg("  Building FAILED: %s\n", build_ErrorString(res));
+		PrintMsg("  Reason: %s\n\n", nb_info.message);
 	}
 
-	return ret;
+	return res;
 }
 
 
@@ -363,6 +344,7 @@ void VisitFile(unsigned int idx, const char *filename)
 		FatalError("file is read only: %s\n", filename);
 	}
 
+	build_result_e res = BUILD_OK;
 
 	if (edit_wad->LevelCount() == 0)
 	{
@@ -370,23 +352,17 @@ void VisitFile(unsigned int idx, const char *filename)
 	}
 	else
 	{
-		nb_info = new nodebuildinfo_t;
-
-		PrepareInfo(nb_info);
-
-		build_result_e ret = BuildAllNodes(nb_info);
-
-		if (ret != BUILD_OK)
-		{ /* TODO */ }
-
-		delete nb_info; nb_info = NULL;
+		res = BuildAllNodes();
 	}
 
 	// this closes the file
 	delete edit_wad; edit_wad = NULL;
 
-	// FIXME
-	// if build failed, FatalError()
+	if (res == BUILD_Cancelled)
+		FatalError("CANCELLED\n");
+
+	if (res != BUILD_OK)
+		FatalError("@@@@@@@@@"); // FIXME
 }
 
 
@@ -581,7 +557,7 @@ void ParseShortArgument(const char *arg)
 					arg++;
 				}
 
-				if (val < 1 || val > 32)
+				if (val < 1 || val > MAX_SPLIT_COST)
 					FatalError("illegal value for '-c' option\n");
 
 				opt_split_cost = val;
@@ -650,7 +626,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 
 		int val = atoi(argv[0]);
 
-		if (val < 1 || val > 32)
+		if (val < 1 || val > MAX_SPLIT_COST)
 			FatalError("illegal value for '--cost' option\n");
 
 		opt_split_cost = val;
