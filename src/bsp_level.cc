@@ -2448,8 +2448,11 @@ build_result_e SaveLevel(node_t *root_node)
 	{
 		cur_info->total_failed_maps++;
 
-		// FIXME : IMPROVE THIS (maybe do this in main.cc)
-		PrintVerbose("    FAILED with %d overflowed lumps\n", lev_overflows);
+		// no message here
+		// [ in verbose mode, each overflow already printed a message ]
+		// [ in normal mode, we don't want any messages at all ]
+
+		return BUILD_LumpOverflow;
 	}
 
 	return BUILD_OK;
@@ -2633,7 +2636,7 @@ Lump_c * CreateGLMarker()
 nodebuildinfo_t * cur_info = NULL;
 
 
-/* ----- build nodes for a single level --------------------------- */
+/* ----- build nodes for a single level ----- */
 
 build_result_e BuildNodesForLevel(nodebuildinfo_t *info, short lev_idx)
 {

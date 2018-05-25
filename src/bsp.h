@@ -104,6 +104,9 @@ typedef enum
 	// the WAD file was corrupt / empty / bad filename
 	BUILD_BadFile,
 
+	// when saving the map, one or more lumps overflowed
+	BUILD_LumpOverflow,
+
 	// file errors
 	BUILD_ReadError,
 	BUILD_WriteError

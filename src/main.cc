@@ -205,6 +205,9 @@ static const char *build_ErrorString(build_result_e res)
 		// building was cancelled
 		case BUILD_Cancelled: return "Cancelled by User";
 
+		// one or more lumps overflowed the limit
+		case BUILD_LumpOverflow: return "Lump Overflow";
+
 		// the WAD file was corrupt / empty / bad filename
 		case BUILD_BadFile: return "Bad File";
 
@@ -251,7 +254,7 @@ static build_result_e BuildAllNodes()
 
 	StopHanging();
 
-	if (visited == 0)
+	if (res == BUILD_OK && visited == 0)
 	{
 		PrintMsg("  No matching levels\n");
 	}
