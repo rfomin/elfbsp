@@ -54,7 +54,7 @@ public:
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;
 
-	// if the node builder failed, this will contain the error
+	// NOTE: not currently used
 	const char *message;
 
 	// from here on, various bits of internal state

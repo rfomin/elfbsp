@@ -54,6 +54,8 @@ const char *Level_name;
 
 map_format_e Level_format;
 
+int total_failed_files = 0;
+
 
 typedef struct map_range_s
 {
@@ -196,32 +198,13 @@ void DebugPrintf(const char *fmt, ...)
 //------------------------------------------------------------------------
 
 
-static const char *build_ErrorString(build_result_e res)
-{
-	switch (res)
-	{
-		case BUILD_OK: return "OK";
-
-		// building was cancelled
-		case BUILD_Cancelled: return "Cancelled by User";
-
-		// the WAD file was corrupt / empty / bad filename
-		case BUILD_BadFile: return "Bad File";
-
-		// one or more lumps overflowed the limit
-		case BUILD_LumpOverflow: return "Lump Overflow";
-
-		default: return "Unknown Error";
-	}
-}
-
-
-static build_result_e BuildAllNodes()
+static build_result_e BuildFile()
 {
 	int num_levels = edit_wad->LevelCount();
 	SYS_ASSERT(num_levels > 0);
 
 	int visited = 0;
+	int failures = 0;
 
 	// prepare the build info struct
 	nodebuildinfo_t nb_info;
@@ -242,7 +225,15 @@ static build_result_e BuildAllNodes()
 
 		visited += 1;
 
-		res = AJBSP_BuildLevel(&nb_info, n);
+		build_result_e res = AJBSP_BuildLevel(&nb_info, n);
+
+		// handle a failed map (due to lump overflow)
+		if (res == BUILD_LumpOverflow)
+		{
+			res = BUILD_OK;
+			failures += 1;
+			continue;
+		}
 
 		if (res != BUILD_OK)
 			break;
@@ -250,31 +241,38 @@ static build_result_e BuildAllNodes()
 
 	StopHanging();
 
-	if (res == BUILD_OK && visited == 0)
+	if (res == BUILD_Cancelled)
+		return res;
+
+	if (res == BUILD_BadFile)
 	{
-		PrintMsg("  No matching levels\n");
-	}
-	// TODO : REVIEW THIS CRUD
-	else if (res == BUILD_OK)
-	{
-		PrintMsg("  Total failed maps: %d\n", nb_info.total_failed_maps);
-		PrintMsg("  Total warnings: %d serious, %d minor\n", nb_info.total_warnings,
-					nb_info.total_minor_warnings);
-	}
-	else if (res == BUILD_Cancelled)
-	{
-		PrintMsg("\n");
-		PrintMsg("CANCELLED\n\n");
-	}
-	else
-	{
-		// build nodes failed
-		PrintMsg("\n");
-		PrintMsg("  Building FAILED: %s\n", build_ErrorString(res));
-		PrintMsg("  Reason: %s\n\n", nb_info.message);
+		PrintMsg("  @@@@@@\n");  // FIXME
+
+		// allow building other files
+		total_failed_files += 1;
+		return BUILD_OK;
 	}
 
-	return res;
+	if (visited == 0)
+	{
+		PrintMsg("  No matching levels\n");
+		return BUILD_OK;
+	}
+
+	if (nb_info.total_warnings > 0)
+	{
+		PrintMsg("  Total warnings: %d\n", nb_info.total_warnings);
+	}
+
+	if (failures > 0)
+	{
+		PrintMsg("  Failures on %d maps.\n", failures);
+
+		// allow building other files
+		total_failed_files += 1;
+	}
+
+	return BUILD_OK;
 }
 
 
@@ -351,7 +349,7 @@ void VisitFile(unsigned int idx, const char *filename)
 	}
 	else
 	{
-		res = BuildAllNodes();
+		res = BuildFile();
 	}
 
 	// this closes the file
@@ -359,9 +357,6 @@ void VisitFile(unsigned int idx, const char *filename)
 
 	if (res == BUILD_Cancelled)
 		FatalError("CANCELLED\n");
-
-	if (res != BUILD_OK)
-		FatalError("@@@@@@@@@"); // FIXME
 }
 
 
@@ -747,6 +742,20 @@ int main(int argc, char *argv[])
 			PrintMsg("\n");
 
 		VisitFile(i, wad_list[i]);
+	}
+
+	PrintMsg("\n");
+
+	if (total_failed_files > 0)
+	{
+		PrintMsg("FAILURES occurred in %d file%s.\n", total_failed_files,
+				total_failed_files == 1 ? "" : "s");
+		PrintMsg("Rerun with --verbose to see more details.\n");
+		return 1;
+	}
+	else
+	{
+		PrintMsg("All files built successfully.\n");
 	}
 
 	// that's all folks!
