@@ -26,5 +26,14 @@ Main Site
 https://gitlab.com/andwj/ajbsp
 
 
+Legalese
+--------
+
+AJBSP is Copyright &copy; 2018 Andrew Apted, Colin Reed, and
+Lee Killough, et al.
+
+AJBSP is Free Software, under the terms of the GNU General Public
+License, version 2 or (at your option) any later version.
+See the [LICENSE.md](LICENSE.md) file for the complete text.
 
 
