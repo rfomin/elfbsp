@@ -339,6 +339,7 @@ void VisitFile(unsigned int idx, const char *filename)
 	if (opt_backup)
 		BackupFile(filename);
 
+	PrintMsg("\n");
 	PrintMsg("Building %s\n", filename);
 
 	edit_wad = Wad_file::Open(filename, 'a');
@@ -371,6 +372,7 @@ static void ShowHelp()
 			"(General Public License), and has ABSOLUTELY NO WARRANTY.\n"
 			"\n");
 	*/
+	printf("\n");
 
 	printf( "Usage: ajbsp [options...] FILE...\n"
 			"\n"
@@ -411,7 +413,6 @@ static void ShowBanner()
 	printf("+-----------------------------------------------+\n");
 	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
 	printf("+-----------------------------------------------+\n");
-	printf("\n");
 
 	fflush(stdout);
 }
@@ -740,9 +741,6 @@ int main(int argc, char *argv[])
 
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
 	{
-		if (i > 0)
-			PrintMsg("\n");
-
 		VisitFile(i, wad_list[i]);
 	}
 
