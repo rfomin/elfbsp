@@ -201,7 +201,12 @@ void DebugPrintf(const char *fmt, ...)
 static build_result_e BuildFile()
 {
 	int num_levels = edit_wad->LevelCount();
-	SYS_ASSERT(num_levels > 0);
+
+	if (num_levels == 0)
+	{
+		PrintMsg("  No levels in wad\n");
+		return BUILD_OK;
+	}
 
 	int visited = 0;
 	int failures = 0;
@@ -225,6 +230,9 @@ static build_result_e BuildFile()
 
 		visited += 1;
 
+		if (n > 0 && opt_verbosity >= 2)
+			PrintMsg("\n");
+
 		build_result_e res = AJBSP_BuildLevel(&nb_info, n);
 
 		// handle a failed map (due to lump overflow)
@@ -244,29 +252,32 @@ static build_result_e BuildFile()
 	if (res == BUILD_Cancelled)
 		return res;
 
-	if (res == BUILD_BadFile)
-	{
-		PrintMsg("  @@@@@@\n");  // FIXME
-
-		// allow building other files
-		total_failed_files += 1;
-		return BUILD_OK;
-	}
-
 	if (visited == 0)
 	{
 		PrintMsg("  No matching levels\n");
 		return BUILD_OK;
 	}
 
-	if (nb_info.total_warnings > 0)
+	PrintMsg("\n");
+
+	if (res == BUILD_BadFile)
+	{
+		PrintMsg("  Corrupted wad or level detected.\n");
+
+		// allow building other files
+		total_failed_files += 1;
+		return BUILD_OK;
+	}
+
+	if (true)
 	{
 		PrintMsg("  Total warnings: %d\n", nb_info.total_warnings);
 	}
 
 	if (failures > 0)
 	{
-		PrintMsg("  Failures on %d maps.\n", failures);
+		PrintMsg("  FAILURES occurred on %d level%s.\n", failures,
+				(failures == 1 ? "" : "s"));
 
 		// allow building other files
 		total_failed_files += 1;
@@ -341,16 +352,7 @@ void VisitFile(unsigned int idx, const char *filename)
 		FatalError("file is read only: %s\n", filename);
 	}
 
-	build_result_e res = BUILD_OK;
-
-	if (edit_wad->LevelCount() == 0)
-	{
-		PrintMsg("  No levels in wad\n");
-	}
-	else
-	{
-		res = BuildFile();
-	}
+	build_result_e res = BuildFile();
 
 	// this closes the file
 	delete edit_wad; edit_wad = NULL;
