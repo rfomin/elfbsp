@@ -330,7 +330,7 @@ void BackupFile(const char *filename)
 	if (! FileCopy(filename, dest_name))
 		FatalError("failed to create backup: %s\n", dest_name);
 
-	PrintVerbose("Created backup: %s\n", dest_name);
+	PrintVerbose("\nCreated backup: %s\n", dest_name);
 }
 
 
