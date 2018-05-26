@@ -538,7 +538,7 @@ Lump_c * Wad_file::FindLumpInNamespace(const char *name, char group)
 
 void Wad_file::ReadDirectory()
 {
-	// TODO: no fatal errors
+	// WISH: no fatal errors
 
 	rewind(fp);
 
