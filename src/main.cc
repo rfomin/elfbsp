@@ -200,13 +200,34 @@ void DebugPrintf(const char *fmt, ...)
 //------------------------------------------------------------------------
 
 
+static bool CheckMapInRange(const map_range_t *range, const char *name)
+{
+	if (strlen(name) != strlen(range->low))
+		return false;
+
+	if (strcmp(name, range->low) < 0)
+		return false;
+
+	if (strcmp(name, range->high) > 0)
+		return false;
+
+	return true;
+}
+
+
 static bool CheckMapInMaplist(short lev_idx)
 {
 	// when --map is not used, allow everything
 	if (map_list.empty())
 		return true;
 
-	// FIXME
+	short lump_idx = edit_wad->LevelHeader(lev_idx);
+
+	const char *name = edit_wad->GetLump(lump_idx)->Name();
+
+	for (unsigned int i = 0 ; i < map_list.size() ; i++)
+		if (CheckMapInRange(&map_list[i], name))
+			return true;
 
 	return false;
 }
@@ -497,7 +518,7 @@ void ParseMapRange(char *tok)
 		FatalError("bad map range (%s and %s start with different letters)\n", low, high);
 
 	if (strcmp(low, high) > 0)
-		FatalError("bad map range (%s comes after %s)\n", low, high);
+		FatalError("bad map range (wrong order, %s > %s)\n", low, high);
 
 	// Ok
 
