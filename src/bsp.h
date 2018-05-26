@@ -142,6 +142,7 @@ void Warning(const char *fmt, ...);
 void MinorWarning(const char *fmt, ...);
 
 // set message for certain errors
+// NOTE: not currently used
 void SetErrorMsg(const char *fmt, ...);
 
 // allocate and clear some memory.  guaranteed not to fail.
@@ -788,7 +789,6 @@ void FreeQuickAllocSupers(void);
 
 
 #endif /* __AJBSP_BSP_H__ */
-
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab
