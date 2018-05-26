@@ -271,7 +271,7 @@ static build_result_e BuildFile()
 
 	if (true)
 	{
-		PrintMsg("  Total warnings: %d\n", nb_info.total_warnings);
+		PrintMsg("  Major warnings: %d\n", nb_info.total_warnings);
 	}
 
 	if (failures > 0)
