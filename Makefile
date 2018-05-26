@@ -24,7 +24,7 @@ OS=UNIX
 CXXFLAGS=$(OPTIMISE) -Wall -D$(OS)  \
          -D_THREAD_SAFE -D_REENTRANT
 
-LDFLAGS=-L/usr/X11R6/lib
+LDFLAGS=
 
 LIBS=-lm -lz
 
