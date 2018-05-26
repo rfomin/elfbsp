@@ -68,6 +68,13 @@ begins with a hyphen.
 Running AJBSP with no options, or the --help option, will show
 some help text, including a summary of all available options.
 
+Once invoked, AJBSP will process each wad file.  All the maps in the
+file have their nodes rebuilt, unless the --map option is used to
+limit which maps are visited.  The normal behavior is to keep the
+output to the terminal fairly terse, only showing the name of each
+map as it being processed, and a simple summary of each file.
+More verbose output can be enabled by the --verbose option.
+
 
 Option List
 -----------
