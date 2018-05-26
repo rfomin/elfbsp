@@ -22,7 +22,7 @@
 #define __AJBSP_MAIN_H__
 
 
-#define AJBSP_VERSION  "0.60"
+#define AJBSP_VERSION  "0.70"
 
 
 /*
