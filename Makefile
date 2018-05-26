@@ -28,6 +28,8 @@ LDFLAGS=-L/usr/X11R6/lib
 
 LIBS=-lm -lz
 
+DUMMY=$(OBJ_DIR)/zzdummy
+
 
 #----- Object files ----------------------------------------------
 
@@ -46,10 +48,15 @@ $(OBJ_DIR)/%.o: src/%.cc
 
 #----- Targets -----------------------------------------------
 
-all: $(PROGRAM)
+all: $(DUMMY) $(PROGRAM)
 
 clean:
 	rm -f $(PROGRAM) $(OBJ_DIR)/*.* core core.* ERRS
+
+# this is used to create the OBJ_DIR directory
+$(DUMMY):
+	mkdir -p $(OBJ_DIR)
+	@touch $@
 
 $(PROGRAM): $(OBJS)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LIBS)
