@@ -37,3 +37,40 @@ License, version 2 or (at your option) any later version.
 See the [LICENSE.txt](LICENSE.txt) file for the complete text.
 
 
+Installation
+------------
+
+TODO
+
+
+Usage
+-----
+
+AJBSP must be run from a terminal (Linux) or the command shell
+(cmd.exe in Win32).  The command-line arguments are either files
+to process or options.  Where options are placed does not matter,
+the set of given options is applied to every given file.
+
+Short options always begin with a hyphen ('-'), followed by one
+or more letters, where each letter is a distinct option (i.e. short
+options may be mixed).  Long options begin with two hyphens ('--')
+followed by a whole word.
+
+When an option needs a value, it should be placed in the next argument,
+i.e. separated by the option name by a space.  For short options which
+take a number, like '-c', the number can be mixed in immediately
+after the letter, such as '-c23'.
+
+The special option '--' causes all following arguments to be
+interpreted as filenames.  This allows processing a file which
+begins with a hyphen.
+
+Running AJBSP with no options, or the --help option, will show
+some help text, including a summary of all available options.
+
+
+Option List
+-----------
+
+TODO
+
