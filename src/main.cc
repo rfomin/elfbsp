@@ -55,6 +55,8 @@ const char *Level_name;
 map_format_e Level_format;
 
 int total_failed_files = 0;
+int total_empty_files = 0;
+int total_built_maps = 0;
 
 
 typedef struct map_range_s
@@ -198,6 +200,18 @@ void DebugPrintf(const char *fmt, ...)
 //------------------------------------------------------------------------
 
 
+static bool CheckMapInMaplist(short lev_idx)
+{
+	// when --map is not used, allow everything
+	if (map_list.empty())
+		return true;
+
+	// FIXME
+
+	return false;
+}
+
+
 static build_result_e BuildFile()
 {
 	int num_levels = edit_wad->LevelCount();
@@ -205,6 +219,7 @@ static build_result_e BuildFile()
 	if (num_levels == 0)
 	{
 		PrintMsg("  No levels in wad\n");
+		total_empty_files += 1;
 		return BUILD_OK;
 	}
 
@@ -226,7 +241,8 @@ static build_result_e BuildFile()
 	// loop over each level in the wad
 	for (int n = 0 ; n < num_levels ; n++)
 	{
-		// FIXME : support map_list
+		if (! CheckMapInMaplist(n))
+			continue;
 
 		visited += 1;
 
@@ -245,6 +261,8 @@ static build_result_e BuildFile()
 
 		if (res != BUILD_OK)
 			break;
+
+		total_built_maps += 1;
 	}
 
 	StopHanging();
@@ -255,6 +273,7 @@ static build_result_e BuildFile()
 	if (visited == 0)
 	{
 		PrintMsg("  No matching levels\n");
+		total_empty_files += 1;
 		return BUILD_OK;
 	}
 
@@ -720,7 +739,9 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if (wad_list.size() == 0)
+	int total_files = (int)wad_list.size();
+
+	if (total_files == 0)
 	{
 		FatalError("no files to process\n");
 		return 0;
@@ -756,9 +777,24 @@ int main(int argc, char *argv[])
 
 		return 1;
 	}
+	else if (total_built_maps == 0)
+	{
+		PrintMsg("NOTHING was built!\n");
+
+		return 1;
+	}
+	else if (total_empty_files == 0)
+	{
+		PrintMsg("Ok, built all files.\n");
+	}
 	else
 	{
-		PrintMsg("All files built successfully.\n");
+		int built = total_files - total_empty_files;
+		int empty = total_empty_files;
+
+		PrintMsg("Ok, built %d file%s, %d file%s empty.\n",
+				built, (built == 1 ? "" : "s"),
+				empty, (empty == 1 ? " was" : "s were"));
 	}
 
 	// that's all folks!
