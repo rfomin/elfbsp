@@ -173,7 +173,7 @@ void PrintDetail(const char *fmt, ...)
 
 void PrintMapName(const char *name)
 {
-	if (opt_verbosity > 0)
+	if (opt_verbosity >= 1)
 	{
 		PrintMsg("  %s\n", name);
 		return;
@@ -290,7 +290,12 @@ static build_result_e BuildFile()
 
 	if (true)
 	{
-		PrintMsg("  Major warnings: %d\n", nb_info.total_warnings);
+		PrintMsg("  Total warnings: %d\n", nb_info.total_warnings);
+	}
+
+	if (opt_verbosity >= 1)
+	{
+		PrintMsg("  Minor issues: %d\n", nb_info.total_minor_warnings);
 	}
 
 	if (failures > 0)
