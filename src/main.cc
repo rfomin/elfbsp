@@ -750,7 +750,10 @@ int main(int argc, char *argv[])
 	{
 		PrintMsg("FAILURES occurred in %d file%s.\n", total_failed_files,
 				total_failed_files == 1 ? "" : "s");
-		PrintMsg("Rerun with --verbose to see more details.\n");
+
+		if (opt_verbosity == 0)
+			PrintMsg("Rerun with --verbose to see more details.\n");
+
 		return 1;
 	}
 	else
