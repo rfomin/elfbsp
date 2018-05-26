@@ -1,0 +1,73 @@
+#
+#  --- AJBSP ---
+#
+#  Makefile for Win32, using a CROSS-COMPILER on Linux
+#
+
+PROGRAM=ajbsp.exe
+
+CROSS=i686-w64-mingw32-
+
+CXX=$(CROSS)g++
+
+LIB_LOC=lib_win32
+OBJ_DIR=obj_win32
+
+ZLIB_DIR=$(LIB_LOC)/zlib-1.2.8
+
+OPTIMISE=-O2 -fno-strict-aliasing
+
+STRIP_FLAGS=--strip-unneeded
+
+# operating system choices: UNIX WIN32
+OS=WIN32
+
+
+#--- Internal stuff from here -----------------------------------
+
+CXXFLAGS=$(OPTIMISE) -Wall -D$(OS) -I$(ZLIB_DIR)
+
+LDFLAGS=-static-libgcc -static-libstdc++
+
+LIBS=-lm $(ZLIB_DIR)/libz.a
+
+DUMMY=$(OBJ_DIR)/zzdummy
+
+
+#----- Object files ----------------------------------------------
+
+OBJS = \
+	$(OBJ_DIR)/bsp_level.o \
+	$(OBJ_DIR)/bsp_node.o  \
+	$(OBJ_DIR)/bsp_util.o  \
+	$(OBJ_DIR)/lib_util.o  \
+	$(OBJ_DIR)/lib_file.o  \
+	$(OBJ_DIR)/main.o      \
+	$(OBJ_DIR)/w_wad.o
+
+$(OBJ_DIR)/%.o: src/%.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+
+#----- Targets -----------------------------------------------
+
+all: $(DUMMY) stripped
+
+clean:
+	rm -f $(PROGRAM) $(OBJ_DIR)/*.* ERRS
+
+# this is used to create the OBJ_DIR directory
+$(DUMMY):
+	mkdir -p $(OBJ_DIR)
+	@touch $@
+
+$(PROGRAM): $(OBJS)
+	$(CXX) $^ -o $@ $(LDFLAGS) $(LIBS)
+
+stripped: $(PROGRAM)
+	$(CROSS)strip $(STRIP_FLAGS) $(PROGRAM)
+
+.PHONY: all clean stripped
+
+#--- editor settings ------------
+# vi:ts=8:sw=8:noexpandtab
