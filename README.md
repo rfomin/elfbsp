@@ -34,6 +34,6 @@ Lee Killough, et al.
 
 AJBSP is Free Software, under the terms of the GNU General Public
 License, version 2 or (at your option) any later version.
-See the [LICENSE.md](LICENSE.md) file for the complete text.
+See the [LICENSE.txt](LICENSE.txt) file for the complete text.
 
 
