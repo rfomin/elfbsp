@@ -75,8 +75,6 @@
 
 #define MSG_BUF_LEN  1024
 
-#define WARN  "Warning: "
-
 
 /*
  *  Global variables

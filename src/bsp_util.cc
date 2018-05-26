@@ -50,7 +50,10 @@ void Warning(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	PrintVerbose("    " WARN "%s", message_buf);
+	if (opt_verbosity >= 2)
+		PrintVerbose("    WARNING: %s", message_buf);
+	else
+		PrintVerbose("    %s", message_buf);
 
 	cur_info->total_warnings++;
 }
@@ -67,7 +70,7 @@ void MinorWarning(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), str, args);
 	va_end(args);
 
-	PrintVerbose("    " WARN "%s", message_buf);
+	PrintVerbose("    WARNING: %s", message_buf);
 #endif
 
 	cur_info->total_minor_warnings++;
