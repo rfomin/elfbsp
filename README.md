@@ -36,6 +36,9 @@ AJBSP is Free Software, under the terms of the GNU General Public
 License, version 2 or (at your option) any later version.
 See the [LICENSE.txt](LICENSE.txt) file for the complete text.
 
+AJBSP comes with NO WARRANTY of any kind, express or implied.
+Please read the license for full details.
+
 
 Installation
 ------------
@@ -55,7 +58,6 @@ Short options always begin with a hyphen ('-'), followed by one
 or more letters, where each letter is a distinct option (i.e. short
 options may be mixed).  Long options begin with two hyphens ('--')
 followed by a whole word.
-
 When an option needs a value, it should be placed in the next argument,
 i.e. separated by the option name by a space.  For short options which
 take a number, like '-c', the number can be mixed in immediately
