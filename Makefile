@@ -11,8 +11,8 @@ PREFIX=/usr/local
 
 OBJ_DIR=obj_linux
 
-OPTIMISE=-O2 -fno-strict-aliasing
-
+WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
+OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
 # operating system choices: UNIX WIN32
@@ -21,10 +21,10 @@ OS=UNIX
 
 #--- Internal stuff from here -----------------------------------
 
-CXXFLAGS=$(OPTIMISE) -Wall -D$(OS)  \
+CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
          -D_THREAD_SAFE -D_REENTRANT
 
-LDFLAGS=
+LDFLAGS=-static-libgcc -static-libstdc++
 
 LIBS=-lm -lz
 
