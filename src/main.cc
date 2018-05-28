@@ -270,7 +270,7 @@ static build_result_e BuildFile()
 		if (n > 0 && opt_verbosity >= 2)
 			PrintMsg("\n");
 
-		build_result_e res = AJBSP_BuildLevel(&nb_info, n);
+		res = AJBSP_BuildLevel(&nb_info, n);
 
 		// handle a failed map (due to lump overflow)
 		if (res == BUILD_LumpOverflow)
