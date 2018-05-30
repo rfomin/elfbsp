@@ -109,7 +109,11 @@ All other maps will be skipped (not touched at all).
 The same set of maps applies to every given wad file.
 The default behavior is to process every map in the wad.
 
-@@@ FORMAT
+Map names must be the lump name, like "MAP01" or "E2M3",
+and cannot be abbreviated.  A range of maps can be
+specified using a hyphen, such as "MAP04-MAP07".
+Several map names and/or ranges can be given, using
+commas to separate them, such as "MAP01,MAP03,MAP05".
 
 NOTE: spaces cannot be used to separate map names.
 
