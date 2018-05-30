@@ -81,9 +81,9 @@ some help text, including a summary of all available options.
 Option List
 -----------
 
-`-v --verbose`  \
+`-v --verbose`  
     Enables more verbosity.
 
-`-f --fast`  \
+`-f --fast`  
     Enables more quickness.
 
