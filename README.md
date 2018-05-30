@@ -85,12 +85,12 @@ Option List
 Produces more verbose output to the terminal.
 Some warnings which are normally hidden (except
 for a final tally) will be shown when enabled.
-Using this option twice will cause the lots of
+Using this option twice will cause lots of
 wonderfully useless information about each level
 to be displayed.
 
 `-vv --very-verbose`  
-This is equivalent to using `-v` twice.
+This is equivalent to using --verbose twice.
 
 `-b --backup`  
 Backs up each input file before processing it.
@@ -106,10 +106,12 @@ however the BSP tree may not be as good.
 `-m --map  NAME(s)`  
 Specifies one or more maps to process.
 All other maps will be skipped (not touched at all).
-This setting applies to every given wad file.
+The same set of maps applies to every given wad file.
 The default behavior is to process every map in the wad.
 
 @@@ FORMAT
+
+NOTE: spaces cannot be used to separate map names.
 
 `-n --nogl`  
 Disables building of GL-Nodes, only the normal nodes
@@ -117,28 +119,36 @@ are built.  Any existing GL-Nodes in a visited map
 will be removed.
 
 `-g --gl5`  
-Forces V5 format of GL-Nodes.  The normal behavior is
-to build V2 format, and only switch to V5 format when
-the level is too large (e.g. has too many segs).
+Forces V5 format of GL-Nodes.  The normal behavior
+is to build V2 format, and only switch to V5 format
+when the level is too large (e.g. has too many segs).
 
 Unless you are testing a source port, there is almost
 no need to use this option.
 
 `-x --xnod`  
-Forces XNOD format of normal nodes.
+Forces XNOD (ZDoom extended) format of normal nodes.
+Without this option, normal nodes will be built using
+the standard DOOM format, and only switch to XNOD format
+when the level is too large (e.g. has too many segs).
 
-@@@
+Using XNOD format can be better for source ports which
+support it, since it provides higher accuracy for seg
+splits.  However, it cannot be used with the original
+DOOM.EXE or with Chocolate-Doom.
 
 `-c --cost  ##`  
 Sets the cost for making seg splits.
-Default value is 11,
-and usable values range from 1 to 32.  Larger values
-try to reduce the number of seg splits.
-Smaller values produce more balanced BSP trees.
+The value is a number between 1 and 32.
+Larger values try to reduce the number of seg splits,
+whereas maller values produce more balanced BSP trees.
+The default value is 11.
+
+NOTE: this option has little effect when the --fast
+option is enabled.
 
 `-h --help`  
 Displays a brief help screen, then exits.
-This is equivalent to running AJBSP with no options.
 
 `--version`  
 Displays the version of AJBSP, then exits.
