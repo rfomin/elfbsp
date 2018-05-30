@@ -81,5 +81,9 @@ some help text, including a summary of all available options.
 Option List
 -----------
 
-TODO
+`-v --verbose`
+>   Enables more verbosity.
+
+`-f --fast`
+>   Enables more quickness.
 
