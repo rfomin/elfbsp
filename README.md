@@ -82,40 +82,64 @@ Option List
 -----------
 
 `-v --verbose`  
-   Enables more verbosity.
-This option can be used twice to display even more
-useless information.
+Produces more verbose output to the terminal.
+Some warnings which are normally hidden (except
+for a final tally) will be shown when enabled.
+Using this option twice will cause the lots of
+wonderfully useless information about each level
+to be displayed.
 
-`--very-verbose`  
+`-vv --very-verbose`  
 This is equivalent to using `-v` twice.
 
 `-b --backup`  
-Back-up each input file before processing it.
-The backup files have the ".bak" extension.
+Backs up each input file before processing it.
+The backup files will have the ".bak" extension
+(replacing the ".wad" extension).  If the backup
+file already exists, it will be silently overwritten.
 
 `-f --fast`  
-Enables more quickness.
+Enables a faster method for selecting partition lines.
+On large maps this can be significantly faster,
+however the BSP tree may not be as good.
 
 `-m --map  NAME(s)`  
-Specify one or maps (levels) to process, and all other
-levels will be untouched (ignored).
+Specifies one or more maps to process.
+All other maps will be skipped (not touched at all).
+This setting applies to every given wad file.
 The default behavior is to process every map in the wad.
 
+@@@ FORMAT
+
 `-n --nogl`  
-Disable building of GL-Nodes, only build normal nodes.
-Existing GL-Nodes of any processed maps is removed.
+Disables building of GL-Nodes, only the normal nodes
+are built.  Any existing GL-Nodes in a visited map
+will be removed.
 
 `-g --gl5`  
-Force GL-Nodes to use version 5.
+Forces V5 format of GL-Nodes.  The normal behavior is
+to build V2 format, and only switch to V5 format when
+the level is too large (e.g. has too many segs).
+
+Unless you are testing a source port, there is almost
+no need to use this option.
 
 `-x --xnod`  
+Forces XNOD format of normal nodes.
+
+@@@
 
 `-c --cost  ##`  
+Sets the cost for making seg splits.
+Default value is 11,
+and usable values range from 1 to 32.  Larger values
+try to reduce the number of seg splits.
+Smaller values produce more balanced BSP trees.
 
 `-h --help`  
-Show the help screen and exit.
+Displays a brief help screen, then exits.
 This is equivalent to running AJBSP with no options.
 
 `--version`  
-Show the version of AJBSP and exit.
+Displays the version of AJBSP, then exits.
 
