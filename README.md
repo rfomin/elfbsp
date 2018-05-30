@@ -145,7 +145,7 @@ DOOM.EXE or with Chocolate-Doom.
 Sets the cost for making seg splits.
 The value is a number between 1 and 32.
 Larger values try to reduce the number of seg splits,
-whereas maller values produce more balanced BSP trees.
+whereas smaller values produce more balanced BSP trees.
 The default value is 11.
 
 NOTE: this option has little effect when the --fast
