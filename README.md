@@ -82,12 +82,12 @@ Option List
 -----------
 
 `-v --verbose`  
-Enables more verbosity.
+   Enables more verbosity.
 This option can be used twice to display even more
 useless information.
 
---very-verbose`  
-This is equivalent to using`-v` twice.
+`--very-verbose`  
+This is equivalent to using `-v` twice.
 
 `-b --backup`  
 Back-up each input file before processing it.
