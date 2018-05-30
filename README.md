@@ -81,41 +81,41 @@ some help text, including a summary of all available options.
 Option List
 -----------
 
-`-v --verbose     `
+`-v --verbose`  
 Enables more verbosity.
 This option can be used twice to display even more
 useless information.
 
-`   --very-verbose`
-This is equivalent to using `-v` twice.
+--very-verbose`  
+This is equivalent to using`-v` twice.
 
-`-b --backup      `
+`-b --backup`  
 Back-up each input file before processing it.
 The backup files have the ".bak" extension.
 
-`-f --fast        `
+`-f --fast`  
 Enables more quickness.
 
-`-m --map         `
+`-m --map  NAME(s)`  
 Specify one or maps (levels) to process, and all other
 levels will be untouched (ignored).
 The default behavior is to process every map in the wad.
 
-`-n --nogl        `
+`-n --nogl`  
 Disable building of GL-Nodes, only build normal nodes.
 Existing GL-Nodes of any processed maps is removed.
 
-`-g --gl5         `
+`-g --gl5`  
 Force GL-Nodes to use version 5.
 
-`-x --xnod        `
+`-x --xnod`  
 
-`-c --cost  ##    `
+`-c --cost  ##`  
 
-`-h --help        `
+`-h --help`  
 Show the help screen and exit.
 This is equivalent to running AJBSP with no options.
 
-`   --version     `
+`--version`  
 Show the version of AJBSP and exit.
 
