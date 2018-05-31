@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2016  Andrew Apted, et al
+//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -34,12 +34,21 @@ namespace ajbsp
 static char message_buf[SYS_MSG_BUFLEN];
 
 
-/* this is not needed in AJBSP
-void PrintVerbose(const char *str, ...)
+void Failure(const char *fmt, ...)
 {
-	(void) str;
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
+	va_end(args);
+
+	if (opt_verbosity >= 2)
+		PrintVerbose("    FAILURE: %s", message_buf);
+	else
+		PrintVerbose("    %s", message_buf);
+
+	// TODO : failures++
 }
-*/
 
 
 void Warning(const char *fmt, ...)
