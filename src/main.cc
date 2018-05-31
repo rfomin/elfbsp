@@ -57,6 +57,7 @@ map_format_e Level_format;
 int total_failed_files = 0;
 int total_empty_files = 0;
 int total_built_maps = 0;
+int total_failed_maps = 0;
 
 
 typedef struct map_range_s
@@ -300,6 +301,8 @@ static build_result_e BuildFile()
 
 	PrintMsg("\n");
 
+	total_failed_maps += failures;
+
 	if (res == BUILD_BadFile)
 	{
 		PrintMsg("  Corrupted wad or level detected.\n");
@@ -309,23 +312,22 @@ static build_result_e BuildFile()
 		return BUILD_OK;
 	}
 
+	if (failures > 0)
+	{
+		PrintMsg("  Failed maps: %d (out of %d)\n", failures, visited);
+
+		// allow building other files
+		total_failed_files += 1;
+	}
+
 	if (true)
 	{
-		PrintMsg("  Total warnings: %d\n", nb_info.total_warnings);
+		PrintMsg("  Serious warnings: %d\n", nb_info.total_warnings);
 	}
 
 	if (opt_verbosity >= 1)
 	{
 		PrintMsg("  Minor issues: %d\n", nb_info.total_minor_warnings);
-	}
-
-	if (failures > 0)
-	{
-		PrintMsg("  FAILURES occurred on %d level%s.\n", failures,
-				(failures == 1 ? "" : "s"));
-
-		// allow building other files
-		total_failed_files += 1;
 	}
 
 	return BUILD_OK;
@@ -799,8 +801,9 @@ int main(int argc, char *argv[])
 
 	if (total_failed_files > 0)
 	{
-		PrintMsg("FAILURES occurred in %d file%s.\n", total_failed_files,
-				total_failed_files == 1 ? "" : "s");
+		PrintMsg("FAILURES occurred on %d map%s in %d file%s.\n",
+				total_failed_maps,  total_failed_maps  == 1 ? "" : "s",
+				total_failed_files, total_failed_files == 1 ? "" : "s");
 
 		if (opt_verbosity == 0)
 			PrintMsg("Rerun with --verbose to see more details.\n");
