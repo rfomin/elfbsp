@@ -105,7 +105,7 @@ void FatalError(const char *fmt, ...)
 
 	fprintf(stderr, "\nFATAL ERROR: %s", buffer);
 
-	exit(2);
+	exit(3);
 }
 
 
@@ -808,7 +808,7 @@ int main(int argc, char *argv[])
 		if (opt_verbosity == 0)
 			PrintMsg("Rerun with --verbose to see more details.\n");
 
-		return 1;
+		return 2;
 	}
 	else if (total_built_maps == 0)
 	{
