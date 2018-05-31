@@ -73,8 +73,8 @@ void MinorWarning(const char *fmt, ...)
 #if 0
 	va_list args;
 
-	va_start(args, str);
-	vsnprintf(message_buf, sizeof(message_buf), str, args);
+	va_start(args, fmt);
+	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
 	PrintVerbose("    WARNING: %s", message_buf);
