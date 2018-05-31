@@ -58,6 +58,7 @@ Short options always begin with a hyphen ('-'), followed by one
 or more letters, where each letter is a distinct option (i.e. short
 options may be mixed).  Long options begin with two hyphens ('--')
 followed by a whole word.
+
 When an option needs a value, it should be placed in the next argument,
 i.e. separated by the option name by a space.  For short options which
 take a number, like '-c', the number can be mixed in immediately

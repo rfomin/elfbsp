@@ -1,0 +1,45 @@
+.TH AJBSP 6 "May 2018"
+.SH NAME
+ajbsp \- a nodes builder for modern DOOM source ports
+.SH SYNOPSIS
+.B ajbsp
+[\fI\,OPTION\/\fR]... \fI\,FILE\/\fR...
+.SH DESCRIPTION
+.B AJBSP
+is a nodes builder for modern DOOM source ports.
+It can build standard DOOM nodes, GL-Nodes, and XNOD format nodes.
+Multiple wad files can be processed, and each file is modified in-place.
+There is an option to backup files before processing them.
+.SH OPTIONS
+Short options begin with a single dash, followed by one
+or more letters, where each letter is a distinct option
+(i.e. short options can be mixed together).
+Long options begin with two dashes, followed by a whole word.
+When an option needs a value, it should be placed in the next
+argument.
+.PP
+Filenames and options may be freely mixed, and the order of
+options on the command line is not significant.
+All files are processed with the same settings.
+.PP
+The special option '--' causes all following arguments to be
+interpreted as filenames.  This allows specifying a file which
+begins with a hyphen.
+.TP
+.B \-h \-\-help
+Show a summary of all the options.
+.SH AUTHORS
+TODO
+.SH COPYRIGHT
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+.PP
+This program is is distributed in the hope that it
+will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+.SH "SEE ALSO"
+.PP
+The AJBSP repository: https://gitlab.com/andwj/ajbsp
