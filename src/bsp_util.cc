@@ -46,8 +46,6 @@ void Failure(const char *fmt, ...)
 		PrintVerbose("    FAILURE: %s", message_buf);
 	else
 		PrintVerbose("    %s", message_buf);
-
-	// TODO : failures++
 }
 
 
