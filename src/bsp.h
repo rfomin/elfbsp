@@ -54,9 +54,6 @@ public:
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;
 
-	// NOTE: not currently used
-	const char *message;
-
 	// from here on, various bits of internal state
 	int total_failed_maps;
 	int total_warnings;
@@ -79,7 +76,6 @@ public:
 		force_compress(false),
 
 		cancelled(false),
-		message(NULL),
 
 		total_failed_maps(0),
 		total_warnings(0),
@@ -87,9 +83,7 @@ public:
 	{ }
 
 	~nodebuildinfo_t()
-	{
-		StringFree(message);
-	}
+	{ }
 };
 
 
@@ -141,10 +135,6 @@ typedef double angle_g;  // degrees, 0 is E, 90 is N
 void Failure(const char *fmt, ...);
 void Warning(const char *fmt, ...);
 void MinorWarning(const char *fmt, ...);
-
-// set message for certain errors
-// NOTE: not currently used
-void SetErrorMsg(const char *fmt, ...);
 
 // allocate and clear some memory.  guaranteed not to fail.
 void *UtilCalloc(int size);
