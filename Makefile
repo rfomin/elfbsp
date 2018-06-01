@@ -1,7 +1,8 @@
 #
 #  --- AJBSP ---
 #
-#  Makefile for Unixy system-wide install
+#  Makefile for Unixy system-wide install.
+#  Requires GNU make.
 #
 
 PROGRAM=ajbsp

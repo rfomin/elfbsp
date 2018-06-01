@@ -2,6 +2,7 @@
 #  --- AJBSP ---
 #
 #  Makefile for Win32, using a CROSS-COMPILER on Linux
+#  Requires GNU make.
 #
 
 PROGRAM=ajbsp.exe
