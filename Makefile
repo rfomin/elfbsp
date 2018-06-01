@@ -8,6 +8,7 @@ PROGRAM=ajbsp
 
 # prefix choices: /usr  /usr/local  /opt
 PREFIX=/usr/local
+MANDIR=$(PREFIX)/share/man
 
 OBJ_DIR=obj_linux
 
@@ -20,6 +21,8 @@ OS=UNIX
 
 
 #--- Internal stuff from here -----------------------------------
+
+MAN_PAGE=$(PROGRAM).6
 
 CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
          -D_THREAD_SAFE -D_REENTRANT
@@ -64,7 +67,15 @@ $(PROGRAM): $(OBJS)
 stripped: $(PROGRAM)
 	strip $(STRIP_FLAGS) $(PROGRAM)
 
-# TODO : install, uninstall
+install: stripped
+	install -d -m 755 $(PREFIX)/bin
+	install -o root -m 755 $(PROGRAM) $(PREFIX)/bin/
+	install -d -m 755 $(MANDIR)/man6
+	install -o root -m 644 doc/$(MAN_PAGE) $(MANDIR)/man6/
+
+uninstall:
+	rm -f -v $(PREFIX)/bin/$(PROGRAM)
+	rm -f -v $(MANDIR)/man6/$(MAN_PAGE)
 
 .PHONY: all clean stripped install uninstall
 
