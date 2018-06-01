@@ -20,7 +20,9 @@
 
 #include "main.h"
 
+#ifdef HAVE_ZLIB
 #include <zlib.h>
+#endif
 
 
 namespace ajbsp
@@ -2460,10 +2462,12 @@ build_result_e SaveLevel(node_t *root_node)
 
 //----------------------------------------------------------------------
 
-
 static Lump_c  *zout_lump;
+
+#ifdef HAVE_ZLIB
 static z_stream zout_stream;
 static Bytef    zout_buffer[1024];
+#endif
 
 
 void ZLibBeginLump(Lump_c *lump)
@@ -2473,6 +2477,9 @@ void ZLibBeginLump(Lump_c *lump)
 	if (! cur_info->force_compress)
 		return;
 
+#ifndef HAVE_ZLIB
+	FatalError("No zlib!\n");
+#else
 	zout_stream.zalloc = (alloc_func)0;
 	zout_stream.zfree  = (free_func)0;
 	zout_stream.opaque = (voidpf)0;
@@ -2482,6 +2489,7 @@ void ZLibBeginLump(Lump_c *lump)
 
 	zout_stream.next_out  = zout_buffer;
 	zout_stream.avail_out = sizeof(zout_buffer);
+#endif
 }
 
 
@@ -2496,6 +2504,9 @@ void ZLibAppendLump(const void *data, int length)
 		return;
 	}
 
+#ifndef HAVE_ZLIB
+	FatalError("No zlib!\n");
+#else
 	zout_stream.next_in  = (Bytef*)data;   // const override
 	zout_stream.avail_in = length;
 
@@ -2514,6 +2525,7 @@ void ZLibAppendLump(const void *data, int length)
 			zout_stream.avail_out = sizeof(zout_buffer);
 		}
 	}
+#endif
 }
 
 
@@ -2525,6 +2537,9 @@ void ZLibFinishLump(void)
 		return;
 	}
 
+#ifndef HAVE_ZLIB
+	FatalError("No zlib!\n");
+#else
 	int left_over;
 
 	// ASSERT(zout_stream.avail_out > 0)
@@ -2558,6 +2573,7 @@ void ZLibFinishLump(void)
 
 	deflateEnd(&zout_stream);
 	zout_lump = NULL;
+#endif
 }
 
 

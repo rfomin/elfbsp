@@ -29,7 +29,7 @@ CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
 
 LDFLAGS=-static-libgcc -static-libstdc++
 
-LIBS=-lm -lz
+LIBS=-lm
 
 DUMMY=$(OBJ_DIR)/zzdummy
 

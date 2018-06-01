@@ -10,10 +10,7 @@ CROSS=i686-w64-mingw32-
 
 CXX=$(CROSS)g++
 
-LIB_LOC=lib_win32
 OBJ_DIR=obj_win32
-
-ZLIB_DIR=$(LIB_LOC)/zlib-1.2.8
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
@@ -25,11 +22,11 @@ OS=WIN32
 
 #--- Internal stuff from here -----------------------------------
 
-CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS) -I$(ZLIB_DIR)
+CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)
 
 LDFLAGS=-static-libgcc -static-libstdc++
 
-LIBS=-lm $(ZLIB_DIR)/libz.a
+LIBS=-lm
 
 DUMMY=$(OBJ_DIR)/zzdummy
 
