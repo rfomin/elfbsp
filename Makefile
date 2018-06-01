@@ -12,6 +12,8 @@ MANDIR=$(PREFIX)/share/man
 
 OBJ_DIR=obj_linux
 
+# GXX=clang++
+
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
@@ -27,6 +29,7 @@ MAN_PAGE=$(PROGRAM).6
 CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
          -D_THREAD_SAFE -D_REENTRANT
 
+# NOTE: these are GCC specific
 LDFLAGS=-static-libgcc -static-libstdc++
 
 LIBS=-lm
