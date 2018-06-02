@@ -93,7 +93,7 @@ wonderfully useless information about each level to be displayed.
 
 `-vvv --super-verbose`  
 This is the same as using --verbose three times, and enables
-the display of all the minor issues (such as mismatched sectors).
+the display of all the minor issues (such as unclosed subsectors).
 
 `-b --backup`  
 Backs up each input file before processing it.
