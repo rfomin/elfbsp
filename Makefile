@@ -1,7 +1,7 @@
 #
 #  --- AJBSP ---
 #
-#  Makefile for Unixy system-wide install.
+#  Makefile for Linux and BSD systems.
 #  Requires GNU make.
 #
 
@@ -13,7 +13,8 @@ MANDIR=$(PREFIX)/share/man
 
 OBJ_DIR=obj_linux
 
-# CXX=clang++
+# CXX=clang++-6.0
+# CXX=g++ -m32   (to compile 32-bit binary on 64-bit system)
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
@@ -30,8 +31,11 @@ MAN_PAGE=$(PROGRAM).6
 CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
          -D_THREAD_SAFE -D_REENTRANT
 
-# NOTE: these are GCC specific
-LDFLAGS=-static-libgcc -static-libstdc++
+LDFLAGS=
+# LDFLAGS=-static
+
+# I needed this when using -m32 and -static:
+# LDFLAGS += -L/usr/lib/gcc/i686-linux-gnu/6/
 
 LIBS=-lm
 
