@@ -638,6 +638,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	{
 		opt_verbosity += 2;
 	}
+	else if (strcmp(name, "--super-verbose") == 0)
+	{
+		opt_verbosity += 3;
+	}
 	else if (strcmp(name, "--backup") == 0 || strcmp(name, "--backups") == 0)
 	{
 		opt_backup = true;

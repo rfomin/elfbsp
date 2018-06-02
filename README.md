@@ -84,14 +84,16 @@ Option List
 
 `-v --verbose`  
 Produces more verbose output to the terminal.
-Some warnings which are normally hidden (except
-for a final tally) will be shown when enabled.
-Using this option twice will cause lots of
-wonderfully useless information about each level
-to be displayed.
+Some warnings which are normally hidden (except for a final
+tally) will be shown when enabled.
 
 `-vv --very-verbose`  
-This is equivalent to using --verbose twice.
+This is equivalent to using --verbose twice, and causes lots of
+wonderfully useless information about each level to be displayed.
+
+`-vvv --super-verbose`  
+This is the same as using --verbose three times, and enables
+the display of all the minor issues (such as mismatched sectors).
 
 `-b --backup`  
 Backs up each input file before processing it.
