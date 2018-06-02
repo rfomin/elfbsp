@@ -13,7 +13,7 @@ MANDIR=$(PREFIX)/share/man
 
 OBJ_DIR=obj_linux
 
-# GXX=clang++
+# CXX=clang++
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
