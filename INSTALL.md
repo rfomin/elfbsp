@@ -34,8 +34,9 @@ To install AJBSP, become root and type:
     make install
 
 NOTE: on BSD systems the manual page may be installed into
-the wrong directory.  Edit the Makefile, find the `MANDIR`
-variable (it is near the top) and change it to this:
+the wrong directory (and not be found).  To fix this, edit the
+Makefile, find the `MANDIR` variable (it is near the top) and
+change it to this:
 
     MANDIR=$(PREFIX)/man
 
@@ -43,7 +44,8 @@ variable (it is near the top) and change it to this:
 Windows (native)
 ----------------
 
-Sorry, compiling under Windows itself is not supported.
+Sorry, compiling under Windows itself is not currently
+supported.
 
 
 Windows (cross compiler)
