@@ -68,7 +68,7 @@ $(DUMMY):
 $(PROGRAM): $(OBJS)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LIBS)
 
-stripped: $(PROGRAM)
+stripped: all
 	strip $(STRIP_FLAGS) $(PROGRAM)
 
 install: stripped

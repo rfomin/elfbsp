@@ -49,7 +49,7 @@ $(OBJ_DIR)/%.o: src/%.cc
 
 #----- Targets -----------------------------------------------
 
-all: $(DUMMY) stripped
+all: $(DUMMY) $(PROGRAM)
 
 clean:
 	rm -f $(PROGRAM) $(OBJ_DIR)/*.* ERRS
@@ -62,7 +62,7 @@ $(DUMMY):
 $(PROGRAM): $(OBJS)
 	$(CXX) $^ -o $@ $(LDFLAGS) $(LIBS)
 
-stripped: $(PROGRAM)
+stripped: all
 	$(CROSS)strip $(STRIP_FLAGS) $(PROGRAM)
 
 .PHONY: all clean stripped
