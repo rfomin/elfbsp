@@ -40,10 +40,10 @@ AJBSP comes with NO WARRANTY of any kind, express or implied.
 Please read the license for full details.
 
 
-Installation
-------------
+Compiling
+---------
 
-TODO
+Please see the [INSTALL.md](INSTALL.md) document.
 
 
 Usage
