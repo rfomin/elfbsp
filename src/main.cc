@@ -327,7 +327,7 @@ static build_result_e BuildFile()
 
 	if (opt_verbosity >= 1)
 	{
-		PrintMsg("  Minor issues: %d\n", nb_info.total_minor_warnings);
+		PrintMsg("  Minor issues: %d\n", nb_info.total_minor_issues);
 	}
 
 	return BUILD_OK;

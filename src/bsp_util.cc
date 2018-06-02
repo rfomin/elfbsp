@@ -66,21 +66,20 @@ void Warning(const char *fmt, ...)
 }
 
 
-void MinorWarning(const char *fmt, ...)
+void MinorIssue(const char *fmt, ...)
 {
-	(void) fmt;
+	if (opt_verbosity >= 3)
+	{
+		va_list args;
 
-#if 0
-	va_list args;
+		va_start(args, fmt);
+		vsnprintf(message_buf, sizeof(message_buf), fmt, args);
+		va_end(args);
 
-	va_start(args, fmt);
-	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
-	va_end(args);
+		PrintVerbose("    ISSUE: %s", message_buf);
+	}
 
-	PrintVerbose("    WARNING: %s", message_buf);
-#endif
-
-	cur_info->total_minor_warnings++;
+	cur_info->total_minor_issues++;
 }
 
 

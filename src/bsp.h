@@ -57,7 +57,7 @@ public:
 	// from here on, various bits of internal state
 	int total_failed_maps;
 	int total_warnings;
-	int total_minor_warnings;
+	int total_minor_issues;
 
 public:
 	nodebuildinfo_t() :
@@ -79,7 +79,7 @@ public:
 
 		total_failed_maps(0),
 		total_warnings(0),
-		total_minor_warnings(0)
+		total_minor_issues(0)
 	{ }
 
 	~nodebuildinfo_t()
@@ -134,7 +134,7 @@ typedef double angle_g;  // degrees, 0 is E, 90 is N
 
 void Failure(const char *fmt, ...);
 void Warning(const char *fmt, ...);
-void MinorWarning(const char *fmt, ...);
+void MinorIssue(const char *fmt, ...);
 
 // allocate and clear some memory.  guaranteed not to fail.
 void *UtilCalloc(int size);
