@@ -160,3 +160,11 @@ Displays a brief help screen, then exits.
 `--version`  
 Displays the version of AJBSP, then exits.
 
+
+Exit Codes
+----------
+
+- 0 if OK.
+- 1 if nothing was built (no matching maps).
+- 2 if one or more maps failed to build properly.
+- 3 if a fatal error occurred.
