@@ -1,12 +1,9 @@
-# ajBSP CMake Script
+# AJBSP CMake Script
 cmake_minimum_required(VERSION 3.2.2)
-project(ajBSP)
 
-# Find zlib first since ajbsp requires it
-find_package( ZLIB REQUIRED )
-include_directories(${ZLIB_INCLUDE_DIR})
+project(ajbsp)
 
-set(ajBSP_SOURCES
+set(AJBSP_SOURCES
 	src/bsp_level.cc
 	src/bsp_node.cc
 	src/bsp_util.cc
@@ -15,10 +12,7 @@ set(ajBSP_SOURCES
 	src/main.cc
 	src/w_wad.cc
 )
-add_executable(ajBSP
-	${ajBSP_SOURCES}
-)
 
-target_link_libraries(ajBSP
-${ZLIB_LIBRARY_RELEASE}
+add_executable(ajbsp
+	${AJBSP_SOURCES}
 )
