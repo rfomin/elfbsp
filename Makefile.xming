@@ -17,13 +17,10 @@ WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
-# operating system choices: UNIX WIN32
-OS=WIN32
-
 
 #--- Internal stuff from here -----------------------------------
 
-CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)
+CXXFLAGS=$(OPTIMISE) $(WARNINGS)
 
 LDFLAGS=-static-libgcc -static-libstdc++
 

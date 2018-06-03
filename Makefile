@@ -20,16 +20,12 @@ WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
-# operating system choices: UNIX WIN32
-OS=UNIX
-
 
 #--- Internal stuff from here -----------------------------------
 
 MAN_PAGE=$(PROGRAM).6
 
-CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D$(OS)  \
-         -D_THREAD_SAFE -D_REENTRANT
+CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D_THREAD_SAFE -D_REENTRANT
 
 LDFLAGS=
 # LDFLAGS=-static
