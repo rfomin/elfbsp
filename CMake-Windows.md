@@ -52,7 +52,7 @@ Configuring AJBSP (CMakeLists.txt)
      haven't already, you should run the command `.\vcpkg integrate install`
      using PowerShell, as this will make vcpkg's build system universally
      included by Visual Studio (this option also works even if a vcpkg
-	 toolchain is not explicitly specified).
+     toolchain is not explicitly specified).
 
 5. Once Configure completes successfully, click **Generate** and then you'll
    get a file called `ajbsp.sln` in the build folder, which you can use to
