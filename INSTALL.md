@@ -1,4 +1,3 @@
-
 Compiling AJBSP
 ===============
 
@@ -10,6 +9,10 @@ Building should be fairly straight-forward on any Unix-like
 system, such as Linux, the BSDs, and even MacOS X.  Fairly
 simple Makefiles are used for building, although they require
 GNU make, so on BSD systems you will need the 'gmake' package.
+
+For Windows, CMake is prefered for building, but this document
+specifically covers cross-compiling Windows builds via Make. See
+CMake-Windows.md for detailed instructions.
 
 
 Linux / BSD
@@ -44,8 +47,13 @@ variable (it is near the top) and change it to this:
 Windows (native)
 ----------------
 
-Sorry, compiling under Windows itself is not currently
-supported.
+Using CMake or CMake-GUI, you can generate a Microsoft Visual Studio
+solution for Windows. Simply point CMake to the root CMakeLists
+inside of /ajbsp, and generate the solution for your intended
+target machine and version of Visual Studio. Upon a successful build,
+MSVC will generate 'ajbsp.exe' in your build directory of choice.
+
+For more information, see CMake-Windows.md.
 
 
 Windows (cross compiler)
