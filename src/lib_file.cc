@@ -605,8 +605,7 @@ const char *GetExecutablePath(const char *argv0)
 	// didn't work, free the memory
 	StringFree(path);
 
-#else
-#ifndef __APPLE__
+#elif !defined(__APPLE__) // UNIX
 	path = StringNew(AJ_PATH_MAX+2);
 
 	int length = readlink("/proc/self/exe", path, AJ_PATH_MAX);
@@ -650,7 +649,6 @@ const char *GetExecutablePath(const char *argv0)
 
 	// didn't work, free the memory
 	StringFree(path);
-#endif
 #endif
 
 	// fallback method: use argv[0]

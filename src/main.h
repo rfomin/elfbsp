@@ -32,10 +32,11 @@
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#ifndef WIN32
-#define WIN32
+  #ifndef WIN32
+  #define WIN32
+  #endif
 #endif
-#endif
+
 
 /*
  *  Standard headers
