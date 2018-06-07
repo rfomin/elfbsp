@@ -57,7 +57,7 @@ Configuring AJBSP (CMakeLists.txt)
 5. Once Configure completes successfully, click **Generate** and then you'll
    get a file called `ajbsp.sln` in the build folder, which you can use to
    compile AJBSP with Visual Studio Community 2015 or 2017 (other VS versions
-   are unttested, but should work in theory).
+   are untested, but should work in theory).
 
 
 Building AJBSP (Visual Studio Community)
