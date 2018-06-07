@@ -41,7 +41,6 @@ Configuring AJBSP (CMakeLists.txt)
       altogether.
 
 4. For most people, the default 'Use default native compilers' is sufficient.
-
    If you are a [vcpkg](https://github.com/Microsoft/vcpkg) user, please refer
    to step (4a), if not, click **Finish** and go to step (5).
    - (4a) If you use [Microsoft's vcpkg](https://github.com/Microsoft/vcpkg)
