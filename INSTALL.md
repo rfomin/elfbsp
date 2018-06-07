@@ -10,9 +10,9 @@ system, such as Linux, the BSDs, and even MacOS X.  Fairly
 simple Makefiles are used for building, although they require
 GNU make, so on BSD systems you will need the 'gmake' package.
 
-For Windows, CMake is prefered for building, but this document
-specifically covers cross-compiling Windows builds via Make. See
-CMake-Windows.md for detailed instructions.
+On Windows, building can be done via CMake and Visual Studio.
+Alternatively, you can use a cross compiler on Linux.  See
+below for more information.
 
 
 Linux / BSD
@@ -44,26 +44,27 @@ variable (it is near the top) and change it to this:
     MANDIR=$(PREFIX)/man
 
 
-Windows (native)
-----------------
+Windows
+-------
 
 Using CMake or CMake-GUI, you can generate a Microsoft Visual Studio
-solution for Windows. Simply point CMake to the root CMakeLists
-inside of /ajbsp, and generate the solution for your intended
-target machine and version of Visual Studio. Upon a successful build,
-MSVC will generate 'ajbsp.exe' in your build directory of choice.
+solution for Windows.  Simply point CMake to the root CMakeLists.txt
+inside of /ajbsp, and generate the solution for your intended target
+machine and version of Visual Studio.  Upon a successful build,
+MSVC will generate `ajbsp.exe` in your build directory of choice.
 
-For more information, see CMake-Windows.md.
+For detailed information, see [CMake-Windows.md](CMake-Windows.md)
 
 
-Windows (cross compiler)
-------------------------
+Cross Compiling
+---------------
 
 A "cross compiler" is a compiler which builds binaries for
 one platform (e.g. Windows) on another platform (e.g. Linux).
-This is how the current Windows executable is built.
+This is how the current Windows executable was built.
 
-On Debian linux, the following packages are needed:
+On Debian linux, the following packages are needed to build
+the Windows binary:
 
 - mingw-w64
 - make
