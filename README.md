@@ -1,5 +1,5 @@
 
-AJBSP 0.95
+AJBSP 0.97
 ==========
 
 by Andrew Apted, 2018.
