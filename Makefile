@@ -58,7 +58,8 @@ $(OBJ_DIR)/%.o: src/%.cc
 all: $(DUMMY) $(PROGRAM)
 
 clean:
-	rm -f $(PROGRAM) $(OBJ_DIR)/*.* core core.* ERRS
+	rm -f $(PROGRAM) $(OBJ_DIR)/*.[oa]
+	rm -f core core.* ERRS
 
 # this is used to create the OBJ_DIR directory
 $(DUMMY):
