@@ -71,15 +71,18 @@ $(PROGRAM): $(OBJS)
 stripped: all
 	strip $(STRIP_FLAGS) $(PROGRAM)
 
+# note that DESTDIR is usually left undefined, and is mainly
+# useful when making packages for Debian/RedHat/etc...
+
 install: stripped
-	install -d -m 755 $(PREFIX)/bin
-	install -o root -m 755 $(PROGRAM) $(PREFIX)/bin/
-	install -d -m 755 $(MANDIR)/man6
-	install -o root -m 644 doc/$(MAN_PAGE) $(MANDIR)/man6/
+	install -d -m 755 $(DESTDIR)$(PREFIX)/bin
+	install -o root -m 755 $(PROGRAM) $(DESTDIR)$(PREFIX)/bin/
+	install -d -m 755 $(DESTDIR)$(MANDIR)/man6
+	install -o root -m 644 doc/$(MAN_PAGE) $(DESTDIR)$(MANDIR)/man6/
 
 uninstall:
-	rm -f -v $(PREFIX)/bin/$(PROGRAM)
-	rm -f -v $(MANDIR)/man6/$(MAN_PAGE)
+	rm -f -v $(DESTDIR)$(PREFIX)/bin/$(PROGRAM)
+	rm -f -v $(DESTDIR)$(MANDIR)/man6/$(MAN_PAGE)
 
 .PHONY: all clean stripped install uninstall
 
