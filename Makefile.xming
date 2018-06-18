@@ -14,7 +14,7 @@ CXX=$(CROSS)g++
 OBJ_DIR=obj_win32
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
-OPTIMISE=-O2 -fno-strict-aliasing -fno-exceptions -fno-rtti
+OPTIMISE=-O2 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
 
