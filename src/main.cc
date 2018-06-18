@@ -378,6 +378,8 @@ void BackupFile(const char *filename)
 		FatalError("failed to create backup: %s\n", dest_name);
 
 	PrintVerbose("\nCreated backup: %s\n", dest_name);
+
+	StringFree(dest_name);
 }
 
 
