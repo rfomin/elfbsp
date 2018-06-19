@@ -26,6 +26,12 @@ Main Site
 https://gitlab.com/andwj/ajbsp
 
 
+Binary Packages
+---------------
+
+https://gitlab.com/andwj/ajbsp/tags
+
+
 Legalese
 --------
 
