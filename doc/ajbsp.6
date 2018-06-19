@@ -1,4 +1,4 @@
-.TH AJBSP 6 "May 2018"
+.TH AJBSP 6 "June 2018"
 .SH NAME
 ajbsp \- a nodes builder for modern DOOM source ports
 .SH SYNOPSIS
@@ -97,6 +97,13 @@ The default value is 11.
 
 NOTE: this option has little effect when the \-\-fast
 option is enabled.
+.TP
+.B \-o \-\-output FILE
+This option is provided *only* for compatibility with
+existing node builders.  It causes the input file to be
+copied to the specified file, and that file is the one
+processed.  This option cannot be used with multiple
+input files, or with the \-\-backup option.
 .TP
 .B \-h \-\-help
 Displays a brief help screen, then exits.

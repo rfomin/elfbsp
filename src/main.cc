@@ -44,6 +44,8 @@ bool opt_force_v5	= false;
 bool opt_force_xnod	= false;
 int  opt_split_cost	= DEFAULT_FACTOR;
 
+const char *opt_output = NULL;
+
 bool opt_help		= false;
 bool opt_version	= false;
 
@@ -385,6 +387,16 @@ void BackupFile(const char *filename)
 
 void VisitFile(unsigned int idx, const char *filename)
 {
+	if (opt_output != NULL)
+	{
+		if (! FileCopy(filename, opt_output))
+			FatalError("failed to create output file: %s\n", opt_output);
+
+		PrintMsg("\nCopied input file: %s\n", filename);
+
+		filename = opt_output;
+	}
+
 	if (opt_backup)
 		BackupFile(filename);
 
@@ -586,7 +598,8 @@ void ParseShortArgument(const char *arg)
 			case 'x': opt_force_xnod = true; continue;
 
 			case 'm':
-				FatalError("cannot use option '-m' like that\n");
+			case 'o':
+				FatalError("cannot use option '-%c' like that\n", c);
 				return;
 
 			case 'c':
@@ -655,7 +668,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
 		if (argc < 1 || argv[0][0] == '-')
-			FatalError("missing value(s) for '--map' option\n");
+			FatalError("missing value for '--map' option\n");
 
 		ParseMapList(argv[0]);
 
@@ -684,6 +697,19 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 			FatalError("illegal value for '--cost' option\n");
 
 		opt_split_cost = val;
+		used = 1;
+	}
+	else if (strcmp(name, "--output") == 0)
+	{
+		// this option is *only* for compatibility
+
+		if (argc < 1 || argv[0][0] == '-')
+			FatalError("missing value for '--output' option\n");
+
+		if (opt_output != NULL)
+			FatalError("cannot use '--output' option twice\n");
+
+		opt_output = StringDup(argv[0]);
 		used = 1;
 	}
 	else
@@ -736,6 +762,7 @@ void ParseCommandLine(int argc, char *argv[])
 		// handle short args which are isolate and require a value
 		if (strcmp(arg, "-c") == 0) arg = "--cost";
 		if (strcmp(arg, "-m") == 0) arg = "--map";
+		if (strcmp(arg, "-o") == 0) arg = "--output";
 
 		if (arg[1] != '-')
 		{
@@ -783,6 +810,18 @@ int main(int argc, char *argv[])
 	{
 		FatalError("no files to process\n");
 		return 0;
+	}
+
+	if (opt_output != NULL)
+	{
+		if (opt_backup)
+			FatalError("cannot use --backup with --output\n");
+
+		if (total_files > 1)
+			FatalError("cannot use multiple input files with --output\n");
+
+		if (y_stricmp(wad_list[0], opt_output) == 0)
+			FatalError("input and output files are the same\n");
 	}
 
 	ShowBanner();

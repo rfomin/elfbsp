@@ -154,6 +154,13 @@ The default value is 11.
 NOTE: this option has little effect when the --fast
 option is enabled.
 
+`-o --output  FILE`  
+This option is provided *only* for compatibility with
+existing node builders.  It causes the input file to be
+copied to the specified file, and that file is the one
+processed.  This option *cannot* be used with multiple
+input files, or with the --backup option.
+
 `-h --help`  
 Displays a brief help screen, then exits.
 
