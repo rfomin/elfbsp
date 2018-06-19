@@ -29,7 +29,7 @@ https://gitlab.com/andwj/ajbsp
 Binary Packages
 ---------------
 
-https://gitlab.com/andwj/ajbsp/tags
+https://gitlab.com/andwj/ajbsp/tags/v1.01
 
 
 Legalese
