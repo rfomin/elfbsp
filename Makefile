@@ -17,7 +17,7 @@ OBJ_DIR=obj_linux
 # CXX=g++ -m32   (to compile 32-bit binary on 64-bit system)
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
-OPTIMISE=-O2 --std=c++03 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
+OPTIMISE=-O2 -std=c++03 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
 
