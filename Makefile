@@ -8,32 +8,41 @@
 PROGRAM=ajbsp
 
 # prefix choices: /usr  /usr/local  /opt
-PREFIX=/usr/local
-MANDIR=$(PREFIX)/share/man
+PREFIX ?= /usr/local
 
-OBJ_DIR=obj_linux
+# for BSD systems use: $(PREFIX)/man
+MANDIR ?= $(PREFIX)/share/man
 
 # CXX=clang++-6.0
 # CXX=g++ -m32   (to compile 32-bit binary on 64-bit system)
 
+# flags controlling the dialect of C++
+# [ the code is old-school C++ without modern features ]
+CXX_DIALECT=-std=c++03 -fno-exceptions -fno-rtti -fno-strict-aliasing -fwrapv
+
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
-OPTIMISE=-O2 -std=c++03 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
+OPTIMISE=-O2 -g
 STRIP_FLAGS=--strip-unneeded
 
+# default flags for compiler, preprocessor and linker
+CXXFLAGS ?= $(OPTIMISE) $(WARNINGS)
+CPPFLAGS ?=
+LDFLAGS ?= $(OPTIMISE)
+LIBS ?=
 
-#--- Internal stuff from here -----------------------------------
+# general things needed by AJBSP
+CXXFLAGS += $(CXX_DIALECT)
+LIBS += -lm
+
+# uncomment this for a fully statically linked binary:
+# LDFLAGS += -static
+
+# I needed this when using -m32 and -static together:
+# LDFLAGS += -L/usr/lib/gcc/i686-linux-gnu/6/
 
 MAN_PAGE=$(PROGRAM).6
 
-CXXFLAGS=$(OPTIMISE) $(WARNINGS) -D_THREAD_SAFE -D_REENTRANT
-
-LDFLAGS=
-# LDFLAGS=-static
-
-# I needed this when using -m32 and -static:
-# LDFLAGS += -L/usr/lib/gcc/i686-linux-gnu/6/
-
-LIBS=-lm
+OBJ_DIR=obj_linux
 
 DUMMY=$(OBJ_DIR)/zzdummy
 
@@ -50,7 +59,7 @@ OBJS = \
 	$(OBJ_DIR)/w_wad.o
 
 $(OBJ_DIR)/%.o: src/%.cc
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 
 #----- Targets -----------------------------------------------
