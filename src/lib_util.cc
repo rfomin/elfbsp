@@ -19,9 +19,6 @@
 
 #include "main.h"
 
-#include <sys/time.h>
-#include <time.h>
-
 #ifdef WIN32
 #include <io.h>
 #else  // UNIX or MACOSX
