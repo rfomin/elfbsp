@@ -472,7 +472,7 @@ static void ShowVersion()
 static void ShowBanner()
 {
 	printf("+-----------------------------------------------+\n");
-	printf("|   AJBSP " AJBSP_VERSION "   (C) 2018 Andrew Apted, et al   |\n");
+	printf("|   AJBSP " AJBSP_VERSION "   (C) 2022 Andrew Apted, et al   |\n");
 	printf("+-----------------------------------------------+\n");
 
 	fflush(stdout);
