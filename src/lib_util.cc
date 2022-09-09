@@ -186,64 +186,6 @@ void StringFree(const char *str)
 }
 
 
-void StringRemoveCRLF(char *str)
-{
-	size_t len = strlen(str);
-
-	if (len > 0 && str[len - 1] == '\n')
-		str[--len] = 0;
-
-	if (len > 0 && str[len - 1] == '\r')
-		str[--len] = 0;
-}
-
-
-char * StringTidy(const char *str, const char *bad_chars)
-{
-	char *buf  = StringNew(strlen(str) + 2);
-	char *dest = buf;
-
-	for ( ; *str ; str++)
-		if (isprint(*str) && ! strchr(bad_chars, *str))
-			*dest++ = *str;
-
-	*dest = 0;
-
-	return buf;
-}
-
-
-void TimeDelay(unsigned int millies)
-{
-	SYS_ASSERT(millies < 300000);
-
-#ifdef WIN32
-	::Sleep(millies);
-
-#else // LINUX or MacOSX
-
-	usleep(millies * 1000);
-#endif
-}
-
-
-unsigned int TimeGetMillies()
-{
-	// Note: you *MUST* handle overflow (it *WILL* happen)
-
-#ifdef WIN32
-	return GetTickCount();
-#else
-	struct timeval tv;
-	struct timezone tz;
-
-	gettimeofday(&tv, &tz);
-
-	return ((int)tv.tv_sec * 1000 + (int)tv.tv_usec / 1000);
-#endif
-}
-
-
 //
 // sanity checks for the sizes and properties of certain types.
 // useful when porting.
@@ -283,63 +225,6 @@ void CheckTypeSizes()
 	assert_size(raw_sidedef_t, 30);
 	assert_size(raw_thing_t,   10);
 	assert_size(raw_vertex_t,   4);
-}
-
-
-//
-// translate (dx, dy) into an integer angle value (0-65535)
-//
-unsigned int ComputeAngle(int dx, int dy)
-{
-	return (unsigned int) (atan2 ((double) dy, (double) dx) * 10430.37835 + 0.5);
-}
-
-
-
-//
-// compute the distance from (0, 0) to (dx, dy)
-//
-unsigned int ComputeDist(int dx, int dy)
-{
-	return (unsigned int) (hypot ((double) dx, (double) dy) + 0.5);
-}
-
-
-double PerpDist(double x, double y,
-                double x1, double y1, double x2, double y2)
-{
-	x  -= x1; y  -= y1;
-	x2 -= x1; y2 -= y1;
-
-	double len = sqrt(x2*x2 + y2*y2);
-
-	SYS_ASSERT(len > 0);
-
-	return (x * y2 - y * x2) / len;
-}
-
-
-double AlongDist(double x, double y,
-                 double x1, double y1, double x2, double y2)
-{
-	x  -= x1; y  -= y1;
-	x2 -= x1; y2 -= y1;
-
-	double len = sqrt(x2*x2 + y2*y2);
-
-	SYS_ASSERT(len > 0);
-
-	return (x * x2 + y * y2) / len;
-}
-
-
-const char *Int_TmpStr(int value)
-{
-	static char buffer[200];
-
-	sprintf(buffer, "%d", value);
-
-	return buffer;
 }
 
 
