@@ -19,15 +19,15 @@
 #ifndef __SYS_TYPE_H__
 #define __SYS_TYPE_H__
 
-// basic types
+#include <stdint.h>
 
-typedef char  s8_t;
-typedef short s16_t;
-typedef int   s32_t;
+typedef int8_t  s8_t;
+typedef int16_t s16_t;
+typedef int32_t s32_t;
 
-typedef unsigned char  u8_t;
-typedef unsigned short u16_t;
-typedef unsigned int   u32_t;
+typedef uint8_t  u8_t;
+typedef uint16_t u16_t;
+typedef uint32_t u32_t;
 
 typedef u8_t byte;
 
