@@ -429,9 +429,9 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 			//       the cost.
 
 			if (a <= DIST_EPSILON || b <= DIST_EPSILON)
-				qnty = IFFY_LEN / MAX(a, b);
+				qnty = IFFY_LEN / std::max(a, b);
 			else
-				qnty = IFFY_LEN / MIN(a, b);
+				qnty = IFFY_LEN / std::min(a, b);
 
 			info->cost += (int) (100 * factor * (qnty * qnty - 1.0));
 			continue;
@@ -454,9 +454,9 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 
 			// the closer the miss, the higher the cost (see note above)
 			if (a >= -DIST_EPSILON || b >= -DIST_EPSILON)
-				qnty = IFFY_LEN / -MIN(a, b);
+				qnty = IFFY_LEN / -std::min(a, b);
 			else
-				qnty = IFFY_LEN / -MAX(a, b);
+				qnty = IFFY_LEN / -std::max(a, b);
 
 			info->cost += (int) (70 * factor * (qnty * qnty - 1.0));
 			continue;
@@ -488,7 +488,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 			info->iffy++;
 
 			// the closer to the end, the higher the cost
-			qnty = IFFY_LEN / MIN(fa, fb);
+			qnty = IFFY_LEN / std::min(fa, fb);
 			info->cost += (int) (140 * factor * (qnty * qnty - 1.0));
 		}
 	}
@@ -913,10 +913,10 @@ static void FindLimitWorker(superblock_t *block, bbox_t *bbox)
 		double x2 = seg->end->x;
 		double y2 = seg->end->y;
 
-		int lx = (int) floor(MIN(x1, x2));
-		int ly = (int) floor(MIN(y1, y2));
-		int hx = (int) ceil(MAX(x1, x2));
-		int hy = (int) ceil(MAX(y1, y2));
+		int lx = (int) floor(std::min(x1, x2));
+		int ly = (int) floor(std::min(y1, y2));
+		int hx = (int) ceil (std::max(x1, x2));
+		int hy = (int) ceil (std::max(y1, y2));
 
 		if (lx < bbox->minx) bbox->minx = lx;
 		if (ly < bbox->miny) bbox->miny = ly;
@@ -1877,7 +1877,7 @@ int ComputeBspHeight(node_t *node)
 		right = ComputeBspHeight(node->r.node);
 		left  = ComputeBspHeight(node->l.node);
 
-		return MAX(left, right) + 1;
+		return std::max(left, right) + 1;
 	}
 
 	return 1;
