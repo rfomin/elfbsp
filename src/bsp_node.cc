@@ -37,7 +37,7 @@
 // Rewritten again by Andrew Apted (-AJA-), 1999-2000.
 //
 
-#include "main.h"
+#include "ajbsp.h"
 
 
 namespace ajbsp

@@ -18,7 +18,7 @@
 //
 //------------------------------------------------------------------------
 
-#include "main.h"
+#include "ajbsp.h"
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>

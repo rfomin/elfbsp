@@ -50,11 +50,11 @@ DUMMY=$(OBJ_DIR)/zzdummy
 #----- Object files ----------------------------------------------
 
 OBJS = \
+	$(OBJ_DIR)/ajbsp.o     \
 	$(OBJ_DIR)/bsp_level.o \
 	$(OBJ_DIR)/bsp_node.o  \
 	$(OBJ_DIR)/bsp_util.o  \
 	$(OBJ_DIR)/lib_util.o  \
-	$(OBJ_DIR)/main.o      \
 	$(OBJ_DIR)/w_wad.o
 
 $(OBJ_DIR)/%.o: src/%.cc
