@@ -20,11 +20,32 @@
 #ifndef __LIB_UTIL_H__
 #define __LIB_UTIL_H__
 
+#ifdef WIN32
+#define DIR_SEP_CH   '\\'
+#define DIR_SEP_STR  "\\"
+#else
+#define DIR_SEP_CH   '/'
+#define DIR_SEP_STR  "/"
+#endif
+
+// filename functions
+bool HasExtension(const char *filename);
+bool MatchExtension(const char *filename, const char *ext);
+char *ReplaceExtension(const char *filename, const char *ext);
+const char *FindBaseName(const char *filename);
+
+// file utilities
+bool FileExists(const char *filename);
+bool FileCopy(const char *src_name, const char *dest_name);
+bool FileRename(const char *old_name, const char *new_name);
+bool FileDelete(const char *filename);
+
 void CheckTypeSizes();
 
 // round a positive value up to the nearest power of two
 int RoundPOW2(int x);
 
+// string utilities
 int y_stricmp (const char *s1, const char *s2);
 int y_strnicmp (const char *s1, const char *s2, size_t len);
 
