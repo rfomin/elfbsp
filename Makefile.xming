@@ -7,9 +7,9 @@
 
 PROGRAM=ajbsp.exe
 
-CROSS=i686-w64-mingw32-
+CROSS=x86_64-w64-mingw32-
 
-CXX=$(CROSS)g++
+CXX=$(CROSS)g++ -m64
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
 OPTIMISE=-O2 -std=c++03 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
