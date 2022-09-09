@@ -80,7 +80,9 @@ Lump_c::~Lump_c()
 
 void Lump_c::MakeEntry(struct raw_wad_entry_s *entry)
 {
-	strncpy(entry->name, name, 8);
+	// do a dance to avoid a compiler warning from strncpy(), *sigh*
+	memset(entry->name, 0, 8);
+	memcpy(entry->name, name, strlen(name));
 
 	entry->pos  = LE_U32(l_start);
 	entry->size = LE_U32(l_length);
@@ -1196,7 +1198,7 @@ void Wad_file::WriteDirectory()
 
 	raw_wad_header_t header;
 
-	strncpy(header.ident, (kind == 'I') ? "IWAD" : "PWAD", 4);
+	memcpy(header.ident, (kind == 'I') ? "IWAD" : "PWAD", 4);
 
 	header.dir_start   = LE_U32(dir_start);
 	header.num_entries = LE_U32(dir_count);
