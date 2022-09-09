@@ -548,12 +548,12 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
 	}
 
 	/* increase cost by the difference between left & right */
-	info.cost += 100 * ABS(info.real_left - info.real_right);
+	info.cost += 100 * abs(info.real_left - info.real_right);
 
 	// -AJA- allow miniseg counts to affect the outcome, but only to a
 	//       lesser degree than real segs.
 
-	info.cost += 50 * ABS(info.mini_left - info.mini_right);
+	info.cost += 50 * abs(info.mini_left - info.mini_right);
 
 	// -AJA- Another little twist, here we show a slight preference for
 	//       partition lines that lie either purely horizontally or
@@ -1503,14 +1503,9 @@ superblock_t *CreateSegs(void)
 			continue;
 
 		// check for Humungously long lines
-		if (ABS(line->start->x - line->end->x) >= 10000 ||
-			ABS(line->start->y - line->end->y) >= 10000)
+		if (UtilComputeDist(line->start->x - line->end->x, line->start->y - line->end->y) >= 30000)
 		{
-			if (UtilComputeDist(line->start->x - line->end->x,
-				line->start->y - line->end->y) >= 30000)
-			{
-				Warning("Linedef #%d is VERY long, it may cause problems\n", line->index);
-			}
+			Warning("Linedef #%d is VERY long, it may cause problems\n", line->index);
 		}
 
 		if (line->right)
