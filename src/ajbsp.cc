@@ -20,12 +20,6 @@
 
 #include "ajbsp.h"
 
-#include <time.h>
-
-#ifndef WIN32
-#include <time.h>
-#endif
-
 
 #define MAX_SPLIT_COST  32
 
