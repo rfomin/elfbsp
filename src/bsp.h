@@ -233,10 +233,10 @@ typedef struct vertex_s
 	int index;
 
 	// vertex is newly created (from a seg split)
-	char is_new;
+	bool is_new;
 
 	// when building normal nodes, unused vertices will be pruned.
-	char is_used;
+	bool is_used;
 
 	// usually NULL, unless this vertex occupies the same location as a
 	// previous vertex.
@@ -334,16 +334,16 @@ typedef struct linedef_s
 	sidedef_t *left;    // left sidede, or NULL if none
 
 	// line is marked two-sided
-	char two_sided;
+	bool two_sided;
 
 	// prefer not to split
-	char is_precious;
+	bool is_precious;
 
 	// zero length (line should be totally ignored)
-	char zero_len;
+	bool zero_len;
 
 	// sector is the same on both sides
-	char self_ref;
+	bool self_ref;
 
 	int flags;
 	int type;
@@ -407,7 +407,7 @@ typedef struct seg_s
 	// start and end vertices produces the same location).  It should be
 	// ignored when writing the SEGS or V1 GL_SEGS lumps.  [Note: there
 	// won't be any of these when writing the V2 GL_SEGS lump].
-	char is_degenerate;
+	bool is_degenerate;
 
 	// the superblock that contains this seg, or NULL if the seg is no
 	// longer in any superblock (e.g. now in a subsector).

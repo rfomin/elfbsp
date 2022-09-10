@@ -251,7 +251,7 @@ static void MarkPolyobjSector(sector_t *sector)
 
 	// mark all lines of this sector as precious, to prevent the sector
 	// from being split.
-	sector->has_polyobj = 1;
+	sector->has_polyobj = true;
 
 	for (i = 0 ; i < num_linedefs ; i++)
 	{
@@ -260,7 +260,7 @@ static void MarkPolyobjSector(sector_t *sector)
 		if ((L->right && L->right->sector == sector) ||
 				(L->left && L->left->sector == sector))
 		{
-			L->is_precious = 1;
+			L->is_precious = true;
 		}
 	}
 }
@@ -770,8 +770,8 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y)
 	vert->x = x;
 	vert->y = y;
 
-	vert->is_new  = 1;
-	vert->is_used = 1;
+	vert->is_new  = true;
+	vert->is_used = true;
 
 	vert->index = num_new_vert;
 	num_new_vert++;
@@ -798,8 +798,8 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
 
 	vertex_t *vert = NewVertex();
 
-	vert->is_new  = 0;
-	vert->is_used = 1;
+	vert->is_new  = false;
+	vert->is_used = true;
 
 	vert->index = num_old_vert;
 	num_old_vert++;

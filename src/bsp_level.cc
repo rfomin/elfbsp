@@ -1172,7 +1172,7 @@ void GetSidedefs(void)
 			LookupSector(LE_U16(raw.sector));
 
 		if (side->sector)
-			side->sector->is_used = 1;
+			side->sector->is_used = true;
 
 		side->x_offset = LE_S16(raw.x_offset);
 		side->y_offset = LE_S16(raw.y_offset);
@@ -1229,8 +1229,8 @@ void GetLinedefs(void)
 		vertex_t *start = LookupVertex(LE_U16(raw.start));
 		vertex_t *end   = LookupVertex(LE_U16(raw.end));
 
-		start->is_used = 1;
-		  end->is_used = 1;
+		start->is_used = true;
+		  end->is_used = true;
 
 		line = NewLinedef();
 
@@ -1238,28 +1238,29 @@ void GetLinedefs(void)
 		line->end   = end;
 
 		// check for zero-length line
-		line->zero_len = (fabs(start->x - end->x) < DIST_EPSILON) &&
+		line->zero_len =
+			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
 		line->flags = LE_U16(raw.flags);
 		line->type = LE_U16(raw.type);
 		line->tag  = LE_S16(raw.tag);
 
-		line->two_sided = (line->flags & MLF_TwoSided) ? 1 : 0;
-		line->is_precious = (line->tag >= 900 && line->tag < 1000) ? 1 : 0;
+		line->two_sided = (line->flags & MLF_TwoSided) != 0;
+		line->is_precious = (line->tag >= 900 && line->tag < 1000);
 
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
 
 		if (line->right)
 		{
-			line->right->is_used = 1;
+			line->right->is_used = true;
 			line->right->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
 		if (line->left)
 		{
-			line->left->is_used = 1;
+			line->left->is_used = true;
 			line->left->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
@@ -1305,8 +1306,8 @@ void GetLinedefsHexen(void)
 		vertex_t *start = LookupVertex(LE_U16(raw.start));
 		vertex_t *end   = LookupVertex(LE_U16(raw.end));
 
-		start->is_used = 1;
-		  end->is_used = 1;
+		start->is_used = true;
+		  end->is_used = true;
 
 		line = NewLinedef();
 
@@ -1314,7 +1315,8 @@ void GetLinedefsHexen(void)
 		line->end   = end;
 
 		// check for zero-length line
-		line->zero_len = (fabs(start->x - end->x) < DIST_EPSILON) &&
+		line->zero_len =
+			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
 		line->flags = LE_U16(raw.flags);
@@ -1326,7 +1328,7 @@ void GetLinedefsHexen(void)
 			line->specials[j] = (u8_t)(raw.args[j]);
 
 		// -JL- Added missing twosided flag handling that caused a broken reject
-		line->two_sided = (line->flags & MLF_TwoSided) ? 1 : 0;
+		line->two_sided = (line->flags & MLF_TwoSided) != 0;
 
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
@@ -1334,13 +1336,13 @@ void GetLinedefsHexen(void)
 		// -JL- Added missing sidedef handling that caused all sidedefs to be pruned
 		if (line->right)
 		{
-			line->right->is_used = 1;
+			line->right->is_used = true;
 			line->right->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
 		if (line->left)
 		{
-			line->left->is_used = 1;
+			line->left->is_used = true;
 			line->left->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
@@ -1531,7 +1533,7 @@ void PutSegs(void)
 		seg_t *seg = segs[i];
 
 		// ignore minisegs and degenerate segs
-		if (! seg->linedef || seg->is_degenerate)
+		if (seg->linedef == NULL || seg->is_degenerate)
 			continue;
 
 		raw.start   = LE_U16(VertexIndex16Bit(seg->start));
@@ -1984,7 +1986,7 @@ void PutZSubsecs(void)
 		for (seg = sub->seg_list ; seg ; seg = seg->next, cur_seg_index++)
 		{
 			// ignore minisegs and degenerate segs
-			if (! seg->linedef || seg->is_degenerate)
+			if (seg->linedef == NULL || seg->is_degenerate)
 				continue;
 
 			if (cur_seg_index != seg->index)
@@ -2017,7 +2019,7 @@ void PutZSegs(void)
 		seg_t *seg = segs[i];
 
 		// ignore minisegs and degenerate segs
-		if (! seg->linedef || seg->is_degenerate)
+		if (seg->linedef == NULL || seg->is_degenerate)
 			continue;
 
 		if (count != seg->index)
