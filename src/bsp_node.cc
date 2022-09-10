@@ -253,8 +253,8 @@ static inline void ComputeIntersection(seg_t *seg, seg_t *part,
 static void AddIntersection(intersection_t ** cut_list,
 		vertex_t *vert, seg_t *part, bool self_ref)
 {
-	bool open_before = VertexCheckOpen(vert, -part->pdx, -part->pdy);
-	bool open_after  = VertexCheckOpen(vert,  part->pdx,  part->pdy);
+	bool open_before = vert->CheckOpen(-part->pdx, -part->pdy);
+	bool open_after  = vert->CheckOpen( part->pdx,  part->pdy);
 
 	double along_dist = part->ParallelDist(vert->x, vert->y);
 

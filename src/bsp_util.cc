@@ -670,8 +670,7 @@ void DetectOverlappingLines(void)
 
 /* ----- vertex routines ------------------------------- */
 
-static void VertexAddWallTip(vertex_t *vert, double dx, double dy,
-		bool open_left, bool open_right)
+void vertex_t::AddWallTip(double dx, double dy, bool open_left, bool open_right)
 {
 	walltip_t *tip = NewWallTip();
 	walltip_t *after;
@@ -681,14 +680,14 @@ static void VertexAddWallTip(vertex_t *vert, double dx, double dy,
 	tip->open_right = open_right;
 
 	// find the correct place (order is increasing angle)
-	for (after=vert->tip_set ; after && after->next ; after=after->next)
+	for (after=tip_set ; after && after->next ; after=after->next)
 	{ }
 
 	while (after && tip->angle + ANG_EPSILON < after->angle)
 		after = after->prev;
 
 	// link it in
-	tip->next = after ? after->next : vert->tip_set;
+	tip->next = after ? after->next : tip_set;
 	tip->prev = after;
 
 	if (after)
@@ -700,10 +699,10 @@ static void VertexAddWallTip(vertex_t *vert, double dx, double dy,
 	}
 	else
 	{
-		if (vert->tip_set)
-			vert->tip_set->prev = tip;
+		if (tip_set != NULL)
+			tip_set->prev = tip;
 
-		vert->tip_set = tip;
+		tip_set = tip;
 	}
 }
 
@@ -727,8 +726,8 @@ void CalculateWallTips(void)
 		bool left  = (L->left  != NULL) && (L->left ->sector != NULL);
 		bool right = (L->right != NULL) && (L->right->sector != NULL);
 
-		VertexAddWallTip(L->start, x2-x1, y2-y1, left, right);
-		VertexAddWallTip(L->end,   x1-x2, y1-y2, right, left);
+		L->start->AddWallTip(x2-x1, y2-y1, left, right);
+		L->end  ->AddWallTip(x1-x2, y1-y2, right, left);
 	}
 
 #if DEBUG_WALLTIPS
@@ -765,8 +764,8 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y)
 	// compute wall-tip info
 	if (seg->linedef == NULL)
 	{
-		VertexAddWallTip(vert,  seg->pdx,  seg->pdy, true, true);
-		VertexAddWallTip(vert, -seg->pdx, -seg->pdy, true, true);
+		vert->AddWallTip( seg->pdx,  seg->pdy, true, true);
+		vert->AddWallTip(-seg->pdx, -seg->pdy, true, true);
 	}
 	else
 	{
@@ -776,8 +775,8 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y)
 		bool left  = (back  != NULL) && (back ->sector != NULL);
 		bool right = (front != NULL) && (front->sector != NULL);
 
-		VertexAddWallTip(vert,  seg->pdx,  seg->pdy, left, right);
-		VertexAddWallTip(vert, -seg->pdx, -seg->pdy, right, left);
+		vert->AddWallTip( seg->pdx,  seg->pdy, left, right);
+		vert->AddWallTip(-seg->pdx, -seg->pdy, right, left);
 	}
 
 	return vert;
@@ -825,7 +824,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
 }
 
 
-bool VertexCheckOpen(vertex_t *vert, double dx, double dy)
+bool vertex_t::CheckOpen(double dx, double dy) const
 {
 	walltip_t *tip;
 
@@ -835,7 +834,7 @@ bool VertexCheckOpen(vertex_t *vert, double dx, double dy)
 	// direction of the given direction (which is relative to the
 	// vertex).
 
-	for (tip=vert->tip_set ; tip ; tip=tip->next)
+	for (tip=tip_set ; tip ; tip=tip->next)
 	{
 		if (fabs(tip->angle - angle) < ANG_EPSILON ||
 			fabs(tip->angle - angle) > (360.0 - ANG_EPSILON))
@@ -849,7 +848,7 @@ bool VertexCheckOpen(vertex_t *vert, double dx, double dy)
 	// the angle we're interested in.  Therefore we'll be on the RIGHT
 	// side of that wall-tip.
 
-	for (tip=vert->tip_set ; tip ; tip=tip->next)
+	for (tip=tip_set ; tip ; tip=tip->next)
 	{
 		if (angle + ANG_EPSILON < tip->angle)
 		{

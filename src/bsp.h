@@ -234,6 +234,14 @@ typedef struct vertex_s
 
 	// list of wall-tips
 	walltip_t *tip_set;
+
+public:
+	// check whether a line with the given delta coordinates from this
+	// vertex is open or closed.  If there exists a walltip at same
+	// angle, it is closed, likewise if line is in void space.
+	bool CheckOpen(double dx, double dy) const;
+
+	void AddWallTip(double dx, double dy, bool open_left, bool open_right);
 }
 vertex_t;
 
@@ -597,21 +605,12 @@ void CalculateWallTips(void);
 
 // return a new vertex (with correct wall-tip info) for the split that
 // happens along the given seg at the given location.
-//
 vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y);
 
 // return a new end vertex to compensate for a seg that would end up
-// being zero-length (after integer rounding).  Doesn't compute the
-// wall-tip info (thus this routine should only be used _after_ node
-// building).
-//
+// being zero-length (after integer rounding).  Doesn't compute the wall-tip
+// info (thus this routine should only be used *after* node building).
 vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
-
-// check whether a line with the given delta coordinates from this
-// vertex is open or closed.  If there exists a walltip at same
-// angle, it is closed, likewise if line is in void space.
-//
-bool VertexCheckOpen(vertex_t *vert, double dx, double dy);
 
 
 //------------------------------------------------------------------------
