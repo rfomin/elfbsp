@@ -1366,7 +1366,7 @@ static inline int VanillaSegDist(const seg_t *seg)
 	double sx = I_ROUND(seg->start->x);
 	double sy = I_ROUND(seg->start->y);
 
-	return (int) floor(UtilComputeDist(sx - lx, sy - ly) + 0.5);
+	return (int) floor(hypot(sx - lx, sy - ly) + 0.5);
 }
 
 static inline int VanillaSegAngle(const seg_t *seg)
@@ -2324,7 +2324,6 @@ void UpdateGLMarker(Lump_c *marker)
 		marker->Printf("LEVEL=%s\n", lev_current_name);
 	}
 
-#if 1
 	marker->Printf("BUILDER=%s\n", "AJBSP " AJBSP_VERSION);
 
 	marker->Printf("OPTIONS=%s\n", CalcOptionsString());
@@ -2336,7 +2335,6 @@ void UpdateGLMarker(Lump_c *marker)
 		marker->Printf("TIME=%s\n", time_str);
 		StringFree(time_str);
 	}
-#endif
 
 	marker->Printf("CHECKSUM=0x%08x\n", crc);
 

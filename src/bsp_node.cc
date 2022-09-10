@@ -113,7 +113,7 @@ void RecomputeSeg(seg_t *seg)
 	seg->pdx = seg->pex - seg->psx;
 	seg->pdy = seg->pey - seg->psy;
 
-	seg->p_length = UtilComputeDist(seg->pdx, seg->pdy);
+	seg->p_length = hypot(seg->pdx, seg->pdy);
 
 	if (seg->p_length <= 0)
 		BugError("Seg %p has zero p_length.\n", seg);
@@ -1419,7 +1419,7 @@ superblock_t *CreateSegs(void)
 			continue;
 
 		// check for Humungously long lines
-		if (UtilComputeDist(line->start->x - line->end->x, line->start->y - line->end->y) >= 30000)
+		if (hypot(line->start->x - line->end->x, line->start->y - line->end->y) >= 30000)
 		{
 			Warning("Linedef #%d is VERY long, it may cause problems\n", line->index);
 		}
