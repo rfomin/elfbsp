@@ -987,9 +987,9 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 		DebugPrintf("  Vertex %8X (%1.1f,%1.1f)  Along %1.2f  [%d/%d]  %s\n",
 				cur->vertex->index, cur->vertex->x, cur->vertex->y,
 				cur->along_dist,
-				cur->before ? cur->before->index : -1,
-				cur->after ? cur->after->index : -1,
-				cur->self_ref ? "SELFREF" : "");
+				cur->open_before ? 1 : 0,
+				cur->open_after  ? 1 : 0,
+				cur->self_ref    ? "SELFREF" : "");
 	}
 # endif
 
@@ -1757,8 +1757,8 @@ static void DebugShowSegs(superblock_t *seg_list)
 
 	for (seg=seg_list->segs ; seg ; seg=seg->next)
 	{
-		DebugPrintf("Build:   %sSEG %p  sector=%d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
-				seg->linedef ? "" : "MINI", seg, seg->sector->index,
+		DebugPrintf("Build:   %sSEG %p  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
+				seg->linedef ? "" : "MINI", seg,
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 	}
 

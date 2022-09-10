@@ -190,7 +190,19 @@ void PrintMapName(const char *name)
 
 void DebugPrintf(const char *fmt, ...)
 {
+#if 1
 	(void) fmt;
+#else
+	static char buffer[MSG_BUF_LEN];
+
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(buffer, sizeof(buffer), fmt, args);
+	va_end(args);
+
+	fprintf(stderr, "%s", buffer);
+#endif
 }
 
 

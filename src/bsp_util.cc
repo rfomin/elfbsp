@@ -20,14 +20,13 @@
 
 #include "ajbsp.h"
 
+#ifndef WIN32
+#include <time.h>
+#endif
+
 
 namespace ajbsp
 {
-
-#define DEBUG_ENABLED   0
-
-#define DEBUGGING_FILE  "gb_debug.txt"
-
 
 #define SYS_MSG_BUFLEN  4000
 
@@ -86,11 +85,6 @@ void MinorIssue(const char *fmt, ...)
 //------------------------------------------------------------------------
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
-
-#ifndef WIN32
-#include <time.h>
-#endif
-
 
 //
 // Allocate memory with error checking.  Zeros the memory.
