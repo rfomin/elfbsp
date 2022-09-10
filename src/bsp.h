@@ -194,12 +194,12 @@ struct sector_s;
 struct superblock_s;
 
 
-// a wall_tip is where a wall meets a vertex
-typedef struct wall_tip_s
+// a wall-tip is where a wall meets a vertex
+typedef struct walltip_s
 {
 	// link in list.  List is kept in ANTI-clockwise order.
-	struct wall_tip_s *next;
-	struct wall_tip_s *prev;
+	struct walltip_s *next;
+	struct walltip_s *prev;
 
 	// angle that line makes at vertex (degrees).
 	angle_g angle;
@@ -210,7 +210,7 @@ typedef struct wall_tip_s
 	bool open_left;
 	bool open_right;
 }
-wall_tip_t;
+walltip_t;
 
 
 typedef struct vertex_s
@@ -232,8 +232,8 @@ typedef struct vertex_s
 	// previous vertex.
 	struct vertex_s *overlap;
 
-	// set of wall_tips
-	wall_tip_t *tip_set;
+	// list of wall-tips
+	walltip_t *tip_set;
 }
 vertex_t;
 
@@ -527,14 +527,27 @@ superblock_t;
 
 /* ----- Level data arrays ----------------------- */
 
-extern int num_vertices;
-extern int num_linedefs;
-extern int num_sidedefs;
-extern int num_sectors;
-extern int num_things;
-extern int num_segs;
-extern int num_subsecs;
-extern int num_nodes;
+extern std::vector<vertex_t *>  lev_vertices;
+extern std::vector<linedef_t *> lev_linedefs;
+extern std::vector<sidedef_t *> lev_sidedefs;
+extern std::vector<sector_t *>  lev_sectors;
+extern std::vector<thing_t *>   lev_things;
+
+extern std::vector<seg_t *>     lev_segs;
+extern std::vector<subsec_t *>  lev_subsecs;
+extern std::vector<node_t *>    lev_nodes;
+extern std::vector<walltip_t *> lev_walltips;
+
+#define num_vertices  ((int)lev_vertices.size())
+#define num_linedefs  ((int)lev_linedefs.size())
+#define num_sidedefs  ((int)lev_sidedefs.size())
+#define num_sectors   ((int)lev_sectors.size())
+#define num_things    ((int)lev_things.size())
+
+#define num_segs      ((int)lev_segs.size())
+#define num_subsecs   ((int)lev_subsecs.size())
+#define num_nodes     ((int)lev_nodes.size())
+#define num_walltips  ((int)lev_walltips.size())
 
 extern int num_old_vert;
 extern int num_new_vert;
@@ -544,25 +557,16 @@ extern int num_complete_seg;
 /* ----- function prototypes ----------------------- */
 
 // allocation routines
-vertex_t *NewVertex(void);
-linedef_t *NewLinedef(void);
-sidedef_t *NewSidedef(void);
-sector_t *NewSector(void);
-thing_t *NewThing(void);
-seg_t *NewSeg(void);
-subsec_t *NewSubsec(void);
-node_t *NewNode(void);
-wall_tip_t *NewWallTip(void);
+vertex_t  *NewVertex();
+linedef_t *NewLinedef();
+sidedef_t *NewSidedef();
+sector_t  *NewSector();
+thing_t   *NewThing();
 
-// lookup routines
-vertex_t *LookupVertex(int index);
-linedef_t *LookupLinedef(int index);
-sidedef_t *LookupSidedef(int index);
-sector_t *LookupSector(int index);
-thing_t *LookupThing(int index);
-seg_t *LookupSeg(int index);
-subsec_t *LookupSubsec(int index);
-node_t *LookupNode(int index);
+seg_t     *NewSeg();
+subsec_t  *NewSubsec();
+node_t    *NewNode();
+walltip_t *NewWallTip();
 
 Lump_c * CreateGLMarker();
 Lump_c * CreateLevelLump(const char *name, int max_size = -1);
@@ -605,14 +609,14 @@ void PruneVerticesAtEnd(void);
 // computes the wall tips for all of the vertices
 void CalculateWallTips(void);
 
-// return a new vertex (with correct wall_tip info) for the split that
+// return a new vertex (with correct wall-tip info) for the split that
 // happens along the given seg at the given location.
 //
 vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y);
 
 // return a new end vertex to compensate for a seg that would end up
 // being zero-length (after integer rounding).  Doesn't compute the
-// wall_tip info (thus this routine should only be used _after_ node
+// wall-tip info (thus this routine should only be used _after_ node
 // building).
 //
 vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);

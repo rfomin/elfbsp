@@ -20,6 +20,8 @@
 
 #include "ajbsp.h"
 
+#include <algorithm>
+
 #ifdef HAVE_ZLIB
 #include <zlib.h>
 #endif
@@ -253,7 +255,7 @@ static void CreateBlockmap(void)
 
 	for (i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = LookupLinedef(i);
+		linedef_t *L = lev_linedefs[i];
 
 		// ignore zero-length lines
 		if (L->zero_len)
@@ -499,7 +501,7 @@ static void FindBlockmapLimits(bbox_t *bbox)
 
 	for (i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = LookupLinedef(i);
+		linedef_t *L = lev_linedefs[i];
 
 		if (! L->zero_len)
 		{
@@ -624,7 +626,7 @@ static void Reject_Init()
 
 	for (int i=0 ; i < num_sectors ; i++)
 	{
-		sector_t *sec = LookupSector(i);
+		sector_t *sec = lev_sectors[i];
 
 		sec->rej_group = i;
 		sec->rej_next = sec->rej_prev = sec;
@@ -650,8 +652,7 @@ static void Reject_GroupSectors()
 
 	for (i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *line = LookupLinedef(i);
-		sector_t *sec1, *sec2, *tmp;
+		linedef_t *line = lev_linedefs[i];
 
 		if (! line->right || ! line->left)
 			continue;
@@ -661,8 +662,9 @@ static void Reject_GroupSectors()
 		if (! line->two_sided)
 			continue;
 
-		sec1 = line->right->sector;
-		sec2 = line->left->sector;
+		sector_t *sec1 = line->right->sector;
+		sector_t *sec2 = line->left->sector;
+		sector_t *tmp;
 
 		if (! sec1 || ! sec2 || sec1 == sec2)
 			continue;
@@ -711,7 +713,7 @@ static void Reject_DebugGroups()
 
 	for (i=0 ; i < num_sectors ; i++)
 	{
-		sector_t *sec = LookupSector(i);
+		sector_t *sec = lev_sectors[i];
 		sector_t *tmp;
 
 		int group = sec->rej_group;
@@ -741,8 +743,8 @@ static void Reject_ProcessSectors()
 	{
 		for (int target=0 ; target < view ; target++)
 		{
-			sector_t *view_sec = LookupSector(view);
-			sector_t *targ_sec = LookupSector(target);
+			sector_t *view_sec = lev_sectors[view];
+			sector_t *targ_sec = lev_sectors[target];
 
 			int p1, p2;
 
@@ -831,22 +833,17 @@ bool lev_long_name;
 int lev_overflows;
 
 
-#define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
-	TYPE ** BASEVAR = NULL;  \
-	int NUMVAR = 0;
+// objects of loaded level, and stuff we've built
+std::vector<vertex_t *>  lev_vertices;
+std::vector<linedef_t *> lev_linedefs;
+std::vector<sidedef_t *> lev_sidedefs;
+std::vector<sector_t *>  lev_sectors;
+std::vector<thing_t *>   lev_things;
 
-
-LEVELARRAY(vertex_t,  lev_vertices,   num_vertices)
-LEVELARRAY(linedef_t, lev_linedefs,   num_linedefs)
-LEVELARRAY(sidedef_t, lev_sidedefs,   num_sidedefs)
-LEVELARRAY(sector_t,  lev_sectors,    num_sectors)
-LEVELARRAY(thing_t,   lev_things,     num_things)
-
-static LEVELARRAY(seg_t,     segs,       num_segs)
-static LEVELARRAY(subsec_t,  subsecs,    num_subsecs)
-static LEVELARRAY(node_t,    nodes,      num_nodes)
-static LEVELARRAY(wall_tip_t,wall_tips,  num_wall_tips)
-
+std::vector<seg_t *>     lev_segs;
+std::vector<subsec_t *>  lev_subsecs;
+std::vector<node_t *>    lev_nodes;
+std::vector<walltip_t *> lev_walltips;
 
 int num_old_vert = 0;
 int num_new_vert = 0;
@@ -856,122 +853,177 @@ int num_real_lines = 0;
 
 /* ----- allocation routines ---------------------------- */
 
-#define ALLIGATOR(TYPE, BASEVAR, NUMVAR)  \
-{  \
-	if ((NUMVAR % ALLOC_BLKNUM) == 0)  \
-	{  \
-		BASEVAR = (TYPE **) UtilRealloc(BASEVAR, (NUMVAR + ALLOC_BLKNUM) * sizeof(TYPE *));  \
-	}  \
-	BASEVAR[NUMVAR] = (TYPE *) UtilCalloc(sizeof(TYPE));  \
-	NUMVAR += 1;  \
-	return BASEVAR[NUMVAR - 1];  \
+vertex_t *NewVertex()
+{
+	vertex_t *V = (vertex_t *) UtilCalloc(sizeof(vertex_t));
+	lev_vertices.push_back(V);
+	return V;
 }
 
+linedef_t *NewLinedef()
+{
+	linedef_t *L = (linedef_t *) UtilCalloc(sizeof(linedef_t));
+	lev_linedefs.push_back(L);
+	return L;
+}
 
-vertex_t *NewVertex(void)
-	ALLIGATOR(vertex_t, lev_vertices, num_vertices)
+sidedef_t *NewSidedef()
+{
+	sidedef_t *S = (sidedef_t *) UtilCalloc(sizeof(sidedef_t));
+	lev_sidedefs.push_back(S);
+	return S;
+}
 
-linedef_t *NewLinedef(void)
-	ALLIGATOR(linedef_t, lev_linedefs, num_linedefs)
+sector_t *NewSector()
+{
+	sector_t *S = (sector_t *) UtilCalloc(sizeof(sector_t));
+	lev_sectors.push_back(S);
+	return S;
+}
 
-sidedef_t *NewSidedef(void)
-	ALLIGATOR(sidedef_t, lev_sidedefs, num_sidedefs)
+thing_t *NewThing()
+{
+	thing_t *T = (thing_t *) UtilCalloc(sizeof(thing_t));
+	lev_things.push_back(T);
+	return T;
+}
 
-sector_t *NewSector(void)
-	ALLIGATOR(sector_t, lev_sectors, num_sectors)
+seg_t *NewSeg()
+{
+	seg_t *S = (seg_t *) UtilCalloc(sizeof(seg_t));
+	lev_segs.push_back(S);
+	return S;
+}
 
-thing_t *NewThing(void)
-	ALLIGATOR(thing_t, lev_things, num_things)
+subsec_t *NewSubsec()
+{
+	subsec_t *S = (subsec_t *) UtilCalloc(sizeof(subsec_t));
+	lev_subsecs.push_back(S);
+	return S;
+}
 
-seg_t *NewSeg(void)
-	ALLIGATOR(seg_t, segs, num_segs)
+node_t *NewNode()
+{
+	node_t *N = (node_t *) UtilCalloc(sizeof(node_t));
+	lev_nodes.push_back(N);
+	return N;
+}
 
-subsec_t *NewSubsec(void)
-	ALLIGATOR(subsec_t, subsecs, num_subsecs)
-
-node_t *NewNode(void)
-	ALLIGATOR(node_t, nodes, num_nodes)
-
-wall_tip_t *NewWallTip(void)
-	ALLIGATOR(wall_tip_t, wall_tips, num_wall_tips)
+walltip_t *NewWallTip()
+{
+	walltip_t *WT = (walltip_t *) UtilCalloc(sizeof(walltip_t));
+	lev_walltips.push_back(WT);
+	return WT;
+}
 
 
 /* ----- free routines ---------------------------- */
 
-#define FREEMASON(TYPE, BASEVAR, NUMVAR)  \
-{  \
-	int i;  \
-	for (i=0 ; i < NUMVAR ; i++)  \
-		UtilFree(BASEVAR[i]);  \
-	if (BASEVAR)  \
-		UtilFree(BASEVAR);  \
-	BASEVAR = NULL; NUMVAR = 0;  \
+void FreeVertices()
+{
+	for (unsigned int i = 0 ; i < lev_vertices.size() ; i++)
+		UtilFree((void *) lev_vertices[i]);
+
+	lev_vertices.clear();
 }
 
+void FreeLinedefs()
+{
+	for (unsigned int i = 0 ; i < lev_linedefs.size() ; i++)
+		UtilFree((void *) lev_linedefs[i]);
 
-void FreeVertices(void)
-	FREEMASON(vertex_t, lev_vertices, num_vertices)
-
-void FreeLinedefs(void)
-	FREEMASON(linedef_t, lev_linedefs, num_linedefs)
-
-void FreeSidedefs(void)
-	FREEMASON(sidedef_t, lev_sidedefs, num_sidedefs)
-
-void FreeSectors(void)
-	FREEMASON(sector_t, lev_sectors, num_sectors)
-
-void FreeThings(void)
-	FREEMASON(thing_t, lev_things, num_things)
-
-void FreeSegs(void)
-	FREEMASON(seg_t, segs, num_segs)
-
-void FreeSubsecs(void)
-	FREEMASON(subsec_t, subsecs, num_subsecs)
-
-void FreeNodes(void)
-	FREEMASON(node_t, nodes, num_nodes)
-
-void FreeWallTips(void)
-	FREEMASON(wall_tip_t, wall_tips, num_wall_tips)
-
-
-/* ----- lookup routines ------------------------------ */
-
-#define LOOKERUPPER(BASEVAR, NUMVAR, NAMESTR)  \
-{  \
-	if (index < 0 || index >= NUMVAR)  \
-		BugError("No such %s number #%d\n", NAMESTR, index);  \
-	return BASEVAR[index];  \
+	lev_linedefs.clear();
 }
 
-vertex_t *LookupVertex(int index)
-	LOOKERUPPER(lev_vertices, num_vertices, "vertex")
+void FreeSidedefs()
+{
+	for (unsigned int i = 0 ; i < lev_sidedefs.size() ; i++)
+		UtilFree((void *) lev_sidedefs[i]);
 
-linedef_t *LookupLinedef(int index)
-	LOOKERUPPER(lev_linedefs, num_linedefs, "linedef")
+	lev_sidedefs.clear();
+}
 
-sidedef_t *LookupSidedef(int index)
-	LOOKERUPPER(lev_sidedefs, num_sidedefs, "sidedef")
+void FreeSectors()
+{
+	for (unsigned int i = 0 ; i < lev_sectors.size() ; i++)
+		UtilFree((void *) lev_sectors[i]);
 
-sector_t *LookupSector(int index)
-	LOOKERUPPER(lev_sectors, num_sectors, "sector")
+	lev_sectors.clear();
+}
 
-thing_t *LookupThing(int index)
-	LOOKERUPPER(lev_things, num_things, "thing")
+void FreeThings()
+{
+	for (unsigned int i = 0 ; i < lev_things.size() ; i++)
+		UtilFree((void *) lev_things[i]);
 
-seg_t *LookupSeg(int index)
-	LOOKERUPPER(segs, num_segs, "seg")
+	lev_things.clear();
+}
 
-subsec_t *LookupSubsec(int index)
-	LOOKERUPPER(subsecs, num_subsecs, "subsector")
+void FreeSegs()
+{
+	for (unsigned int i = 0 ; i < lev_segs.size() ; i++)
+		UtilFree((void *) lev_segs[i]);
 
-node_t *LookupNode(int index)
-	LOOKERUPPER(nodes, num_nodes, "node")
+	lev_segs.clear();
+}
+
+void FreeSubsecs()
+{
+	for (unsigned int i = 0 ; i < lev_subsecs.size() ; i++)
+		UtilFree((void *) lev_subsecs[i]);
+
+	lev_subsecs.clear();
+}
+
+void FreeNodes()
+{
+	for (unsigned int i = 0 ; i < lev_nodes.size() ; i++)
+		UtilFree((void *) lev_nodes[i]);
+
+	lev_nodes.clear();
+}
+
+void FreeWallTips()
+{
+	for (unsigned int i = 0 ; i < lev_walltips.size() ; i++)
+		UtilFree((void *) lev_walltips[i]);
+
+	lev_walltips.clear();
+}
 
 
 /* ----- reading routines ------------------------------ */
+
+static vertex_t *SafeLookupVertex(u16_t num)
+{
+	if ((int)num >= num_vertices)
+		FatalError("illegal vertex number #%d\n", (int)num);
+
+	return lev_vertices[num];
+}
+
+static sector_t *SafeLookupSector(u16_t num)
+{
+	if (num == 0xFFFF)
+		return NULL;
+
+	if (num >= num_sectors)
+		FatalError("illegal sector number #%d\n", (int)num);
+
+	return lev_sectors[num];
+}
+
+static inline sidedef_t *SafeLookupSidedef(u16_t num)
+{
+	if (num == 0xFFFF)
+		return NULL;
+
+	// silently ignore illegal sidedef numbers
+	if (num >= (unsigned int)num_sidedefs)
+		return NULL;
+
+	return lev_sidedefs[num];
+}
 
 
 void GetVertices(void)
@@ -1168,8 +1220,7 @@ void GetSidedefs(void)
 
 		sidedef_t *side = NewSidedef();
 
-		side->sector = (LE_S16(raw.sector) == -1) ? NULL :
-			LookupSector(LE_U16(raw.sector));
+		side->sector = SafeLookupSector(LE_S16(raw.sector));
 
 		if (side->sector)
 			side->sector->is_used = true;
@@ -1184,17 +1235,6 @@ void GetSidedefs(void)
 		// sidedef indices never change
 		side->index = i;
 	}
-}
-
-static inline sidedef_t *SafeLookupSidedef(u16_t num)
-{
-	if (num == 0xFFFF)
-		return NULL;
-
-	if ((int)num >= num_sidedefs && (s16_t)(num) < 0)
-		return NULL;
-
-	return LookupSidedef(num);
 }
 
 
@@ -1226,8 +1266,8 @@ void GetLinedefs(void)
 
 		linedef_t *line;
 
-		vertex_t *start = LookupVertex(LE_U16(raw.start));
-		vertex_t *end   = LookupVertex(LE_U16(raw.end));
+		vertex_t *start = SafeLookupVertex(LE_U16(raw.start));
+		vertex_t *end   = SafeLookupVertex(LE_U16(raw.end));
 
 		start->is_used = true;
 		  end->is_used = true;
@@ -1303,8 +1343,8 @@ void GetLinedefsHexen(void)
 
 		linedef_t *line;
 
-		vertex_t *start = LookupVertex(LE_U16(raw.start));
-		vertex_t *end   = LookupVertex(LE_U16(raw.end));
+		vertex_t *start = SafeLookupVertex(LE_U16(raw.start));
+		vertex_t *end   = SafeLookupVertex(LE_U16(raw.end));
 
 		start->is_used = true;
 		  end->is_used = true;
@@ -1383,20 +1423,6 @@ static inline int VanillaSegAngle(const seg_t *seg)
 	int result = (int) floor(angle * 65536.0 / 360.0 + 0.5);
 
 	return (result & 0xFFFF);
-}
-
-static int SegCompare(const void *p1, const void *p2)
-{
-	const seg_t *A = ((const seg_t **) p1)[0];
-	const seg_t *B = ((const seg_t **) p2)[0];
-
-	if (A->index < 0)
-		BugError("Seg %p never reached a subsector !\n", A);
-
-	if (B->index < 0)
-		BugError("Seg %p never reached a subsector !\n", B);
-
-	return (A->index - B->index);
 }
 
 
@@ -1530,7 +1556,7 @@ void PutSegs(void)
 	{
 		raw_seg_t raw;
 
-		seg_t *seg = segs[i];
+		seg_t *seg = lev_segs[i];
 
 		// ignore minisegs and degenerate segs
 		if (seg->linedef == NULL || seg->is_degenerate)
@@ -1581,7 +1607,7 @@ void PutGLSegs(void)
 	{
 		raw_gl_seg_t raw;
 
-		seg_t *seg = segs[i];
+		seg_t *seg = lev_segs[i];
 
 		// ignore degenerate segs
 		if (seg->is_degenerate)
@@ -1635,7 +1661,7 @@ void PutGLSegs_V5()
 	{
 		raw_v5_seg_t raw;
 
-		seg_t *seg = segs[i];
+		seg_t *seg = lev_segs[i];
 
 		// ignore degenerate segs
 		if (seg->is_degenerate)
@@ -1686,7 +1712,7 @@ void PutSubsecs(const char *name, int do_gl)
 	{
 		raw_subsec_t raw;
 
-		subsec_t *sub = subsecs[i];
+		subsec_t *sub = lev_subsecs[i];
 
 		raw.first = LE_U16(sub->seg_list->index);
 		raw.num   = LE_U16(sub->seg_count);
@@ -1719,7 +1745,7 @@ void PutGLSubsecs_V5()
 	{
 		raw_v5_subsec_t raw;
 
-		subsec_t *sub = subsecs[i];
+		subsec_t *sub = lev_subsecs[i];
 
 		raw.first = LE_U32(sub->seg_list->index);
 		raw.num   = LE_U32(sub->seg_count);
@@ -1917,10 +1943,25 @@ void CheckLimits()
 }
 
 
+struct Compare_seg_pred
+{
+	inline bool operator() (const seg_t *A, const seg_t *B) const
+	{
+		return A->index < B->index;
+	}
+};
+
 void SortSegs()
 {
+	// do a sanity check
+	for (int i = 0 ; i < num_segs ; i++)
+	{
+		if (lev_segs[i]->index < 0)
+			BugError("Seg %p never reached a subsector!\n", i);
+	}
+
 	// sort segs into ascending index
-	qsort(segs, num_segs, sizeof(seg_t *), SegCompare);
+	std::sort(lev_segs.begin(), lev_segs.end(), Compare_seg_pred());
 }
 
 
@@ -1974,7 +2015,7 @@ void PutZSubsecs(void)
 
 	for (i=0 ; i < num_subsecs ; i++)
 	{
-		subsec_t *sub = subsecs[i];
+		subsec_t *sub = lev_subsecs[i];
 		seg_t *seg;
 
 		raw_num = LE_U32(sub->seg_count);
@@ -2016,7 +2057,7 @@ void PutZSegs(void)
 
 	for (i=0, count=0 ; i < num_segs ; i++)
 	{
-		seg_t *seg = segs[i];
+		seg_t *seg = lev_segs[i];
 
 		// ignore minisegs and degenerate segs
 		if (seg->linedef == NULL || seg->is_degenerate)

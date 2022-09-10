@@ -225,12 +225,6 @@ void Adler32_Finish(u32_t *crc)
 
 #define POLY_BOX_SZ  10
 
-// stuff needed from level.c (this file closely related)
-extern vertex_t  ** lev_vertices;
-extern linedef_t ** lev_linedefs;
-extern sidedef_t ** lev_sidedefs;
-extern sector_t  ** lev_sectors;
-
 
 /* ----- polyobj handling ----------------------------- */
 
@@ -427,7 +421,7 @@ void DetectPolyobjSectors(void)
 
 	for (i = 0 ; i < num_things ; i++)
 	{
-		thing_t *T = LookupThing(i);
+		thing_t *T = lev_things[i];
 
 		if (T->type == ZDOOM_PO_SPAWN_TYPE || T->type == ZDOOM_PO_SPAWNCRUSH_TYPE)
 		{
@@ -444,7 +438,7 @@ void DetectPolyobjSectors(void)
 
 	for (i = 0 ; i < num_things ; i++)
 	{
-		thing_t *T = LookupThing(i);
+		thing_t *T = lev_things[i];
 
 		double x = (double) T->x;
 		double y = (double) T->y;
@@ -544,7 +538,7 @@ void DetectOverlappingVertices(void)
 
 void PruneVerticesAtEnd(void)
 {
-	int new_num = num_vertices;
+	int old_num = num_vertices;
 
 	// scan all vertices.
 	// only remove from the end, so stop when hit a used one.
@@ -558,16 +552,14 @@ void PruneVerticesAtEnd(void)
 
 		UtilFree(V);
 
-		new_num -= 1;
+		lev_vertices.pop_back();
 	}
 
-	if (new_num < num_vertices)
+	int unused = old_num - num_vertices;
+
+	if (unused > 0)
 	{
-		int unused = num_vertices - new_num;
-
 		PrintDetail("    Pruned %d unused vertices at end\n", unused);
-
-		num_vertices = new_num;
 	}
 
 	num_old_vert = num_vertices;
@@ -687,8 +679,8 @@ void DetectOverlappingLines(void)
 static void VertexAddWallTip(vertex_t *vert, double dx, double dy,
 		bool open_left, bool open_right)
 {
-	wall_tip_t *tip = NewWallTip();
-	wall_tip_t *after;
+	walltip_t *tip = NewWallTip();
+	walltip_t *after;
 
 	tip->angle = UtilComputeAngle(dx, dy);
 	tip->open_left  = open_left;
@@ -748,11 +740,11 @@ void CalculateWallTips(void)
 # if DEBUG_WALLTIPS
 	for (i=0 ; i < num_vertices ; i++)
 	{
-		vertex_t *V = LookupVertex(i);
+		vertex_t *V = lev_vertices[i];
 
 		DebugPrintf("WallTips for vertex %d:\n", i);
 
-		for (wall_tip_t *tip = V->tip_set ; tip ; tip = tip->next)
+		for (walltip_t *tip = V->tip_set ; tip ; tip = tip->next)
 		{
 			DebugPrintf("  Angle=%1.1f left=%d right=%d\n", tip->angle,
 					tip->open_left  ? 1 : 0,
@@ -776,7 +768,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y)
 	vert->index = num_new_vert;
 	num_new_vert++;
 
-	// compute wall_tip info
+	// compute wall-tip info
 
 	VertexAddWallTip(vert, -seg->pdx, -seg->pdy, true, true);
 	VertexAddWallTip(vert,  seg->pdx,  seg->pdy, true, true);
@@ -828,11 +820,11 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
 
 bool VertexCheckOpen(vertex_t *vert, double dx, double dy)
 {
-	wall_tip_t *tip;
+	walltip_t *tip;
 
 	angle_g angle = UtilComputeAngle(dx, dy);
 
-	// first check whether there's a wall_tip that lies in the exact
+	// first check whether there's a wall-tip that lies in the exact
 	// direction of the given direction (which is relative to the
 	// vertex).
 
@@ -846,9 +838,9 @@ bool VertexCheckOpen(vertex_t *vert, double dx, double dy)
 		}
 	}
 
-	// OK, now just find the first wall_tip whose angle is greater than
+	// OK, now just find the first wall-tip whose angle is greater than
 	// the angle we're interested in.  Therefore we'll be on the RIGHT
-	// side of that wall_tip.
+	// side of that wall-tip.
 
 	for (tip=vert->tip_set ; tip ; tip=tip->next)
 	{

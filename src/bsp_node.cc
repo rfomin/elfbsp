@@ -1406,7 +1406,7 @@ superblock_t *CreateSegs(void)
 
 	for (i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *line = LookupLinedef(i);
+		linedef_t *line = lev_linedefs[i];
 
 		right = NULL;
 
@@ -1914,7 +1914,7 @@ void ClockwiseBspTree()
 
 	for (int i=0 ; i < num_subsecs ; i++)
 	{
-		subsec_t *sub = LookupSubsec(i);
+		subsec_t *sub = lev_subsecs[i];
 
 		ClockwiseOrder(sub);
 		RenumberSubsecSegs(sub);
@@ -1983,7 +1983,7 @@ void NormaliseBspTree()
 
 	for (int i=0 ; i < num_subsecs ; i++)
 	{
-		subsec_t *sub = LookupSubsec(i);
+		subsec_t *sub = lev_subsecs[i];
 
 		NormaliseSubsector(sub);
 		RenumberSubsecSegs(sub);
@@ -1995,7 +1995,7 @@ static void RoundOffVertices()
 {
 	for (int i = 0 ; i < num_vertices ; i++)
 	{
-		vertex_t *vert = LookupVertex(i);
+		vertex_t *vert = lev_vertices[i];
 
 		if (vert->is_new)
 		{
@@ -2124,7 +2124,7 @@ void RoundOffBspTree()
 
 	for (int i=0 ; i < num_subsecs ; i++)
 	{
-		subsec_t *sub = LookupSubsec(i);
+		subsec_t *sub = lev_subsecs[i];
 
 		RoundOffSubsector(sub);
 		RenumberSubsecSegs(sub);
