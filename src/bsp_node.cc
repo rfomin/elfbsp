@@ -259,7 +259,7 @@ static void AddIntersection(intersection_t ** cut_list,
 	if (force_closed == 1) open_before = false;
 	if (force_closed == 2) open_after  = false;
 
-	double along_dist = UtilParallelDist(part, vert->x, vert->y);
+	double along_dist = part->ParallelDist(vert->x, vert->y);
 
 	intersection_t *cut;
 	intersection_t *after;
@@ -396,8 +396,8 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 		}
 		else
 		{
-			a = UtilPerpDist(part, check->psx, check->psy);
-			b = UtilPerpDist(part, check->pex, check->pey);
+			a = part->PerpDist(check->psx, check->psy);
+			b = part->PerpDist(check->pex, check->pey);
 
 			fa = fabs(a);
 			fb = fabs(b);
@@ -816,8 +816,8 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 	double x, y;
 
 	/* get state of lines' relation to each other */
-	double a = UtilPerpDist(part, seg->psx, seg->psy);
-	double b = UtilPerpDist(part, seg->pex, seg->pey);
+	double a = part->PerpDist(seg->psx, seg->psy);
+	double b = part->PerpDist(seg->pex, seg->pey);
 
 	bool self_ref = seg->linedef ? seg->linedef->self_ref : false;
 
@@ -1101,9 +1101,9 @@ static superblock_t *quick_alloc_supers = NULL;
 //
 // Returns -1 for left, +1 for right, or 0 for intersect.
 //
-static int PointOnLineSide(seg_t *part, double x, double y)
+int seg_s::PointOnLineSide(double x, double y) const
 {
-	double perp = UtilPerpDist(part, x, y);
+	double perp = PerpDist(x, y);
 
 	if (fabs(perp) <= DIST_EPSILON)
 		return 0;
@@ -1147,13 +1147,13 @@ int BoxOnLineSide(superblock_t *box, seg_t *part)
 	// now handle the cases of positive and negative slope
 	else if (part->pdx * part->pdy > 0)
 	{
-		p1 = PointOnLineSide(part, x1, y2);
-		p2 = PointOnLineSide(part, x2, y1);
+		p1 = part->PointOnLineSide(x1, y2);
+		p2 = part->PointOnLineSide(x2, y1);
 	}
 	else  // NEGATIVE
 	{
-		p1 = PointOnLineSide(part, x1, y1);
-		p2 = PointOnLineSide(part, x2, y2);
+		p1 = part->PointOnLineSide(x1, y1);
+		p2 = part->PointOnLineSide(x2, y2);
 	}
 
 	if (p1 == p2)
