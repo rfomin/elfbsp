@@ -1139,9 +1139,7 @@ void GetThings(void)
 		thing->x = LE_S16(raw.x);
 		thing->y = LE_S16(raw.y);
 
-		thing->type = LE_U16(raw.type);
-		thing->options = LE_U16(raw.options);
-
+		thing->type  = LE_U16(raw.type);
 		thing->index = i;
 	}
 }
@@ -1178,9 +1176,7 @@ void GetThingsHexen(void)
 		thing->x = LE_S16(raw.x);
 		thing->y = LE_S16(raw.y);
 
-		thing->type = LE_U16(raw.type);
-		thing->options = LE_U16(raw.options);
-
+		thing->type  = LE_U16(raw.type);
 		thing->index = i;
 	}
 }
