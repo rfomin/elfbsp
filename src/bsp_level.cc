@@ -1102,14 +1102,8 @@ void GetSectors(void)
 		sector->special = LE_U16(raw.type);
 		sector->tag = LE_S16(raw.tag);
 
-		sector->coalesce = (sector->tag >= 900 && sector->tag < 1000) ? 1 : 0;
-
 		// sector indices never change
 		sector->index = i;
-
-		sector->warned_facing = -1;
-
-		// Note: rej_* fields are handled completely in reject.c
 	}
 }
 

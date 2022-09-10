@@ -246,7 +246,7 @@ static void MarkPolyobjSector(sector_t *sector)
 		linedef_t *L = lev_linedefs[i];
 
 		if ((L->right && L->right->sector == sector) ||
-				(L->left && L->left->sector == sector))
+			(L->left  && L->left ->sector == sector))
 		{
 			L->is_precious = true;
 		}

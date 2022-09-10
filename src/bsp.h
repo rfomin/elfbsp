@@ -243,11 +243,8 @@ typedef struct sector_s
 	// sector index.  Always valid after loading & pruning.
 	int index;
 
-	// allow segs from other sectors to coexist in a subsector.
-	char coalesce;
-
 	// -JL- non-zero if this sector contains a polyobj.
-	char has_polyobj;
+	bool has_polyobj;
 
 	// heights
 	int floor_h, ceil_h;
@@ -270,10 +267,6 @@ typedef struct sector_s
 
 	struct sector_s *rej_next;
 	struct sector_s *rej_prev;
-
-	// suppress superfluous mini warnings
-	int warned_facing;
-	char warned_unclosed;
 }
 sector_t;
 
