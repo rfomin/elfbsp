@@ -214,11 +214,11 @@ typedef struct wall_tip_s
 	// angle that line makes at vertex (degrees).
 	angle_g angle;
 
-	// sectors on each side of wall.  Left is the side of increasing
-	// angles, right is the side of decreasing angles.  Either can be
-	// NULL for one sided walls.
-	struct sector_s *left;
-	struct sector_s *right;
+	// whether each side of wall is OPEN or CLOSED.
+	// left is the side of increasing angles, whereas
+	// right is the side of decreasing angles.
+	bool open_left;
+	bool open_right;
 }
 wall_tip_t;
 
@@ -389,9 +389,6 @@ typedef struct seg_s
 
 	// linedef that this seg goes along, or NULL if miniseg
 	linedef_t *linedef;
-
-	// adjacent sector, or NULL if invalid sidedef or miniseg
-	sector_t *sector;
 
 	// 0 for right, 1 for left
 	int side;
@@ -614,11 +611,11 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y);
 //
 vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
 
-// check whether a line with the given delta coordinates and beginning
-// at this vertex is open.  Returns a sector reference if it's open,
-// or NULL if closed (void space or directly along a linedef).
+// check whether a line with the given delta coordinates from this
+// vertex is open or closed.  If there exists a walltip at same
+// angle, it is closed, likewise if line is in void space.
 //
-sector_t * VertexCheckOpen(vertex_t *vert, double dx, double dy);
+bool VertexCheckOpen(vertex_t *vert, double dx, double dy);
 
 
 //------------------------------------------------------------------------
@@ -658,10 +655,10 @@ typedef struct intersection_s
 	// true if this intersection was on a self-referencing linedef
 	bool self_ref;
 
-	// sector on each side of the vertex (along the partition),
-	// or NULL when that direction isn't OPEN.
-	sector_t *before;
-	sector_t *after;
+	// status of each side of the vertex (along the partition),
+	// true if OPEN and false if CLOSED.
+	bool open_before;
+	bool open_after;
 }
 intersection_t;
 
