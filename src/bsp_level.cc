@@ -1222,9 +1222,6 @@ void GetSidedefs(void)
 
 		side->sector = SafeLookupSector(LE_S16(raw.sector));
 
-		if (side->sector)
-			side->sector->is_used = true;
-
 		side->x_offset = LE_S16(raw.x_offset);
 		side->y_offset = LE_S16(raw.y_offset);
 
@@ -1294,13 +1291,11 @@ void GetLinedefs(void)
 
 		if (line->right)
 		{
-			line->right->is_used = true;
 			line->right->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
 		if (line->left)
 		{
-			line->left->is_used = true;
 			line->left->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
@@ -1376,13 +1371,11 @@ void GetLinedefsHexen(void)
 		// -JL- Added missing sidedef handling that caused all sidedefs to be pruned
 		if (line->right)
 		{
-			line->right->is_used = true;
 			line->right->on_special |= (line->type > 0) ? 1 : 0;
 		}
 
 		if (line->left)
 		{
-			line->left->is_used = true;
 			line->left->on_special |= (line->type > 0) ? 1 : 0;
 		}
 

@@ -249,9 +249,6 @@ typedef struct sector_s
 	// -JL- non-zero if this sector contains a polyobj.
 	char has_polyobj;
 
-	// when building normal nodes, unused sectors will be pruned.
-	char is_used;
-
 	// heights
 	int floor_h, ceil_h;
 
@@ -296,9 +293,6 @@ typedef struct sidedef_s
 
 	// sidedef index.  Always valid after loading & pruning.
 	int index;
-
-	// when building normal nodes, unused sidedefs will be pruned.
-	char is_used;
 
 	// usually NULL, unless this sidedef is exactly the same as a
 	// previous one.  Only used during the pruning phase.
