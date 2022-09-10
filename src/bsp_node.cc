@@ -251,13 +251,10 @@ static inline void ComputeIntersection(seg_t *seg, seg_t *part,
 
 
 static void AddIntersection(intersection_t ** cut_list,
-		vertex_t *vert, seg_t *part, bool self_ref, int force_closed)
+		vertex_t *vert, seg_t *part, bool self_ref)
 {
 	bool open_before = VertexCheckOpen(vert, -part->pdx, -part->pdy);
 	bool open_after  = VertexCheckOpen(vert,  part->pdx,  part->pdy);
-
-	if (force_closed == 1) open_before = false;
-	if (force_closed == 2) open_after  = false;
 
 	double along_dist = part->ParallelDist(vert->x, vert->y);
 
@@ -267,26 +264,8 @@ static void AddIntersection(intersection_t ** cut_list,
 	/* merge with any existing vertex? */
 	for (cut=(*cut_list) ; cut ; cut=cut->next)
 	{
-		if (vert == cut->vertex)
-		{
-			if (force_closed == 1) cut->open_before = false;
-			if (force_closed == 2) cut->open_after  = false;
-
-			return;
-		}
-
 		if (fabs(along_dist - cut->along_dist) < DIST_EPSILON)
-		{
-			// an OPEN aspect always overrides a CLOSED one.
-			// [ though a mismatch should only occur with broken geometry ]
-			if (open_before) cut->open_before = true;
-			if (open_after)  cut->open_after  = true;
-
-			if (force_closed == 1) cut->open_before = false;
-			if (force_closed == 2) cut->open_after  = false;
-
 			return;
-		}
 	}
 
 	/* create new intersection */
@@ -827,8 +806,8 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 	/* check for being on the same line */
 	if (fabs(a) <= DIST_EPSILON && fabs(b) <= DIST_EPSILON)
 	{
-		AddIntersection(cut_list, seg->start, part, self_ref, 2);
-		AddIntersection(cut_list, seg->end,   part, self_ref, 1);
+		AddIntersection(cut_list, seg->start, part, self_ref);
+		AddIntersection(cut_list, seg->end,   part, self_ref);
 
 		// this seg runs along the same line as the partition.  check
 		// whether it goes in the same direction or the opposite.
@@ -849,9 +828,9 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 	if (a > -DIST_EPSILON && b > -DIST_EPSILON)
 	{
 		if (a < DIST_EPSILON)
-			AddIntersection(cut_list, seg->start, part, self_ref, 0);
+			AddIntersection(cut_list, seg->start, part, self_ref);
 		else if (b < DIST_EPSILON)
-			AddIntersection(cut_list, seg->end, part, self_ref, 0);
+			AddIntersection(cut_list, seg->end, part, self_ref);
 
 		AddSegToSuper(right_list, seg);
 		return;
@@ -861,9 +840,9 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 	if (a < DIST_EPSILON && b < DIST_EPSILON)
 	{
 		if (a > -DIST_EPSILON)
-			AddIntersection(cut_list, seg->start, part, self_ref, 0);
+			AddIntersection(cut_list, seg->start, part, self_ref);
 		else if (b > -DIST_EPSILON)
-			AddIntersection(cut_list, seg->end, part, self_ref, 0);
+			AddIntersection(cut_list, seg->end, part, self_ref);
 
 		AddSegToSuper(left_list, seg);
 		return;
@@ -876,7 +855,7 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 
 	new_seg = SplitSeg(seg, x, y);
 
-	AddIntersection(cut_list, seg->end, part, self_ref, 0);
+	AddIntersection(cut_list, seg->end, part, self_ref);
 
 	if (a < 0)
 	{
