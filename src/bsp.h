@@ -445,6 +445,17 @@ typedef struct subsec_s
 	// approximate middle point
 	double mid_x;
 	double mid_y;
+
+public:
+	void DetermineMiddle();
+	void ClockwiseOrder();
+	void RenumberSegs();
+
+	void RoundOff();
+	void Normalise();
+
+	void SanityCheckClosed() const;
+	void SanityCheckHasRealSeg() const;
 }
 subsec_t;
 

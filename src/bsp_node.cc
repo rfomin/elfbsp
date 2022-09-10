@@ -1440,15 +1440,15 @@ superblock_t *CreateSegs(void)
 }
 
 
-static void DetermineMiddle(subsec_t *sub)
+void subsec_t::DetermineMiddle()
 {
-	seg_t *seg;
+	mid_x = 0;
+	mid_y = 0;
 
-	double mid_x=0, mid_y=0;
-	int total=0;
+	int total = 0;
 
 	// compute middle coordinates
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg_t *seg=seg_list ; seg ; seg=seg->next)
 	{
 		mid_x += seg->start->x + seg->end->x;
 		mid_y += seg->start->y + seg->end->y;
@@ -1456,8 +1456,11 @@ static void DetermineMiddle(subsec_t *sub)
 		total += 2;
 	}
 
-	sub->mid_x = mid_x / total;
-	sub->mid_y = mid_y / total;
+	if (total > 0)
+	{
+		mid_x /= total;
+		mid_y /= total;
+	}
 }
 
 
@@ -1465,7 +1468,7 @@ static void DetermineMiddle(subsec_t *sub)
 // -AJA- Put the list of segs into clockwise order.
 //       Uses the now famous "double bubble" sorter :).
 //
-static void ClockwiseOrder(subsec_t *sub)
+void subsec_t::ClockwiseOrder()
 {
 	seg_t *seg;
 	seg_t ** array;
@@ -1477,12 +1480,12 @@ static void ClockwiseOrder(subsec_t *sub)
 	int first = 0;
 	int score = -1;
 
-# if DEBUG_SUBSEC
-	DebugPrintf("Subsec: Clockwising %d\n", sub->index);
-# endif
+#if DEBUG_SUBSEC
+	DebugPrintf("Subsec: Clockwising %d\n", index);
+#endif
 
 	// count segs and create an array to manipulate them
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 		total++;
 
 	// use local array if small enough
@@ -1491,7 +1494,7 @@ static void ClockwiseOrder(subsec_t *sub)
 	else
 		array = (seg_t **) UtilCalloc(total * sizeof(seg_t *));
 
-	for (seg=sub->seg_list, i=0 ; seg ; seg=seg->next, i++)
+	for (seg=seg_list, i=0 ; seg ; seg=seg->next, i++)
 		array[i] = seg;
 
 	if (i != total)
@@ -1507,10 +1510,8 @@ static void ClockwiseOrder(subsec_t *sub)
 		seg_t *A = array[i];
 		seg_t *B = array[i+1];
 
-		angle_g angle1, angle2;
-
-		angle1 = UtilComputeAngle(A->start->x - sub->mid_x, A->start->y - sub->mid_y);
-		angle2 = UtilComputeAngle(B->start->x - sub->mid_x, B->start->y - sub->mid_y);
+		angle_g angle1 = UtilComputeAngle(A->start->x - mid_x, A->start->y - mid_y);
+		angle_g angle2 = UtilComputeAngle(B->start->x - mid_x, B->start->y - mid_y);
 
 		if (angle1 + ANG_EPSILON < angle2)
 		{
@@ -1549,42 +1550,40 @@ static void ClockwiseOrder(subsec_t *sub)
 	}
 
 	// transfer sorted array back into sub
-	sub->seg_list = NULL;
+	seg_list = NULL;
 
 	for (i=total-1 ; i >= 0 ; i--)
 	{
 		int j = (i + first) % total;
 
-		array[j]->next = sub->seg_list;
-		sub->seg_list  = array[j];
+		array[j]->next = seg_list;
+		seg_list  = array[j];
 	}
 
 	if (total > 32)
 		UtilFree(array);
 
-# if DEBUG_SORTER
-	DebugPrintf("Sorted SEGS around (%1.1f,%1.1f)\n", sub->mid_x, sub->mid_y);
+#if DEBUG_SORTER
+	DebugPrintf("Sorted SEGS around (%1.1f,%1.1f)\n", mid_x, mid_y);
 
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
-		angle_g angle = UtilComputeAngle(seg->start->x - sub->mid_x,
-				seg->start->y - sub->mid_y);
-
+		angle_g angle = UtilComputeAngle(seg->start->x - mid_x, seg->start->y - mid_y);
 		DebugPrintf("  Seg %p: Angle %1.6f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				seg, angle, seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 	}
-# endif
+#endif
 }
 
 
-static void SanityCheckClosed(subsec_t *sub)
+void subsec_t::SanityCheckClosed() const
 {
 	seg_t *seg, *next;
 	int total=0, gaps=0;
 
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
-		next = seg->next ? seg->next : sub->seg_list;
+		next = seg->next ? seg->next : seg_list;
 
 		if (seg->end->x != next->start->x || seg->end->y != next->start->y)
 			gaps++;
@@ -1595,56 +1594,54 @@ static void SanityCheckClosed(subsec_t *sub)
 	if (gaps > 0)
 	{
 		MinorIssue("Subsector #%d near (%1.1f,%1.1f) is not closed "
-				"(%d gaps, %d segs)\n", sub->index,
-				sub->mid_x, sub->mid_y, gaps, total);
+				"(%d gaps, %d segs)\n", index, mid_x, mid_y, gaps, total);
 
-#   if DEBUG_SUBSEC
-		for (seg=sub->seg_list ; seg ; seg=seg->next)
+#if DEBUG_SUBSEC
+		for (seg=seg_list ; seg ; seg=seg->next)
 		{
 			DebugPrintf("  SEG %p  (%1.1f,%1.1f) --> (%1.1f,%1.1f)\n", seg,
 					seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 		}
-#   endif
+#endif
 	}
 }
 
 
-static void SanityCheckHasRealSeg(subsec_t *sub)
+void subsec_t::SanityCheckHasRealSeg() const
 {
 	seg_t *seg;
 
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
 		if (seg->linedef)
 			return;
 	}
 
 	BugError("Subsector #%d near (%1.1f,%1.1f) has no real seg!\n",
-			sub->index, sub->mid_x, sub->mid_y);
+			index, mid_x, mid_y);
 }
 
 
-static void RenumberSubsecSegs(subsec_t *sub)
+void subsec_t::RenumberSegs()
 {
 	seg_t *seg;
 
-# if DEBUG_SUBSEC
-	DebugPrintf("Subsec: Renumbering %d\n", sub->index);
-# endif
+#if DEBUG_SUBSEC
+	DebugPrintf("Subsec: Renumbering %d\n", index);
+#endif
 
-	sub->seg_count = 0;
+	seg_count = 0;
 
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
 		seg->index = num_complete_seg;
 		num_complete_seg++;
 
-		sub->seg_count++;
+		seg_count++;
 
-#   if DEBUG_SUBSEC
-		DebugPrintf("Subsec:   %d: Seg %p  Index %d\n", sub->seg_count,
-				seg, seg->index);
-#   endif
+#if DEBUG_SUBSEC
+		DebugPrintf("Subsec:   %d: Seg %p  Index %d\n", seg_count, seg, seg->index);
+#endif
 	}
 }
 
@@ -1701,11 +1698,11 @@ static subsec_t *CreateSubsec(superblock_t *seg_list)
 	// copy segs into subsector
 	CreateSubsecWorker(sub, seg_list);
 
-	DetermineMiddle(sub);
+	sub->DetermineMiddle();
 
-# if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 	DebugPrintf("Subsec: Creating %d\n", sub->index);
-# endif
+#endif
 
 	return sub;
 }
@@ -1895,30 +1892,30 @@ void ClockwiseBspTree()
 	{
 		subsec_t *sub = lev_subsecs[i];
 
-		ClockwiseOrder(sub);
-		RenumberSubsecSegs(sub);
+		sub->ClockwiseOrder();
+		sub->RenumberSegs();
 
 		// do some sanity checks
-		SanityCheckClosed(sub);
-		SanityCheckHasRealSeg(sub);
+		sub->SanityCheckClosed();
+		sub->SanityCheckHasRealSeg();
 	}
 }
 
-static void NormaliseSubsector(subsec_t *sub)
+void subsec_t::Normalise()
 {
 	// use head + tail to maintain same order of segs
 	seg_t *new_head = NULL;
 	seg_t *new_tail = NULL;
 
-# if DEBUG_SUBSEC
-	DebugPrintf("Subsec: Normalising %d\n", sub->index);
-# endif
+#if DEBUG_SUBSEC
+	DebugPrintf("Subsec: Normalising %d\n", index);
+#endif
 
-	while (sub->seg_list)
+	while (seg_list)
 	{
 		// remove head
-		seg_t *seg = sub->seg_list;
-		sub->seg_list = seg->next;
+		seg_t *seg = seg_list;
+		seg_list = seg->next;
 
 		// only add non-minisegs to new list
 		if (seg->linedef)
@@ -1937,9 +1934,9 @@ static void NormaliseSubsector(subsec_t *sub)
 		}
 		else
 		{
-#     if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 			DebugPrintf("Subsec: Removing miniseg %p\n", seg);
-#     endif
+#endif
 
 			// set index to a really high value, so that SortSegs() will
 			// move all the minisegs to the top of the seg array.
@@ -1948,9 +1945,9 @@ static void NormaliseSubsector(subsec_t *sub)
 	}
 
 	if (new_head == NULL)
-		BugError("Subsector %d normalised to being EMPTY\n", sub->index);
+		BugError("Subsector %d normalised to being EMPTY\n", index);
 
-	sub->seg_list = new_head;
+	seg_list = new_head;
 }
 
 
@@ -1964,13 +1961,13 @@ void NormaliseBspTree()
 	{
 		subsec_t *sub = lev_subsecs[i];
 
-		NormaliseSubsector(sub);
-		RenumberSubsecSegs(sub);
+		sub->Normalise();
+		sub->RenumberSegs();
 	}
 }
 
 
-static void RoundOffVertices()
+void RoundOffVertices()
 {
 	for (int i = 0 ; i < num_vertices ; i++)
 	{
@@ -1987,7 +1984,7 @@ static void RoundOffVertices()
 }
 
 
-static void RoundOffSubsector(subsec_t *sub)
+void subsec_t::RoundOff()
 {
 	seg_t *new_head = NULL;
 	seg_t *new_tail = NULL;
@@ -1998,12 +1995,12 @@ static void RoundOffSubsector(subsec_t *sub)
 	int real_total  = 0;
 	int degen_total = 0;
 
-# if DEBUG_SUBSEC
-	DebugPrintf("Subsec: Rounding off %d\n", sub->index);
-# endif
+#if DEBUG_SUBSEC
+	DebugPrintf("Subsec: Rounding off %d\n", index);
+#endif
 
 	// do an initial pass, just counting the degenerates
-	for (seg=sub->seg_list ; seg ; seg=seg->next)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
 		// is the seg degenerate ?
 		if (I_ROUND(seg->start->x) == I_ROUND(seg->end->x) &&
@@ -2022,45 +2019,44 @@ static void RoundOffSubsector(subsec_t *sub)
 			real_total++;
 	}
 
-# if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 	DebugPrintf("Subsec: degen=%d real=%d\n", degen_total, real_total);
-# endif
+#endif
 
 	// handle the (hopefully rare) case where all of the real segs
 	// became degenerate.
 	if (real_total == 0)
 	{
 		if (last_real_degen == NULL)
-			BugError("Subsector %d rounded off with NO real segs\n",
-					sub->index);
+			BugError("Subsector %d rounded off with NO real segs\n", index);
 
-#   if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 		DebugPrintf("Degenerate before: (%1.2f,%1.2f) -> (%1.2f,%1.2f)\n",
 				last_real_degen->start->x, last_real_degen->start->y,
 				last_real_degen->end->x, last_real_degen->end->y);
-#   endif
+#endif
 
 		// create a new vertex for this baby
 		last_real_degen->end = NewVertexDegenerate(
 				last_real_degen->start, last_real_degen->end);
 
-#   if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 		DebugPrintf("Degenerate after:  (%d,%d) -> (%d,%d)\n",
 				I_ROUND(last_real_degen->start->x),
 				I_ROUND(last_real_degen->start->y),
 				I_ROUND(last_real_degen->end->x),
 				I_ROUND(last_real_degen->end->y));
-#   endif
+#endif
 
 		last_real_degen->is_degenerate = false;
 	}
 
 	// second pass, remove the blighters...
-	while (sub->seg_list)
+	while (seg_list)
 	{
 		// remove head
-		seg = sub->seg_list;
-		sub->seg_list = seg->next;
+		seg = seg_list;
+		seg_list = seg->next;
 
 		if (! seg->is_degenerate)
 		{
@@ -2078,9 +2074,9 @@ static void RoundOffSubsector(subsec_t *sub)
 		}
 		else
 		{
-#     if DEBUG_SUBSEC
+#if DEBUG_SUBSEC
 			DebugPrintf("Subsec: Removing degenerate %p\n", seg);
-#     endif
+#endif
 
 			// set index to a really high value, so that SortSegs() will
 			// move all the minisegs to the top of the seg array.
@@ -2089,9 +2085,9 @@ static void RoundOffSubsector(subsec_t *sub)
 	}
 
 	if (new_head == NULL)
-		BugError("Subsector %d rounded off to being EMPTY\n", sub->index);
+		BugError("Subsector %d rounded off to being EMPTY\n", index);
 
-	sub->seg_list = new_head;
+	seg_list = new_head;
 }
 
 
@@ -2105,8 +2101,8 @@ void RoundOffBspTree()
 	{
 		subsec_t *sub = lev_subsecs[i];
 
-		RoundOffSubsector(sub);
-		RenumberSubsecSegs(sub);
+		sub->RoundOff();
+		sub->RenumberSegs();
 	}
 }
 
