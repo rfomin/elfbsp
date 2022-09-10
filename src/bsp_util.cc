@@ -731,7 +731,7 @@ void CalculateWallTips(void)
 		VertexAddWallTip(L->end,   x1-x2, y1-y2, right, left);
 	}
 
-# if DEBUG_WALLTIPS
+#if DEBUG_WALLTIPS
 	for (i=0 ; i < num_vertices ; i++)
 	{
 		vertex_t *V = lev_vertices[i];
@@ -745,7 +745,7 @@ void CalculateWallTips(void)
 					tip->open_right ? 1 : 0);
 		}
 	}
-# endif
+#endif
 }
 
 
@@ -763,9 +763,22 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, double x, double y)
 	num_new_vert++;
 
 	// compute wall-tip info
+	if (seg->linedef == NULL)
+	{
+		VertexAddWallTip(vert,  seg->pdx,  seg->pdy, true, true);
+		VertexAddWallTip(vert, -seg->pdx, -seg->pdy, true, true);
+	}
+	else
+	{
+		const sidedef_t *front = seg->side ? seg->linedef->left  : seg->linedef->right;
+		const sidedef_t *back  = seg->side ? seg->linedef->right : seg->linedef->left;
 
-	VertexAddWallTip(vert, -seg->pdx, -seg->pdy, true, true);
-	VertexAddWallTip(vert,  seg->pdx,  seg->pdy, true, true);
+		bool left  = (back  != NULL) && (back ->sector != NULL);
+		bool right = (front != NULL) && (front->sector != NULL);
+
+		VertexAddWallTip(vert,  seg->pdx,  seg->pdy, left, right);
+		VertexAddWallTip(vert, -seg->pdx, -seg->pdy, right, left);
+	}
 
 	return vert;
 }
