@@ -21,7 +21,6 @@
 #include <algorithm>
 
 
-Wad_file * game_wad;
 Wad_file * edit_wad;
 
 
