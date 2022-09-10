@@ -13,7 +13,7 @@ PREFIX ?= /usr/local
 # for BSD systems use: $(PREFIX)/man
 MANDIR ?= $(PREFIX)/share/man
 
-# CXX=clang++-6.0
+# CXX=clang++
 # CXX=g++ -m32   (to compile 32-bit binary on 64-bit system)
 
 # flags controlling the dialect of C++
