@@ -26,20 +26,17 @@ namespace ajbsp
 
 #define AJBSP_VERSION  "1.02"
 
+//
 // Node Build Information Structure
 //
-// Memory note: when changing the string values here (and in
-// nodebuildcomms_t) they should be freed using StringFree() and
-// allocated with StringDup().  The application has the final
-// responsibility to free the strings in here.
-//
-#define DEFAULT_FACTOR  11
+
+#define SPLIT_COST_MIN       1
+#define SPLIT_COST_DEFAULT  11
+#define SPLIT_COST_MAX      32
 
 class buildinfo_t
 {
 public:
-	int factor;
-
 	// use a faster method to pick nodes
 	bool fast;
 
@@ -56,6 +53,8 @@ public:
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;
 
+	int split_cost;
+
 	// this affects how some messages are shown
 	int verbosity;
 
@@ -66,8 +65,6 @@ public:
 
 public:
 	buildinfo_t() :
-		factor(DEFAULT_FACTOR),
-
 		fast(false),
 
 		gl_nodes(true),
@@ -81,6 +78,7 @@ public:
 
 		cancelled(false),
 
+		split_cost(SPLIT_COST_DEFAULT),
 		verbosity(0),
 
 		total_failed_maps(0),

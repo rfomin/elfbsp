@@ -23,31 +23,14 @@
 #include "utility.h"
 #include "wad.h"
 
-
-#define MAX_SPLIT_COST  32
-
 namespace ajbsp
 {
 
-//
-//  global variables
-//
-
-int opt_verbosity = 0;  // 0 is normal, 1+ is verbose
-
 bool opt_backup		= false;
-bool opt_fast		= false;
-
-bool opt_no_gl		= false;
-bool opt_force_v5	= false;
-bool opt_force_xnod	= false;
-int  opt_split_cost	= DEFAULT_FACTOR;
-
-const char *opt_output = NULL;
-
 bool opt_help		= false;
 bool opt_version	= false;
 
+const char *opt_output = NULL;
 
 std::vector< const char * > wad_list;
 
@@ -55,7 +38,6 @@ int total_failed_files = 0;
 int total_empty_files = 0;
 int total_built_maps = 0;
 int total_failed_maps = 0;
-
 
 typedef struct map_range_s
 {
@@ -88,7 +70,7 @@ class mybuildinfo_t : public buildinfo_t
 public:
 	void Print(int level, const char *fmt, ...)
 	{
-		if (level > opt_verbosity)
+		if (level > verbosity)
 			return;
 
 		va_list arg_ptr;
@@ -122,7 +104,7 @@ public:
 
 	void ShowMap(const char *name)
 	{
-		if (opt_verbosity >= 1)
+		if (verbosity >= 1)
 		{
 			Print(0, "  %s\n", name);
 			return;
@@ -214,16 +196,8 @@ static build_result_e BuildFile()
 		return BUILD_OK;
 	}
 
-	int visited = 0;
+	int visited  = 0;
 	int failures = 0;
-
-	// prepare the build info struct
-	config.factor		= opt_split_cost;
-	config.gl_nodes	= ! opt_no_gl;
-	config.fast		= opt_fast;
-
-	config.force_v5	= opt_force_v5;
-	config.force_xnod	= opt_force_xnod;
 
 	build_result_e res = BUILD_OK;
 
@@ -235,7 +209,7 @@ static build_result_e BuildFile()
 
 		visited += 1;
 
-		if (n > 0 && opt_verbosity >= 2)
+		if (n > 0 && config.verbosity >= 2)
 			config.Print(0, "\n");
 
 		res = AJBSP_BuildLevel(&config, n);
@@ -292,7 +266,7 @@ static build_result_e BuildFile()
 		config.Print(0, "  Serious warnings: %d\n", config.total_warnings);
 	}
 
-	if (opt_verbosity >= 1)
+	if (config.verbosity >= 1)
 	{
 		config.Print(0, "  Minor issues: %d\n", config.total_minor_issues);
 	}
@@ -555,12 +529,13 @@ void ParseShortArgument(const char *arg)
 		switch (c)
 		{
 			case 'h': opt_help = true; continue;
-			case 'v': opt_verbosity += 1; continue;
 			case 'b': opt_backup = true; continue;
-			case 'f': opt_fast = true; continue;
-			case 'n': opt_no_gl = true; continue;
-			case 'g': opt_force_v5 = true; continue;
-			case 'x': opt_force_xnod = true; continue;
+
+			case 'v': config.verbosity += 1; continue;
+			case 'f': config.fast = true; continue;
+			case 'n': config.gl_nodes = false; continue;
+			case 'g': config.force_v5 = true; continue;
+			case 'x': config.force_xnod = true; continue;
 
 			case 'm':
 			case 'o':
@@ -581,10 +556,10 @@ void ParseShortArgument(const char *arg)
 					arg++;
 				}
 
-				if (val < 1 || val > MAX_SPLIT_COST)
+				if (val < SPLIT_COST_MIN || val > SPLIT_COST_MAX)
 					config.FatalError("illegal value for '-c' option\n");
 
-				opt_split_cost = val;
+				config.split_cost = val;
 				continue;
 
 			default:
@@ -612,15 +587,15 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--verbose") == 0)
 	{
-		opt_verbosity += 1;
+		config.verbosity += 1;
 	}
 	else if (strcmp(name, "--very-verbose") == 0)
 	{
-		opt_verbosity += 2;
+		config.verbosity += 2;
 	}
 	else if (strcmp(name, "--super-verbose") == 0)
 	{
-		opt_verbosity += 3;
+		config.verbosity += 3;
 	}
 	else if (strcmp(name, "--backup") == 0 || strcmp(name, "--backups") == 0)
 	{
@@ -628,7 +603,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--fast") == 0)
 	{
-		opt_fast = true;
+		config.fast = true;
 	}
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
@@ -641,15 +616,15 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--nogl") == 0 || strcmp(name, "--no-gl") == 0)
 	{
-		opt_no_gl = true;
+		config.gl_nodes = false;
 	}
 	else if (strcmp(name, "--xnod") == 0)
 	{
-		opt_force_xnod = true;
+		config.force_xnod = true;
 	}
 	else if (strcmp(name, "--gl5") == 0)
 	{
-		opt_force_v5 = true;
+		config.force_v5 = true;
 	}
 	else if (strcmp(name, "--cost") == 0)
 	{
@@ -658,10 +633,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 
 		int val = atoi(argv[0]);
 
-		if (val < 1 || val > MAX_SPLIT_COST)
+		if (val < SPLIT_COST_MIN || val > SPLIT_COST_MAX)
 			config.FatalError("illegal value for '--cost' option\n");
 
-		opt_split_cost = val;
+		config.split_cost = val;
 		used = 1;
 	}
 	else if (strcmp(name, "--output") == 0)
@@ -842,7 +817,7 @@ int Main(int argc, char *argv[])
 				total_failed_maps,  total_failed_maps  == 1 ? "" : "s",
 				total_failed_files, total_failed_files == 1 ? "" : "s");
 
-		if (opt_verbosity == 0)
+		if (config.verbosity == 0)
 			config.Print(0, "Rerun with --verbose to see more details.\n");
 
 		return 2;

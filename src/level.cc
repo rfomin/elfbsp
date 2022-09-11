@@ -2317,7 +2317,7 @@ static const char *CalcOptionsString()
 {
 	static char buffer[256];
 
-	sprintf(buffer, "--cost %d", cur_info->factor);
+	sprintf(buffer, "--cost %d", cur_info->split_cost);
 
 	if (cur_info->fast)
 		strcat(buffer, " --fast");

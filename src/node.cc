@@ -320,7 +320,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 	double a, b, fa, fb;
 
 	int num;
-	int factor = cur_info->factor;
+	int split_cost = cur_info->split_cost;
 
 	// -AJA- this is the heart of my superblock idea, it tests the
 	//       _whole_ block against the partition line to quickly handle
@@ -411,7 +411,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 		if (fa <= DIST_EPSILON || fb <= DIST_EPSILON)
 		{
 			if (check->linedef && check->linedef->is_precious)
-				info->cost += 40 * factor * PRECIOUS_MULTIPLY;
+				info->cost += 40 * split_cost * PRECIOUS_MULTIPLY;
 		}
 
 		/* check for right side */
@@ -439,7 +439,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 			else
 				qnty = IFFY_LEN / std::min(a, b);
 
-			info->cost += (int) (100 * factor * (qnty * qnty - 1.0));
+			info->cost += (int) (100 * split_cost * (qnty * qnty - 1.0));
 			continue;
 		}
 
@@ -464,7 +464,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 			else
 				qnty = IFFY_LEN / -std::max(a, b);
 
-			info->cost += (int) (70 * factor * (qnty * qnty - 1.0));
+			info->cost += (int) (70 * split_cost * (qnty * qnty - 1.0));
 			continue;
 		}
 
@@ -479,9 +479,9 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 		// lifts/stairs from being messed up accidentally by splits.
 
 		if (check->linedef && check->linedef->is_precious)
-			info->cost += 100 * factor * PRECIOUS_MULTIPLY;
+			info->cost += 100 * split_cost * PRECIOUS_MULTIPLY;
 		else
-			info->cost += 100 * factor;
+			info->cost += 100 * split_cost;
 
 		// -AJA- check if the split point is very close to one end, which
 		//       is quite an undesirable situation (producing really short
@@ -495,7 +495,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 
 			// the closer to the end, the higher the cost
 			qnty = IFFY_LEN / std::min(fa, fb);
-			info->cost += (int) (140 * factor * (qnty * qnty - 1.0));
+			info->cost += (int) (140 * split_cost * (qnty * qnty - 1.0));
 		}
 	}
 
