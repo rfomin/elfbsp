@@ -46,7 +46,7 @@ void Failure(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	if (opt_verbosity >= 2)
+	if (cur_info->verbosity >= 2)
 		cur_info->Print(1, "    FAILURE: %s", message_buf);
 	else
 		cur_info->Print(1, "    %s", message_buf);
@@ -61,7 +61,7 @@ void Warning(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	if (opt_verbosity >= 2)
+	if (cur_info->verbosity >= 2)
 		cur_info->Print(1, "    WARNING: %s", message_buf);
 	else
 		cur_info->Print(1, "    %s", message_buf);
@@ -72,7 +72,7 @@ void Warning(const char *fmt, ...)
 
 void MinorIssue(const char *fmt, ...)
 {
-	if (opt_verbosity >= 3)
+	if (cur_info->verbosity >= 3)
 	{
 		va_list args;
 

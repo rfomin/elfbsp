@@ -40,14 +40,14 @@ class buildinfo_t
 public:
 	int factor;
 
+	// use a faster method to pick nodes
+	bool fast;
+
 	bool gl_nodes;
 
 	// when these two are false, they create an empty lump
 	bool do_blockmap;
 	bool do_reject;
-
-	bool fast;
-	bool warnings;	// NOTE: not currently used
 
 	bool force_v5;
 	bool force_xnod;
@@ -55,6 +55,9 @@ public:
 
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;
+
+	// this affects how some messages are shown
+	int verbosity;
 
 	// from here on, various bits of internal state
 	int total_failed_maps;
@@ -65,19 +68,20 @@ public:
 	buildinfo_t() :
 		factor(DEFAULT_FACTOR),
 
+		fast(false),
+
 		gl_nodes(true),
 
 		do_blockmap(true),
 		do_reject  (true),
-
-		fast(false),
-		warnings(false),
 
 		force_v5(false),
 		force_xnod(false),
 		force_compress(false),
 
 		cancelled(false),
+
+		verbosity(0),
 
 		total_failed_maps(0),
 		total_warnings(0),

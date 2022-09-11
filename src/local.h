@@ -29,16 +29,9 @@ namespace ajbsp
 class Lump_c;
 
 
-// internal storage of node building parameters
+// storage of node building parameters
 
 extern buildinfo_t * cur_info;
-
-
-/*
- *  Global variables
- */
-
-extern int opt_verbosity;	// 0 is normal, 1+ is verbose
 
 
 /*
