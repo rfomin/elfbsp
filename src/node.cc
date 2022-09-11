@@ -271,7 +271,7 @@ static void AddIntersection(intersection_t ** cut_list,
 	/* merge with any existing vertex? */
 	for (cut=(*cut_list) ; cut ; cut=cut->next)
 	{
-		if (fabs(along_dist - cut->along_dist) < DIST_EPSILON)
+		if (vert->Overlaps(cut->vertex))
 			return;
 	}
 

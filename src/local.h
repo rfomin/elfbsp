@@ -147,6 +147,8 @@ public:
 	bool CheckOpen(double dx, double dy) const;
 
 	void AddWallTip(double dx, double dy, bool open_left, bool open_right);
+
+	bool Overlaps(const vertex_t *other) const;
 }
 vertex_t;
 
@@ -539,7 +541,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
 #define IFFY_LEN  4.0
 
 // smallest distance between two points before being considered equal
-#define DIST_EPSILON  (1.0 / 128.0)
+#define DIST_EPSILON  (1.0 / 1024.0)
 
 // smallest degrees between two angles before being considered equal
 #define ANG_EPSILON  (1.0 / 1024.0)

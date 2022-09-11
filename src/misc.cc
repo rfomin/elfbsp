@@ -335,6 +335,14 @@ void DetectPolyobjSectors(void)
 
 /* ----- analysis routines ----------------------------- */
 
+bool vertex_t::Overlaps(const vertex_t *other) const
+{
+	double dx = fabs(other->x - x);
+	double dy = fabs(other->y - y);
+
+	return dx < DIST_EPSILON && dy < DIST_EPSILON
+}
+
 static int VertexCompare(const void *p1, const void *p2)
 {
 	int vert1 = ((const u16_t *) p1)[0];
