@@ -46,10 +46,7 @@ void Failure(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	if (cur_info->verbosity >= 2)
-		cur_info->Print(1, "    FAILURE: %s", message_buf);
-	else
-		cur_info->Print(1, "    %s", message_buf);
+	cur_info->Print(1, "    FAILURE: %s", message_buf);
 }
 
 
@@ -61,10 +58,7 @@ void Warning(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	if (cur_info->verbosity >= 2)
-		cur_info->Print(1, "    WARNING: %s", message_buf);
-	else
-		cur_info->Print(1, "    %s", message_buf);
+	cur_info->Print(1, "    WARNING: %s", message_buf);
 
 	cur_info->total_warnings++;
 }
