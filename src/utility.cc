@@ -225,7 +225,6 @@ bool FileRename(const char *old_name, const char *new_name)
 	return (::MoveFile(old_name, new_name) != 0);
 
 #else // UNIX or MACOSX
-
 	return (rename(old_name, new_name) == 0);
 #endif
 }
@@ -237,7 +236,6 @@ bool FileDelete(const char *filename)
 	return (::DeleteFile(filename) != 0);
 
 #else // UNIX or MACOSX
-
 	return (remove(filename) == 0);
 #endif
 }
@@ -253,18 +251,14 @@ int StringCaseCmp(const char *s1, const char *s2)
 {
 	for (;;)
 	{
-		if (tolower(*s1) != tolower(*s2))
-			return (int)(unsigned char)(*s1) - (int)(unsigned char)(*s2);
+		int A = tolower(*s1++);
+		int B = tolower(*s2++);
 
-		if (*s1 && *s2)
-		{
-			s1++;
-			s2++;
-			continue;
-		}
+		if (A != B)
+			return A - B;
 
-		// both *s1 and *s2 must be zero
-		return 0;
+		if (A == 0)
+			return 0;
 	}
 }
 
@@ -276,23 +270,22 @@ int StringCaseCmpMax(const char *s1, const char *s2, size_t len)
 {
 	SYS_ASSERT(len != 0);
 
-	while (len-- > 0)
+	for (;;)
 	{
-		if (tolower(*s1) != tolower(*s2))
-			return (int)(unsigned char)(*s1) - (int)(unsigned char)(*s2);
+		if (len == 0)
+			return 0;
 
-		if (*s1 && *s2)
-		{
-			s1++;
-			s2++;
-			continue;
-		}
+		int A = tolower(*s1++);
+		int B = tolower(*s2++);
 
-		// both *s1 and *s2 must be zero
-		return 0;
+		if (A != B)
+			return A - B;
+
+		if (A == 0)
+			return 0;
+
+		len--;
 	}
-
-	return 0;
 }
 
 
