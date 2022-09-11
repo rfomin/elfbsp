@@ -122,7 +122,7 @@ public:
 };
 
 
-class mybuildinfo_t nb_info;
+class mybuildinfo_t config;
 
 
 //
@@ -148,74 +148,11 @@ void FatalError(const char *fmt, ...)
 }
 
 
-void PrintMsg(const char *fmt, ...)
-{
-	va_list arg_ptr;
-
-	static char buffer[MSG_BUF_LEN];
-
-	va_start(arg_ptr, fmt);
-	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
-	va_end(arg_ptr);
-
-	buffer[MSG_BUF_LEN-1] = 0;
-
-	StopHanging();
-
-	printf("%s", buffer);
-	fflush(stdout);
-}
-
-
-void PrintVerbose(const char *fmt, ...)
-{
-	if (opt_verbosity < 1)
-		return;
-
-	va_list arg_ptr;
-
-	static char buffer[MSG_BUF_LEN];
-
-	va_start(arg_ptr, fmt);
-	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
-	va_end(arg_ptr);
-
-	buffer[MSG_BUF_LEN-1] = 0;
-
-	StopHanging();
-
-	printf("%s", buffer);
-	fflush(stdout);
-}
-
-
-void PrintDetail(const char *fmt, ...)
-{
-	if (opt_verbosity < 2)
-		return;
-
-	va_list arg_ptr;
-
-	static char buffer[MSG_BUF_LEN];
-
-	va_start(arg_ptr, fmt);
-	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
-	va_end(arg_ptr);
-
-	buffer[MSG_BUF_LEN-1] = 0;
-
-	StopHanging();
-
-	printf("%s", buffer);
-	fflush(stdout);
-}
-
-
 void PrintMapName(const char *name)
 {
 	if (opt_verbosity >= 1)
 	{
-		PrintMsg("  %s\n", name);
+		config.Print(0, "  %s\n", name);
 		return;
 	}
 
@@ -291,7 +228,7 @@ static build_result_e BuildFile()
 
 	if (num_levels == 0)
 	{
-		PrintMsg("  No levels in wad\n");
+		config.Print(0, "  No levels in wad\n");
 		total_empty_files += 1;
 		return BUILD_OK;
 	}
@@ -300,12 +237,12 @@ static build_result_e BuildFile()
 	int failures = 0;
 
 	// prepare the build info struct
-	nb_info.factor		= opt_split_cost;
-	nb_info.gl_nodes	= ! opt_no_gl;
-	nb_info.fast		= opt_fast;
+	config.factor		= opt_split_cost;
+	config.gl_nodes	= ! opt_no_gl;
+	config.fast		= opt_fast;
 
-	nb_info.force_v5	= opt_force_v5;
-	nb_info.force_xnod	= opt_force_xnod;
+	config.force_v5	= opt_force_v5;
+	config.force_xnod	= opt_force_xnod;
 
 	build_result_e res = BUILD_OK;
 
@@ -318,9 +255,9 @@ static build_result_e BuildFile()
 		visited += 1;
 
 		if (n > 0 && opt_verbosity >= 2)
-			PrintMsg("\n");
+			config.Print(0, "\n");
 
-		res = AJBSP_BuildLevel(&nb_info, n);
+		res = AJBSP_BuildLevel(&config, n);
 
 		// handle a failed map (due to lump overflow)
 		if (res == BUILD_LumpOverflow)
@@ -343,18 +280,18 @@ static build_result_e BuildFile()
 
 	if (visited == 0)
 	{
-		PrintMsg("  No matching levels\n");
+		config.Print(0, "  No matching levels\n");
 		total_empty_files += 1;
 		return BUILD_OK;
 	}
 
-	PrintMsg("\n");
+	config.Print(0, "\n");
 
 	total_failed_maps += failures;
 
 	if (res == BUILD_BadFile)
 	{
-		PrintMsg("  Corrupted wad or level detected.\n");
+		config.Print(0, "  Corrupted wad or level detected.\n");
 
 		// allow building other files
 		total_failed_files += 1;
@@ -363,7 +300,7 @@ static build_result_e BuildFile()
 
 	if (failures > 0)
 	{
-		PrintMsg("  Failed maps: %d (out of %d)\n", failures, visited);
+		config.Print(0, "  Failed maps: %d (out of %d)\n", failures, visited);
 
 		// allow building other files
 		total_failed_files += 1;
@@ -371,12 +308,12 @@ static build_result_e BuildFile()
 
 	if (true)
 	{
-		PrintMsg("  Serious warnings: %d\n", nb_info.total_warnings);
+		config.Print(0, "  Serious warnings: %d\n", config.total_warnings);
 	}
 
 	if (opt_verbosity >= 1)
 	{
-		PrintMsg("  Minor issues: %d\n", nb_info.total_minor_issues);
+		config.Print(0, "  Minor issues: %d\n", config.total_minor_issues);
 	}
 
 	return BUILD_OK;
@@ -426,7 +363,7 @@ void BackupFile(const char *filename)
 	if (! FileCopy(filename, dest_name))
 		FatalError("failed to create backup: %s\n", dest_name);
 
-	PrintVerbose("\nCreated backup: %s\n", dest_name);
+	config.Print(1, "\nCreated backup: %s\n", dest_name);
 
 	StringFree(dest_name);
 }
@@ -439,7 +376,7 @@ void VisitFile(unsigned int idx, const char *filename)
 		if (! FileCopy(filename, opt_output))
 			FatalError("failed to create output file: %s\n", opt_output);
 
-		PrintMsg("\nCopied input file: %s\n", filename);
+		config.Print(0, "\nCopied input file: %s\n", filename);
 
 		filename = opt_output;
 	}
@@ -447,8 +384,8 @@ void VisitFile(unsigned int idx, const char *filename)
 	if (opt_backup)
 		BackupFile(filename);
 
-	PrintMsg("\n");
-	PrintMsg("Building %s\n", filename);
+	config.Print(0, "\n");
+	config.Print(0, "Building %s\n", filename);
 
 	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
@@ -913,35 +850,35 @@ int Main(int argc, char *argv[])
 		VisitFile(i, wad_list[i]);
 	}
 
-	PrintMsg("\n");
+	config.Print(0, "\n");
 
 	if (total_failed_files > 0)
 	{
-		PrintMsg("FAILURES occurred on %d map%s in %d file%s.\n",
+		config.Print(0, "FAILURES occurred on %d map%s in %d file%s.\n",
 				total_failed_maps,  total_failed_maps  == 1 ? "" : "s",
 				total_failed_files, total_failed_files == 1 ? "" : "s");
 
 		if (opt_verbosity == 0)
-			PrintMsg("Rerun with --verbose to see more details.\n");
+			config.Print(0, "Rerun with --verbose to see more details.\n");
 
 		return 2;
 	}
 	else if (total_built_maps == 0)
 	{
-		PrintMsg("NOTHING was built!\n");
+		config.Print(0, "NOTHING was built!\n");
 
 		return 1;
 	}
 	else if (total_empty_files == 0)
 	{
-		PrintMsg("Ok, built all files.\n");
+		config.Print(0, "Ok, built all files.\n");
 	}
 	else
 	{
 		int built = total_files - total_empty_files;
 		int empty = total_empty_files;
 
-		PrintMsg("Ok, built %d file%s, %d file%s empty.\n",
+		config.Print(0, "Ok, built %d file%s, %d file%s empty.\n",
 				built, (built == 1 ? "" : "s"),
 				empty, (empty == 1 ? " was" : "s were"));
 	}
