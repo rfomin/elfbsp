@@ -21,6 +21,9 @@
 #ifndef __AJBSP_BSP_H__
 #define __AJBSP_BSP_H__
 
+namespace ajbsp
+{
+
 class Lump_c;
 
 
@@ -113,8 +116,8 @@ build_result_e AJBSP_BuildLevel(nodebuildinfo_t *info, short lev_idx);
 //
 //======================================================================
 
-namespace ajbsp
-{
+// namespace ajbsp
+// {
 
 
 // internal storage of node building parameters

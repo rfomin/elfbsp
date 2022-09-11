@@ -32,6 +32,9 @@
 #include <sys/param.h>
 #endif
 
+namespace ajbsp
+{
+
 bool HasExtension(const char *filename)
 {
 	int A = (int)strlen(filename) - 1;
@@ -454,6 +457,7 @@ int RoundPOW2(int x)
 	return x + 1;
 }
 
+} // namespace ajbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

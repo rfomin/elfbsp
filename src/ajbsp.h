@@ -74,6 +74,9 @@
 #include "bsp.h"
 
 
+namespace ajbsp
+{
+
 /*
  *  Misc constants
  */
@@ -127,6 +130,8 @@ void PrintMapName(const char *name);
         BugError("Assertion (%s) failed\nIn file %s:%d\n", #cond , __FILE__, __LINE__))
 #endif
 
+
+} // namespace ajbsp
 
 #endif  /* __AJBSP_MAIN_H__ */
 

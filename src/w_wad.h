@@ -19,6 +19,9 @@
 #ifndef __AJBSP_W_WAD_H__
 #define __AJBSP_W_WAD_H__
 
+namespace ajbsp
+{
+
 class Wad_file;
 
 
@@ -303,6 +306,9 @@ private:
 
 // the current PWAD
 extern Wad_file * edit_wad;
+
+
+} // namespace ajbsp
 
 #endif  /* __AJBSP_W_WAD_H__ */
 

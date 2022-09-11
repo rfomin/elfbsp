@@ -20,6 +20,8 @@
 
 #include <algorithm>
 
+namespace ajbsp
+{
 
 Wad_file * edit_wad;
 
@@ -1216,6 +1218,7 @@ bool Wad_file::Backup(const char *new_filename)
 	return FileCopy(PathName(), new_filename);
 }
 
+} // namespace ajbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

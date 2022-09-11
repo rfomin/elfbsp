@@ -20,6 +20,9 @@
 #ifndef __LIB_UTIL_H__
 #define __LIB_UTIL_H__
 
+namespace ajbsp
+{
+
 #ifdef WIN32
 #define DIR_SEP_CH   '\\'
 #define DIR_SEP_STR  "\\"
@@ -58,6 +61,7 @@ char *StringUpper(const char *name);
 char *StringPrintf(const char *str, ...);
 void  StringFree(const char *str);
 
+} // namespace ajbsp
 
 #endif  /* __LIB_UTIL_H__ */
 

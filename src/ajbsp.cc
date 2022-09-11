@@ -23,6 +23,8 @@
 
 #define MAX_SPLIT_COST  32
 
+namespace ajbsp
+{
 
 //
 //  global variables
@@ -787,10 +789,7 @@ void ParseCommandLine(int argc, char *argv[])
 }
 
 
-//
-//  the program starts here
-//
-int main(int argc, char *argv[])
+int Main(int argc, char *argv[])
 {
 	// sanity check on type sizes (useful when porting)
 	CheckTypeSizes();
@@ -883,6 +882,13 @@ int main(int argc, char *argv[])
 
 	// that's all folks!
 	return 0;
+}
+
+} // namespace ajbsp
+
+int main(int argc, char *argv[])
+{
+	return ajbsp::Main(argc, argv);
 }
 
 
