@@ -5,11 +5,11 @@ project(ajbsp)
 
 set(AJBSP_SOURCES
 	src/ajbsp.cc
-	src/bsp_level.cc
-	src/bsp_node.cc
-	src/bsp_util.cc
-	src/lib_util.cc
-	src/w_wad.cc
+	src/level.cc
+	src/node.cc
+	src/misc.cc
+	src/utility.cc
+	src/wad.cc
 )
 
 add_executable(ajbsp
