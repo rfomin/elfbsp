@@ -165,21 +165,21 @@ static inline uint64_t __Swap64(uint64_t n) {
 }
 #endif
 
-// the Makefile or build system must define BIG_ENDIAN
-#ifdef BIG_ENDIAN
-#define LE_U16(x)  ((u16_t)(x))
-#define LE_U32(x)  ((u32_t)(x))
-#define LE_U64(x)  ((u64_t)(x))
-#define BE_U16(x)  __Swap16(x)
-#define BE_U32(x)  __Swap32(x)
-#define BE_U64(x)  __Swap64(x)
-#else
+// the Makefile or build system must define BIG_ENDIAN_CPU
+#ifdef BIG_ENDIAN_CPU
 #define LE_U16(x)  __Swap16(x)
 #define LE_U32(x)  __Swap32(x)
 #define LE_U64(x)  __Swap64(x)
 #define BE_U16(x)  ((u16_t)(x))
 #define BE_U32(x)  ((u32_t)(x))
 #define BE_U64(x)  ((u64_t)(x))
+#else
+#define LE_U16(x)  ((u16_t)(x))
+#define LE_U32(x)  ((u32_t)(x))
+#define LE_U64(x)  ((u64_t)(x))
+#define BE_U16(x)  __Swap16(x)
+#define BE_U32(x)  __Swap32(x)
+#define BE_U64(x)  __Swap64(x)
 #endif
 
 // signed versions of the above
