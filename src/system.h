@@ -1,6 +1,4 @@
 //------------------------------------------------------------------------
-//  MAIN DEFINITIONS
-//------------------------------------------------------------------------
 //
 //  AJ-BSP  Copyright (C) 2001-2018  Andrew Apted
 //          Copyright (C) 1994-1998  Colin Reed
@@ -18,11 +16,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_MAIN_H__
-#define __AJBSP_MAIN_H__
-
-
-#define AJBSP_VERSION  "1.02"
+#ifndef __AJBSP_SYSTEM_H__
+#define __AJBSP_SYSTEM_H__
 
 
 /*
@@ -133,7 +128,7 @@ void PrintMapName(const char *name);
 
 } // namespace ajbsp
 
-#endif  /* __AJBSP_MAIN_H__ */
+#endif  /* __AJBSP_SYSTEM_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

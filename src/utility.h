@@ -17,8 +17,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __LIB_UTIL_H__
-#define __LIB_UTIL_H__
+#ifndef __AJBSP_UTILITY_H__
+#define __AJBSP_UTILITY_H__
 
 namespace ajbsp
 {
@@ -63,7 +63,7 @@ void  StringFree(const char *str);
 
 } // namespace ajbsp
 
-#endif  /* __LIB_UTIL_H__ */
+#endif  /* __AJBSP_UTILITY_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

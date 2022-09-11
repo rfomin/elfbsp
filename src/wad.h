@@ -16,8 +16,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_W_WAD_H__
-#define __AJBSP_W_WAD_H__
+#ifndef __AJBSP_WAD_H__
+#define __AJBSP_WAD_H__
 
 namespace ajbsp
 {
@@ -310,7 +310,7 @@ extern Wad_file * edit_wad;
 
 } // namespace ajbsp
 
-#endif  /* __AJBSP_W_WAD_H__ */
+#endif  /* __AJBSP_WAD_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab
