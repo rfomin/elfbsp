@@ -316,6 +316,9 @@ typedef struct seg_s
 	// "minisegs", this is the linedef of the partition line.
 	linedef_t *source_line;
 
+	// this only used by ClockwiseOrder()
+	double cmp_angle;
+
 public:
 	int PointOnLineSide(double x, double y) const;
 
