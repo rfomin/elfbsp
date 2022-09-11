@@ -327,7 +327,7 @@ char *StringNew(int length)
 	char *s = (char *) calloc(length + 1, 1);
 
 	if (! s)
-		FatalError("Out of memory (%d bytes for string)\n", length);
+		cur_info->FatalError("Out of memory (%d bytes for string)\n", length);
 
 	return s;
 }
@@ -343,7 +343,7 @@ char *StringDup(const char *orig, int limit)
 		char *s = strdup(orig);
 
 		if (! s)
-			FatalError("Out of memory (copy string)\n");
+			cur_info->FatalError("Out of memory (copy string)\n");
 
 		return s;
 	}
@@ -384,7 +384,7 @@ char *StringPrintf(const char *str, ...)
 
 		buf = (char*)realloc(buf, buf_size);
 		if (!buf)
-			FatalError("Out of memory (formatting string)\n");
+			cur_info->FatalError("Out of memory (formatting string)\n");
 
 		va_start(args, str);
 		out_len = vsnprintf(buf, buf_size, str, args);
@@ -421,7 +421,7 @@ void *UtilCalloc(int size)
 	void *ret = calloc(1, size);
 
 	if (!ret)
-		FatalError("Out of memory (cannot allocate %d bytes)\n", size);
+		cur_info->FatalError("Out of memory (cannot allocate %d bytes)\n", size);
 
 	return ret;
 }
@@ -435,7 +435,7 @@ void *UtilRealloc(void *old, int size)
 	void *ret = realloc(old, size);
 
 	if (!ret)
-		FatalError("Out of memory (cannot reallocate %d bytes)\n", size);
+		cur_info->FatalError("Out of memory (cannot reallocate %d bytes)\n", size);
 
 	return ret;
 }

@@ -42,20 +42,10 @@ extern int opt_verbosity;	// 0 is normal, 1+ is verbose
 
 
 /*
- *  Global functions
- */
-
-#ifdef __GNUC__
-__attribute__((noreturn))
-#endif
-void FatalError(const char *fmt, ...);
-
-#define BugError  FatalError
-
-
-/*
  *  Assertions
  */
+
+#define BugError  cur_info->FatalError
 
 #if defined(__GNUC__)
 #define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \

@@ -1000,7 +1000,7 @@ void FreeWallTips()
 static vertex_t *SafeLookupVertex(u16_t num)
 {
 	if ((int)num >= num_vertices)
-		FatalError("illegal vertex number #%d\n", (int)num);
+		cur_info->FatalError("illegal vertex number #%d\n", (int)num);
 
 	return lev_vertices[num];
 }
@@ -1011,7 +1011,7 @@ static sector_t *SafeLookupSector(u16_t num)
 		return NULL;
 
 	if (num >= num_sectors)
-		FatalError("illegal sector number #%d\n", (int)num);
+		cur_info->FatalError("illegal sector number #%d\n", (int)num);
 
 	return lev_sectors[num];
 }
@@ -1046,14 +1046,14 @@ void GetVertices(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to vertices.\n");
+		cur_info->FatalError("Error seeking to vertices.\n");
 
 	for (i = 0 ; i < count ; i++)
 	{
 		raw_vertex_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading vertices.\n");
+			cur_info->FatalError("Error reading vertices.\n");
 
 		vertex_t *vert = NewVertex();
 
@@ -1080,7 +1080,7 @@ void GetSectors(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to sectors.\n");
+		cur_info->FatalError("Error seeking to sectors.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetSectors: num = %d\n", count);
@@ -1091,7 +1091,7 @@ void GetSectors(void)
 		raw_sector_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading sectors.\n");
+			cur_info->FatalError("Error reading sectors.\n");
 
 		sector_t *sector = NewSector();
 
@@ -1124,7 +1124,7 @@ void GetThings(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to things.\n");
+		cur_info->FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetThings: num = %d\n", count);
@@ -1135,7 +1135,7 @@ void GetThings(void)
 		raw_thing_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading things.\n");
+			cur_info->FatalError("Error reading things.\n");
 
 		thing_t *thing = NewThing();
 
@@ -1161,7 +1161,7 @@ void GetThingsHexen(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to things.\n");
+		cur_info->FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetThingsHexen: num = %d\n", count);
@@ -1172,7 +1172,7 @@ void GetThingsHexen(void)
 		raw_hexen_thing_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading things.\n");
+			cur_info->FatalError("Error reading things.\n");
 
 		thing_t *thing = NewThing();
 
@@ -1198,7 +1198,7 @@ void GetSidedefs(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to sidedefs.\n");
+		cur_info->FatalError("Error seeking to sidedefs.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetSidedefs: num = %d\n", count);
@@ -1209,7 +1209,7 @@ void GetSidedefs(void)
 		raw_sidedef_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading sidedefs.\n");
+			cur_info->FatalError("Error reading sidedefs.\n");
 
 		sidedef_t *side = NewSidedef();
 
@@ -1241,7 +1241,7 @@ void GetLinedefs(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to linedefs.\n");
+		cur_info->FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetLinedefs: num = %d\n", count);
@@ -1252,7 +1252,7 @@ void GetLinedefs(void)
 		raw_linedef_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading linedefs.\n");
+			cur_info->FatalError("Error reading linedefs.\n");
 
 		linedef_t *line;
 
@@ -1316,7 +1316,7 @@ void GetLinedefsHexen(void)
 		return;
 
 	if (! lump->Seek())
-		FatalError("Error seeking to linedefs.\n");
+		cur_info->FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
 	cur_info->Debug("GetLinedefsHexen: num = %d\n", count);
@@ -1327,7 +1327,7 @@ void GetLinedefsHexen(void)
 		raw_hexen_linedef_t raw;
 
 		if (! lump->Read(&raw, sizeof(raw)))
-			FatalError("Error reading linedefs.\n");
+			cur_info->FatalError("Error reading linedefs.\n");
 
 		linedef_t *line;
 
@@ -2287,7 +2287,7 @@ static u32_t CalcGLChecksum(void)
 
 		if (! lump->Seek() ||
 		    ! lump->Read(data, lump->Length()))
-			FatalError("Error reading vertices (for checksum).\n");
+			cur_info->FatalError("Error reading vertices (for checksum).\n");
 
 		Adler32_AddBlock(&crc, data, lump->Length());
 		delete[] data;
@@ -2301,7 +2301,7 @@ static u32_t CalcGLChecksum(void)
 
 		if (! lump->Seek() ||
 		    ! lump->Read(data, lump->Length()))
-			FatalError("Error reading linedefs (for checksum).\n");
+			cur_info->FatalError("Error reading linedefs (for checksum).\n");
 
 		Adler32_AddBlock(&crc, data, lump->Length());
 		delete[] data;
@@ -2514,14 +2514,14 @@ void ZLibBeginLump(Lump_c *lump)
 		return;
 
 #ifndef HAVE_ZLIB
-	FatalError("No zlib!\n");
+	cur_info->FatalError("No zlib!\n");
 #else
 	zout_stream.zalloc = (alloc_func)0;
 	zout_stream.zfree  = (free_func)0;
 	zout_stream.opaque = (voidpf)0;
 
 	if (Z_OK != deflateInit(&zout_stream, Z_DEFAULT_COMPRESSION))
-		FatalError("Trouble setting up zlib compression\n");
+		cur_info->FatalError("Trouble setting up zlib compression\n");
 
 	zout_stream.next_out  = zout_buffer;
 	zout_stream.avail_out = sizeof(zout_buffer);
@@ -2541,7 +2541,7 @@ void ZLibAppendLump(const void *data, int length)
 	}
 
 #ifndef HAVE_ZLIB
-	FatalError("No zlib!\n");
+	cur_info->FatalError("No zlib!\n");
 #else
 	zout_stream.next_in  = (Bytef*)data;   // const override
 	zout_stream.avail_in = length;
@@ -2551,7 +2551,7 @@ void ZLibAppendLump(const void *data, int length)
 		int err = deflate(&zout_stream, Z_NO_FLUSH);
 
 		if (err != Z_OK)
-			FatalError("Trouble compressing %d bytes (zlib)\n", length);
+			cur_info->FatalError("Trouble compressing %d bytes (zlib)\n", length);
 
 		if (zout_stream.avail_out == 0)
 		{
@@ -2574,7 +2574,7 @@ void ZLibFinishLump(void)
 	}
 
 #ifndef HAVE_ZLIB
-	FatalError("No zlib!\n");
+	cur_info->FatalError("No zlib!\n");
 #else
 	int left_over;
 
@@ -2591,7 +2591,7 @@ void ZLibFinishLump(void)
 			break;
 
 		if (err != Z_OK)
-			FatalError("Trouble finishing compression (zlib)\n");
+			cur_info->FatalError("Trouble finishing compression (zlib)\n");
 
 		if (zout_stream.avail_out == 0)
 		{

@@ -138,33 +138,33 @@ public:
 
 		hanging_pos += strlen(name) + 2;
 	}
+
+	//
+	//  show an error message and terminate the program
+	//
+	void FatalError(const char *fmt, ...)
+	{
+		va_list arg_ptr;
+
+		static char buffer[MSG_BUF_LEN];
+
+		va_start(arg_ptr, fmt);
+		vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+		va_end(arg_ptr);
+
+		buffer[MSG_BUF_LEN-1] = 0;
+
+		StopHanging();
+
+		fprintf(stderr, "\nFATAL ERROR: %s", buffer);
+
+		exit(3);
+	}
 };
 
 
 class mybuildinfo_t config;
 
-
-//
-//  show an error message and terminate the program
-//
-void FatalError(const char *fmt, ...)
-{
-	va_list arg_ptr;
-
-	static char buffer[MSG_BUF_LEN];
-
-	va_start(arg_ptr, fmt);
-	vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
-	va_end(arg_ptr);
-
-	buffer[MSG_BUF_LEN-1] = 0;
-
-	StopHanging();
-
-	fprintf(stderr, "\nFATAL ERROR: %s", buffer);
-
-	exit(3);
-}
 
 
 //------------------------------------------------------------------------
@@ -307,11 +307,11 @@ void ValidateInputFilename(const char *filename)
 
 	// files with ".bak" extension cannot be backed up, so refuse them
 	if (MatchExtension(filename, "bak"))
-		FatalError("cannot process a backup file: %s\n", filename);
+		config.FatalError("cannot process a backup file: %s\n", filename);
 
 	// GWA files only contain GL-nodes, never any maps
 	if (MatchExtension(filename, "gwa"))
-		FatalError("cannot process a GWA file: %s\n", filename);
+		config.FatalError("cannot process a GWA file: %s\n", filename);
 
 	// we do not support packages
 	if (MatchExtension(filename, "pak") || MatchExtension(filename, "pk2") ||
@@ -320,7 +320,7 @@ void ValidateInputFilename(const char *filename)
 		MatchExtension(filename, "epk") || MatchExtension(filename, "pack") ||
 		MatchExtension(filename, "zip") || MatchExtension(filename, "rar"))
 	{
-		FatalError("package files (like PK3) are not supported: %s\n", filename);
+		config.FatalError("package files (like PK3) are not supported: %s\n", filename);
 	}
 
 	// check some very common formats
@@ -332,7 +332,7 @@ void ValidateInputFilename(const char *filename)
 		MatchExtension(filename, "gif") || MatchExtension(filename, "png") ||
 		MatchExtension(filename, "jpg") || MatchExtension(filename, "jpeg"))
 	{
-		FatalError("not a wad file: %s\n", filename);
+		config.FatalError("not a wad file: %s\n", filename);
 	}
 }
 
@@ -342,7 +342,7 @@ void BackupFile(const char *filename)
 	const char *dest_name = ReplaceExtension(filename, "bak");
 
 	if (! FileCopy(filename, dest_name))
-		FatalError("failed to create backup: %s\n", dest_name);
+		config.FatalError("failed to create backup: %s\n", dest_name);
 
 	config.Print(1, "\nCreated backup: %s\n", dest_name);
 
@@ -355,7 +355,7 @@ void VisitFile(unsigned int idx, const char *filename)
 	if (opt_output != NULL)
 	{
 		if (! FileCopy(filename, opt_output))
-			FatalError("failed to create output file: %s\n", opt_output);
+			config.FatalError("failed to create output file: %s\n", opt_output);
 
 		config.Print(0, "\nCopied input file: %s\n", filename);
 
@@ -370,13 +370,13 @@ void VisitFile(unsigned int idx, const char *filename)
 
 	edit_wad = Wad_file::Open(filename, 'a');
 	if (! edit_wad)
-		FatalError("Cannot open file: %s\n", filename);
+		config.FatalError("Cannot open file: %s\n", filename);
 
 	if (edit_wad->IsReadOnly())
 	{
 		delete edit_wad; edit_wad = NULL;
 
-		FatalError("file is read only: %s\n", filename);
+		config.FatalError("file is read only: %s\n", filename);
 	}
 
 	build_result_e res = BuildFile();
@@ -385,7 +385,7 @@ void VisitFile(unsigned int idx, const char *filename)
 	delete edit_wad; edit_wad = NULL;
 
 	if (res == BUILD_Cancelled)
-		FatalError("CANCELLED\n");
+		config.FatalError("CANCELLED\n");
 }
 
 
@@ -484,22 +484,22 @@ void ParseMapRange(char *tok)
 	}
 
 	if (! ValidateMapName(low))
-		FatalError("illegal map name: '%s'\n", low);
+		config.FatalError("illegal map name: '%s'\n", low);
 
 	if (! ValidateMapName(high))
-		FatalError("illegal map name: '%s'\n", high);
+		config.FatalError("illegal map name: '%s'\n", high);
 
 	if (strlen(low) < strlen(high))
-		FatalError("bad map range (%s shorter than %s)\n", low, high);
+		config.FatalError("bad map range (%s shorter than %s)\n", low, high);
 
 	if (strlen(low) > strlen(high))
-		FatalError("bad map range (%s longer than %s)\n", low, high);
+		config.FatalError("bad map range (%s longer than %s)\n", low, high);
 
 	if (low[0] != high[0])
-		FatalError("bad map range (%s and %s start with different letters)\n", low, high);
+		config.FatalError("bad map range (%s and %s start with different letters)\n", low, high);
 
 	if (strcmp(low, high) > 0)
-		FatalError("bad map range (wrong order, %s > %s)\n", low, high);
+		config.FatalError("bad map range (wrong order, %s > %s)\n", low, high);
 
 	// Ok
 
@@ -523,7 +523,7 @@ void ParseMapList(const char *from_arg)
 	while (*arg)
 	{
 		if (*arg == ',')
-			FatalError("bad map list (empty element)\n");
+			config.FatalError("bad map list (empty element)\n");
 
 		// find next comma
 		char *tok = arg;
@@ -564,12 +564,12 @@ void ParseShortArgument(const char *arg)
 
 			case 'm':
 			case 'o':
-				FatalError("cannot use option '-%c' like that\n", c);
+				config.FatalError("cannot use option '-%c' like that\n", c);
 				return;
 
 			case 'c':
 				if (*arg == 0 || ! isdigit(*arg))
-					FatalError("missing value for '-c' option\n");
+					config.FatalError("missing value for '-c' option\n");
 
 				// we only accept one or two digits here
 				val = *arg - '0';
@@ -582,16 +582,16 @@ void ParseShortArgument(const char *arg)
 				}
 
 				if (val < 1 || val > MAX_SPLIT_COST)
-					FatalError("illegal value for '-c' option\n");
+					config.FatalError("illegal value for '-c' option\n");
 
 				opt_split_cost = val;
 				continue;
 
 			default:
 				if (isprint(c) && !isspace(c))
-					FatalError("unknown short option: '-%c'\n", c);
+					config.FatalError("unknown short option: '-%c'\n", c);
 				else
-					FatalError("illegal short option (ascii code %d)\n", (int)(unsigned char)c);
+					config.FatalError("illegal short option (ascii code %d)\n", (int)(unsigned char)c);
 				return;
 		}
 	}
@@ -633,7 +633,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
 		if (argc < 1 || argv[0][0] == '-')
-			FatalError("missing value for '--map' option\n");
+			config.FatalError("missing value for '--map' option\n");
 
 		ParseMapList(argv[0]);
 
@@ -654,12 +654,12 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	else if (strcmp(name, "--cost") == 0)
 	{
 		if (argc < 1 || ! isdigit(argv[0][0]))
-			FatalError("missing value for '--cost' option\n");
+			config.FatalError("missing value for '--cost' option\n");
 
 		int val = atoi(argv[0]);
 
 		if (val < 1 || val > MAX_SPLIT_COST)
-			FatalError("illegal value for '--cost' option\n");
+			config.FatalError("illegal value for '--cost' option\n");
 
 		opt_split_cost = val;
 		used = 1;
@@ -669,17 +669,17 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 		// this option is *only* for compatibility
 
 		if (argc < 1 || argv[0][0] == '-')
-			FatalError("missing value for '--output' option\n");
+			config.FatalError("missing value for '--output' option\n");
 
 		if (opt_output != NULL)
-			FatalError("cannot use '--output' option twice\n");
+			config.FatalError("cannot use '--output' option twice\n");
 
 		opt_output = StringDup(argv[0]);
 		used = 1;
 	}
 	else
 	{
-		FatalError("unknown long option: '%s'\n", name);
+		config.FatalError("unknown long option: '%s'\n", name);
 	}
 
 	return used;
@@ -716,7 +716,7 @@ void ParseCommandLine(int argc, char *argv[])
 		}
 
 		if (strcmp(arg, "-") == 0)
-			FatalError("illegal option '-'\n");
+			config.FatalError("illegal option '-'\n");
 
 		if (strcmp(arg, "--") == 0)
 		{
@@ -753,7 +753,7 @@ void ParseCommandLine(int argc, char *argv[])
 #define assert_size(type,size)  \
     do {  \
         if (sizeof (type) != size)  \
-            FatalError("sizeof " #type " is %d (should be " #size ")\n", (int)sizeof(type));  \
+            config.FatalError("sizeof " #type " is %d (should be " #size ")\n", (int)sizeof(type));  \
     } while (0)
 
 void CheckTypeSizes()
@@ -778,6 +778,9 @@ int Main(int argc, char *argv[])
 	// sanity check on type sizes (useful when porting)
 	CheckTypeSizes();
 
+	// TODO this is hacky!!
+	cur_info = &config;
+
 	ParseCommandLine(argc, argv);
 
 	if (opt_version)
@@ -797,20 +800,20 @@ int Main(int argc, char *argv[])
 
 	if (total_files == 0)
 	{
-		FatalError("no files to process\n");
+		config.FatalError("no files to process\n");
 		return 0;
 	}
 
 	if (opt_output != NULL)
 	{
 		if (opt_backup)
-			FatalError("cannot use --backup with --output\n");
+			config.FatalError("cannot use --backup with --output\n");
 
 		if (total_files > 1)
-			FatalError("cannot use multiple input files with --output\n");
+			config.FatalError("cannot use multiple input files with --output\n");
 
 		if (y_stricmp(wad_list[0], opt_output) == 0)
-			FatalError("input and output files are the same\n");
+			config.FatalError("input and output files are the same\n");
 	}
 
 	ShowBanner();
@@ -823,7 +826,7 @@ int Main(int argc, char *argv[])
 		ValidateInputFilename(filename);
 
 		if (! FileExists(filename))
-			FatalError("no such file: %s\n", filename);
+			config.FatalError("no such file: %s\n", filename);
 	}
 
 	for (unsigned int i = 0 ; i < wad_list.size() ; i++)
