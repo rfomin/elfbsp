@@ -33,15 +33,20 @@ Wad_file * edit_wad;
 #define MAX_LUMPS_IN_A_LEVEL	21
 
 
-void LumpWarning(const char *fmt, ...)
-{
-	(void) fmt;
-}
-
+#if DEBUG_WAD
+#define FileMessage  cur_info->Debug
+#define LumpWarning  cur_info->Debug
+#else
 void FileMessage(const char *fmt, ...)
 {
 	(void) fmt;
 }
+
+void LumpWarning(const char *fmt, ...)
+{
+	(void) fmt;
+}
+#endif
 
 
 //------------------------------------------------------------------------
