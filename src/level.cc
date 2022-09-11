@@ -147,7 +147,7 @@ static void BlockAdd(int blk_num, int line_index)
 	u16_t *cur = block_lines[blk_num];
 
 # if DEBUG_BLOCKMAP
-	DebugPrintf("Block %d has line %d\n", blk_num, line_index);
+	cur_info->Debug("Block %d has line %d\n", blk_num, line_index);
 # endif
 
 	if (blk_num < 0 || blk_num >= block_count)
@@ -194,7 +194,7 @@ static void BlockAddLine(linedef_t *L)
 	int line_index = L->index;
 
 # if DEBUG_BLOCKMAP
-	DebugPrintf("BlockAddLine: %d (%d,%d) -> (%d,%d)\n", line_index,
+	cur_info->Debug("BlockAddLine: %d (%d,%d) -> (%d,%d)\n", line_index,
 			x1, y1, x2, y2);
 # endif
 
@@ -377,7 +377,7 @@ static void CompressBlockmap(void)
 	}
 
 # if DEBUG_BLOCKMAP
-	DebugPrintf("Blockmap: Last ptr = %d  duplicates = %d\n",
+	cur_info->Debug("Blockmap: Last ptr = %d  duplicates = %d\n",
 			cur_offset, dup_count);
 # endif
 
@@ -535,7 +535,7 @@ static void FindBlockmapLimits(bbox_t *bbox)
 	}
 
 # if DEBUG_BLOCKMAP
-	DebugPrintf("Blockmap lines centered at (%d,%d)\n", block_mid_x, block_mid_y);
+	cur_info->Debug("Blockmap lines centered at (%d,%d)\n", block_mid_x, block_mid_y);
 # endif
 }
 
@@ -547,8 +547,9 @@ void InitBlockmap()
 	// find limits of linedefs, and store as map limits
 	FindBlockmapLimits(&map_bbox);
 
-	PrintDetail("    Map limits: (%d,%d) to (%d,%d)\n",
-			map_bbox.minx, map_bbox.miny, map_bbox.maxx, map_bbox.maxy);
+	cur_info->Print(2, "    Map limits: (%d,%d) to (%d,%d)\n",
+			map_bbox.minx, map_bbox.miny,
+			map_bbox.maxx, map_bbox.maxy);
 
 	block_x = map_bbox.minx - (map_bbox.minx & 0x7);
 	block_y = map_bbox.miny - (map_bbox.miny & 0x7);
@@ -595,7 +596,7 @@ void PutBlockmap()
 	{
 		WriteBlockmap();
 
-		PrintDetail("    Blockmap size: %dx%d (compression: %d%%)\n",
+		cur_info->Print(2, "    Blockmap size: %dx%d (compression: %d%%)\n",
 				block_w, block_h, block_compression);
 	}
 
@@ -733,7 +734,7 @@ static void Reject_DebugGroups()
 			num++;
 		}
 
-		DebugPrintf("Group %d  Sectors %d\n", group, num);
+		cur_info->Debug("Group %d  Sectors %d\n", group, num);
 	}
 }
 #endif
@@ -800,7 +801,7 @@ void PutReject()
 	Reject_WriteLump();
 	Reject_Free();
 
-	PrintDetail("    Reject size: %d\n", rej_total_size);
+	cur_info->Print(2, "    Reject size: %d\n", rej_total_size);
 }
 
 
@@ -1038,7 +1039,7 @@ void GetVertices(void)
 		count = lump->Length() / sizeof(raw_vertex_t);
 
 # if DEBUG_LOAD
-	DebugPrintf("GetVertices: num = %d\n", count);
+	cur_info->Debug("GetVertices: num = %d\n", count);
 # endif
 
 	if (!lump || count == 0)
@@ -1082,7 +1083,7 @@ void GetSectors(void)
 		FatalError("Error seeking to sectors.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetSectors: num = %d\n", count);
+	cur_info->Debug("GetSectors: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1126,7 +1127,7 @@ void GetThings(void)
 		FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetThings: num = %d\n", count);
+	cur_info->Debug("GetThings: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1163,7 +1164,7 @@ void GetThingsHexen(void)
 		FatalError("Error seeking to things.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetThingsHexen: num = %d\n", count);
+	cur_info->Debug("GetThingsHexen: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1200,7 +1201,7 @@ void GetSidedefs(void)
 		FatalError("Error seeking to sidedefs.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetSidedefs: num = %d\n", count);
+	cur_info->Debug("GetSidedefs: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1243,7 +1244,7 @@ void GetLinedefs(void)
 		FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetLinedefs: num = %d\n", count);
+	cur_info->Debug("GetLinedefs: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1318,7 +1319,7 @@ void GetLinedefsHexen(void)
 		FatalError("Error seeking to linedefs.\n");
 
 # if DEBUG_LOAD
-	DebugPrintf("GetLinedefsHexen: num = %d\n", count);
+	cur_info->Debug("GetLinedefsHexen: num = %d\n", count);
 # endif
 
 	for (i = 0 ; i < count ; i++)
@@ -1559,7 +1560,7 @@ void PutSegs(void)
 		count++;
 
 #   if DEBUG_BSP
-		DebugPrintf("PUT SEG: %04X  Vert %04X->%04X  Line %04X %s  "
+		cur_info->Debug("PUT SEG: %04X  Vert %04X->%04X  Line %04X %s  "
 				"Angle %04X  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index,
 				LE_U16(raw.start), LE_U16(raw.end), LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U16(raw.angle),
@@ -1617,7 +1618,7 @@ void PutGLSegs(void)
 		count++;
 
 #   if DEBUG_BSP
-		DebugPrintf("PUT GL SEG: %04X  Line %04X %s  Partner %04X  "
+		cur_info->Debug("PUT GL SEG: %04X  Line %04X %s  Partner %04X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U16(raw.partner),
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
@@ -1672,7 +1673,7 @@ void PutGLSegs_V5()
 		count++;
 
 #   if DEBUG_BSP
-		DebugPrintf("PUT V3 SEG: %06X  Line %04X %s  Partner %06X  "
+		cur_info->Debug("PUT V3 SEG: %06X  Line %04X %s  Partner %06X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U32(raw.partner),
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
@@ -1705,7 +1706,7 @@ void PutSubsecs(const char *name, int do_gl)
 		lump->Write(&raw, sizeof(raw));
 
 #   if DEBUG_BSP
-		DebugPrintf("PUT SUBSEC %04X  First %04X  Num %04X\n",
+		cur_info->Debug("PUT SUBSEC %04X  First %04X  Num %04X\n",
 				sub->index, LE_U16(raw.first), LE_U16(raw.num));
 #   endif
 	}
@@ -1738,7 +1739,7 @@ void PutGLSubsecs_V5()
 		lump->Write(&raw, sizeof(raw));
 
 #   if DEBUG_BSP
-		DebugPrintf("PUT V3 SUBSEC %06X  First %06X  Num %06X\n",
+		cur_info->Debug("PUT V3 SUBSEC %06X  First %06X  Num %06X\n",
 					sub->index, LE_U32(raw.first), LE_U32(raw.num));
 #   endif
 	}
@@ -1791,7 +1792,7 @@ static void PutOneNode(node_t *node, Lump_c *lump)
 	lump->Write(&raw, sizeof(raw));
 
 # if DEBUG_BSP
-	DebugPrintf("PUT NODE %04X  Left %04X  Right %04X  "
+	cur_info->Debug("PUT NODE %04X  Left %04X  Right %04X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U16(raw.left),
 			LE_U16(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
@@ -1843,7 +1844,7 @@ static void PutOneNode_V5(node_t *node, Lump_c *lump)
 	lump->Write(&raw, sizeof(raw));
 
 # if DEBUG_BSP
-	DebugPrintf("PUT V5 NODE %08X  Left %08X  Right %08X  "
+	cur_info->Debug("PUT V5 NODE %08X  Left %08X  Right %08X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U32(raw.left),
 			LE_U32(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
@@ -2127,7 +2128,7 @@ static void PutOneZNode(node_t *node)
 	ZLibAppendLump(&raw.left,  4);
 
 # if DEBUG_BSP
-	DebugPrintf("PUT Z NODE %08X  Left %08X  Right %08X  "
+	cur_info->Debug("PUT Z NODE %08X  Left %08X  Right %08X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U32(raw.left),
 			LE_U32(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
@@ -2238,7 +2239,7 @@ void LoadLevel()
 		GetThings();
 	}
 
-	PrintDetail("    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
+	cur_info->Print(2, "    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
 				num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
 	// always prune vertices at end of lump, otherwise all the
@@ -2724,14 +2725,14 @@ build_result_e BuildNodesForLevel(buildinfo_t *info, short lev_idx)
 
 	if (ret == BUILD_OK)
 	{
-		PrintDetail("    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
-					num_nodes, num_subsecs, num_segs, num_old_vert + num_new_vert);
+		cur_info->Print(2, "    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
+				num_nodes, num_subsecs, num_segs, num_old_vert + num_new_vert);
 
 		if (root_node)
 		{
-			PrintDetail("    Heights of subtrees: %d / %d\n",
-						ComputeBspHeight(root_node->r.node),
-						ComputeBspHeight(root_node->l.node));
+			cur_info->Print(2, "    Heights of subtrees: %d / %d\n",
+					ComputeBspHeight(root_node->r.node),
+					ComputeBspHeight(root_node->l.node));
 		}
 
 		ClockwiseBspTree();

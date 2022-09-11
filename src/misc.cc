@@ -432,7 +432,7 @@ void PruneVerticesAtEnd(void)
 
 	if (unused > 0)
 	{
-		PrintDetail("    Pruned %d unused vertices at end\n", unused);
+		cur_info->Print(2, "    Pruned %d unused vertices at end\n", unused);
 	}
 
 	num_old_vert = num_vertices;
@@ -540,7 +540,7 @@ void DetectOverlappingLines(void)
 
 	if (count > 0)
 	{
-		PrintDetail("    Detected %d overlapped linedefs\n", count);
+		cur_info->Print(2, "    Detected %d overlapped linedefs\n", count);
 	}
 
 	UtilFree(array);

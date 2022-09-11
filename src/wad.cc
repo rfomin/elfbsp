@@ -71,7 +71,7 @@ Lump_c::Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry) :
 	l_start  = LE_U32(entry->pos);
 	l_length = LE_U32(entry->size);
 
-//	DebugPrintf("new lump '%s' @ %d len:%d\n", name, l_start, l_length);
+//	cur_info->Debug("new lump '%s' @ %d len:%d\n", name, l_start, l_length);
 }
 
 
@@ -261,7 +261,7 @@ retry:
 
 	w->total_size = (int)ftell(fp);
 
-	DebugPrintf("total_size = %d\n", w->total_size);
+	cur_info->Debug("total_size = %d\n", w->total_size);
 
 	if (w->total_size < 0)
 		FatalError("Error determining WAD size.\n");
@@ -613,7 +613,7 @@ void Wad_file::DetectLevels()
 		{
 			levels.push_back(k);
 
-			DebugPrintf("Detected level : %s\n", directory[k]->name);
+			cur_info->Debug("Detected level : %s\n", directory[k]->name);
 		}
 	}
 
@@ -740,7 +740,7 @@ void Wad_file::ProcessNamespaces()
 				continue;
 			}
 
-//			DebugPrintf("Namespace %c lump : %s\n", active, name);
+//			cur_info->Debug("Namespace %c lump : %s\n", active, name);
 
 			switch (active)
 			{
@@ -1112,7 +1112,7 @@ int Wad_file::PositionForWrite(int max_size)
 			FatalError("Error seeking to new write position.\n");
 	}
 
-	DebugPrintf("POSITION FOR WRITE: %d  (total_size %d)\n", want_pos, total_size);
+	cur_info->Debug("POSITION FOR WRITE: %d  (total_size %d)\n", want_pos, total_size);
 
 	return want_pos;
 }
@@ -1171,8 +1171,8 @@ void Wad_file::WriteDirectory()
 	dir_start = PositionForWrite();
 	dir_count = NumLumps();
 
-	DebugPrintf("WriteDirectory...\n");
-	DebugPrintf("dir_start:%d  dir_count:%d\n", dir_start, dir_count);
+	cur_info->Debug("WriteDirectory...\n");
+	cur_info->Debug("dir_start:%d  dir_count:%d\n", dir_start, dir_count);
 
 	for (short k = 0 ; k < dir_count ; k++)
 	{
@@ -1190,7 +1190,7 @@ void Wad_file::WriteDirectory()
 	fflush(fp);
 
 	total_size = (int)ftell(fp);
-	DebugPrintf("total_size: %d\n", total_size);
+	cur_info->Debug("total_size: %d\n", total_size);
 
 	if (total_size < 0)
 		FatalError("Error determining WAD size.\n");
