@@ -69,7 +69,6 @@ void MinorIssue(const char *fmt, ...);
 
 // compute blockmap origin & size (the block_x/y/w/h variables)
 // based on the set of loaded linedefs.
-//
 void InitBlockmap();
 
 // build the blockmap and write the data into the BLOCKMAP lump
@@ -252,6 +251,12 @@ typedef struct linedef_s
 	// linedef index.  Always valid after loading & pruning of zero
 	// length lines has occurred.
 	int index;
+
+public:
+	double MinX() const
+	{
+		return std::min(start->x, end->x);
+	}
 }
 linedef_t;
 

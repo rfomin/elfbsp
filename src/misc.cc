@@ -439,99 +439,52 @@ void PruneVerticesAtEnd(void)
 }
 
 
-static inline int LineVertexLowest(const linedef_t *L)
+struct Compare_line_MinX_pred
 {
-	// returns the "lowest" vertex (normally the left-most, but if the
-	// line is vertical, then the bottom-most) => 0 for start, 1 for end.
-
-	return ((int)L->start->x < (int)L->end->x ||
-			((int)L->start->x == (int)L->end->x &&
-			 (int)L->start->y <  (int)L->end->y)) ? 0 : 1;
-}
-
-static int LineStartCompare(const void *p1, const void *p2)
-{
-	int line1 = ((const int *) p1)[0];
-	int line2 = ((const int *) p2)[0];
-
-	linedef_t *A = lev_linedefs[line1];
-	linedef_t *B = lev_linedefs[line2];
-
-	vertex_t *C;
-	vertex_t *D;
-
-	if (line1 == line2)
-		return 0;
-
-	// determine left-most vertex of each line
-	C = LineVertexLowest(A) ? A->end : A->start;
-	D = LineVertexLowest(B) ? B->end : B->start;
-
-	if ((int)C->x != (int)D->x)
-		return (int)C->x - (int)D->x;
-
-	return (int)C->y - (int)D->y;
-}
-
-static int LineEndCompare(const void *p1, const void *p2)
-{
-	int line1 = ((const int *) p1)[0];
-	int line2 = ((const int *) p2)[0];
-
-	linedef_t *A = lev_linedefs[line1];
-	linedef_t *B = lev_linedefs[line2];
-
-	vertex_t *C;
-	vertex_t *D;
-
-	if (line1 == line2)
-		return 0;
-
-	// determine right-most vertex of each line
-	C = LineVertexLowest(A) ? A->start : A->end;
-	D = LineVertexLowest(B) ? B->start : B->end;
-
-	if ((int)C->x != (int)D->x)
-		return (int)C->x - (int)D->x;
-
-	return (int)C->y - (int)D->y;
-}
+	inline bool operator() (const linedef_t *A, const linedef_t *B) const
+	{
+		return A->MinX() < B->MinX();
+	}
+};
 
 
 void DetectOverlappingLines(void)
 {
 	// Algorithm:
-	//   Sort all lines by left-most vertex.
+	//   Sort all lines by minimum X coordinate.
 	//   Overlapping lines will then be near each other in this set.
-	//   Note: does not detect partially overlapping lines.
+	//   NOTE: does not detect partially overlapping lines.
 
-	int i;
-	int *array = (int *)UtilCalloc(num_linedefs * sizeof(int));
+	std::vector<linedef_t *> array(lev_linedefs);
+
+	std::sort(array.begin(), array.end(), Compare_line_MinX_pred());
+
 	int count = 0;
 
-	// sort array of indices
-	for (i=0 ; i < num_linedefs ; i++)
-		array[i] = i;
-
-	qsort(array, num_linedefs, sizeof(int), LineStartCompare);
-
-	for (i=0 ; i < num_linedefs - 1 ; i++)
+	for (int i=0 ; i < num_linedefs - 1 ; i++)
 	{
-		int j;
+		linedef_t *A = array[i];
 
-		for (j = i+1 ; j < num_linedefs ; j++)
+		for (int k = i+1 ; k < num_linedefs ; k++)
 		{
-			if (LineStartCompare(array + i, array + j) != 0)
+			linedef_t *B = array[k];
+
+			if (B->MinX() > A->MinX() + DIST_EPSILON)
 				break;
 
-			if (LineEndCompare(array + i, array + j) == 0)
+			// due to DetectOverlappingVertices(), we can compare the vertex pointers
+			bool over1 = (A->start == B->start) && (A->end == B->end);
+			bool over2 = (A->start == B->end)   && (A->end == B->start);
+
+			if (over1 || over2)
 			{
 				// found an overlap !
 
-				linedef_t *A = lev_linedefs[array[i]];
-				linedef_t *B = lev_linedefs[array[j]];
-
-				B->overlap = A->overlap ? A->overlap : A;
+				// keep the lowest numbered one
+				if (A->index < B->index)
+					A->overlap = B->overlap ? B->overlap : B;
+				else
+					B->overlap = A->overlap ? A->overlap : A;
 
 				count++;
 			}
@@ -542,8 +495,6 @@ void DetectOverlappingLines(void)
 	{
 		cur_info->Print(2, "    Detected %d overlapped linedefs\n", count);
 	}
-
-	UtilFree(array);
 }
 
 
