@@ -51,9 +51,9 @@ std::vector< map_range_t > map_list;
 
 // this is > 0 when ShowMap() is used and the current line
 // has not been terminated with a new-line ('\n') character.
-static int hanging_pos;
+int hanging_pos;
 
-static void StopHanging()
+void StopHanging()
 {
 	if (hanging_pos > 0)
 	{
@@ -152,7 +152,7 @@ class mybuildinfo_t config;
 //------------------------------------------------------------------------
 
 
-static bool CheckMapInRange(const map_range_t *range, const char *name)
+bool CheckMapInRange(const map_range_t *range, const char *name)
 {
 	if (strlen(name) != strlen(range->low))
 		return false;
@@ -167,7 +167,7 @@ static bool CheckMapInRange(const map_range_t *range, const char *name)
 }
 
 
-static bool CheckMapInMaplist(short lev_idx)
+bool CheckMapInMaplist(short lev_idx)
 {
 	// when --map is not used, allow everything
 	if (map_list.empty())
@@ -185,7 +185,7 @@ static bool CheckMapInMaplist(short lev_idx)
 }
 
 
-static build_result_e BuildFile()
+build_result_e BuildFile()
 {
 	int num_levels = edit_wad->LevelCount();
 
@@ -365,13 +365,8 @@ void VisitFile(unsigned int idx, const char *filename)
 
 // ----- user information -----------------------------
 
-static void ShowHelp()
+void ShowHelp()
 {
-	/*
-	printf(	"AJBSP is free software, under the terms of the GNU GPL\n"
-			"(General Public License), and has ABSOLUTELY NO WARRANTY.\n"
-			"\n");
-	*/
 	printf("\n");
 
 	printf( "Usage: ajbsp [options...] FILE...\n"
@@ -392,15 +387,13 @@ static void ShowHelp()
 			"\n"
 			"Map names should be full, like E1M3 or MAP24, but a list\n"
 			"and/or ranges can be specified: MAP01,MAP04-MAP07,MAP12\n"
-			);
-
-	//	"Home page: https://gitlab.com/andwj/ajbsp\n"
+	);
 
 	fflush(stdout);
 }
 
 
-static void ShowVersion()
+void ShowVersion()
 {
 	printf("ajbsp " AJBSP_VERSION "  (" __DATE__ ")\n");
 
@@ -408,7 +401,7 @@ static void ShowVersion()
 }
 
 
-static void ShowBanner()
+void ShowBanner()
 {
 	printf("+-----------------------------------------------+\n");
 	printf("|   AJBSP " AJBSP_VERSION "   (C) 2022 Andrew Apted, et al   |\n");
