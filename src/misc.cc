@@ -134,7 +134,7 @@ void UtilFree(void *data)
 //
 // Translate (dx, dy) into an angle value (degrees)
 //
-angle_g UtilComputeAngle(double dx, double dy)
+double UtilComputeAngle(double dx, double dy)
 {
 	double angle;
 
@@ -833,7 +833,7 @@ bool vertex_t::CheckOpen(double dx, double dy) const
 {
 	walltip_t *tip;
 
-	angle_g angle = UtilComputeAngle(dx, dy);
+	double angle = UtilComputeAngle(dx, dy);
 
 	// first check whether there's a wall-tip that lies in the exact
 	// direction of the given direction (which is relative to the

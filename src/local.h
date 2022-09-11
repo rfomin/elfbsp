@@ -35,12 +35,6 @@ extern nodebuildinfo_t * cur_info;
 
 
 
-/* ----- basic types --------------------------- */
-
-typedef double angle_g;  // degrees, 0 is E, 90 is N
-
-
-
 /*
  *  Global variables
  */
@@ -104,8 +98,9 @@ void UtilFree(void *data);
 // or NULL if an error occurred.
 char *UtilTimeString(void);
 
-// compute angle of line from (0,0) to (dx,dy)
-angle_g UtilComputeAngle(double dx, double dy);
+// compute angle of line from (0,0) to (dx,dy).
+// result is degrees, where 0 is east and 90 is north.
+double UtilComputeAngle(double dx, double dy);
 
 // checksum functions
 void Adler32_Begin(u32_t *crc);
@@ -157,7 +152,7 @@ typedef struct walltip_s
 	struct walltip_s *prev;
 
 	// angle that line makes at vertex (degrees).
-	angle_g angle;
+	double angle;
 
 	// whether each side of wall is OPEN or CLOSED.
 	// left is the side of increasing angles, whereas
