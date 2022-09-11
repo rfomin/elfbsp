@@ -50,8 +50,6 @@ __attribute__((noreturn))
 #endif
 void FatalError(const char *fmt, ...);
 
-void PrintMapName(const char *name);
-
 #define BugError  FatalError
 
 

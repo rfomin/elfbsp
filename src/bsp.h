@@ -90,6 +90,7 @@ public:
 public:
 	virtual void Print(int level, const char *msg, ...) = 0;
 	virtual void Debug(const char *msg, ...) = 0;
+	virtual void ShowMap(const char *name) = 0;
 };
 
 

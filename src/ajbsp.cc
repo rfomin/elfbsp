@@ -67,7 +67,7 @@ typedef struct map_range_s
 std::vector< map_range_t > map_list;
 
 
-// this is > 0 when PrintMapName() is used and the current line
+// this is > 0 when ShowMap() is used and the current line
 // has not been terminated with a new-line ('\n') character.
 static int hanging_pos;
 
@@ -119,6 +119,25 @@ public:
 
 		fprintf(stderr, "%s", buffer);
 	}
+
+	void ShowMap(const char *name)
+	{
+		if (opt_verbosity >= 1)
+		{
+			Print(0, "  %s\n", name);
+			return;
+		}
+
+		// display the map names across the terminal
+
+		if (hanging_pos >= 68)
+			StopHanging();
+
+		printf("  %s", name);
+		fflush(stdout);
+
+		hanging_pos += strlen(name) + 2;
+	}
 };
 
 
@@ -145,44 +164,6 @@ void FatalError(const char *fmt, ...)
 	fprintf(stderr, "\nFATAL ERROR: %s", buffer);
 
 	exit(3);
-}
-
-
-void PrintMapName(const char *name)
-{
-	if (opt_verbosity >= 1)
-	{
-		config.Print(0, "  %s\n", name);
-		return;
-	}
-
-	// display the map names across the terminal
-
-	if (hanging_pos >= 68)
-		StopHanging();
-
-	printf("  %s", name);
-	fflush(stdout);
-
-	hanging_pos += strlen(name) + 2;
-}
-
-
-void DebugPrintf(const char *fmt, ...)
-{
-#if 1
-	(void) fmt;
-#else
-	static char buffer[MSG_BUF_LEN];
-
-	va_list args;
-
-	va_start(args, fmt);
-	vsnprintf(buffer, sizeof(buffer), fmt, args);
-	va_end(args);
-
-	fprintf(stderr, "%s", buffer);
-#endif
 }
 
 
