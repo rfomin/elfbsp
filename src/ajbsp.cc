@@ -83,6 +83,48 @@ static void StopHanging()
 }
 
 
+class mybuildinfo_t : public buildinfo_t
+{
+public:
+	void Print(int level, const char *fmt, ...)
+	{
+		if (level > opt_verbosity)
+			return;
+
+		va_list arg_ptr;
+
+		static char buffer[MSG_BUF_LEN];
+
+		va_start(arg_ptr, fmt);
+		vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+		va_end(arg_ptr);
+
+		buffer[MSG_BUF_LEN-1] = 0;
+
+		StopHanging();
+
+		printf("%s", buffer);
+		fflush(stdout);
+	}
+
+	void Debug(const char *fmt, ...)
+	{
+		static char buffer[MSG_BUF_LEN];
+
+		va_list args;
+
+		va_start(args, fmt);
+		vsnprintf(buffer, sizeof(buffer), fmt, args);
+		va_end(args);
+
+		fprintf(stderr, "%s", buffer);
+	}
+};
+
+
+class mybuildinfo_t nb_info;
+
+
 //
 //  show an error message and terminate the program
 //
@@ -258,8 +300,6 @@ static build_result_e BuildFile()
 	int failures = 0;
 
 	// prepare the build info struct
-	nodebuildinfo_t nb_info;
-
 	nb_info.factor		= opt_split_cost;
 	nb_info.gl_nodes	= ! opt_no_gl;
 	nb_info.fast		= opt_fast;

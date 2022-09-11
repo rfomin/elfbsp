@@ -31,8 +31,7 @@ class Lump_c;
 
 // internal storage of node building parameters
 
-extern nodebuildinfo_t * cur_info;
-
+extern buildinfo_t * cur_info;
 
 
 /*

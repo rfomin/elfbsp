@@ -2683,12 +2683,12 @@ Lump_c * CreateGLMarker()
 //------------------------------------------------------------------------
 
 
-nodebuildinfo_t * cur_info = NULL;
+buildinfo_t * cur_info = NULL;
 
 
 /* ----- build nodes for a single level ----- */
 
-build_result_e BuildNodesForLevel(nodebuildinfo_t *info, short lev_idx)
+build_result_e BuildNodesForLevel(buildinfo_t *info, short lev_idx)
 {
 	cur_info = info;
 
@@ -2751,7 +2751,7 @@ build_result_e BuildNodesForLevel(nodebuildinfo_t *info, short lev_idx)
 }
 
 
-build_result_e AJBSP_BuildLevel(nodebuildinfo_t *info, short lev_idx)
+build_result_e AJBSP_BuildLevel(buildinfo_t *info, short lev_idx)
 {
 	return ajbsp::BuildNodesForLevel(info, lev_idx);
 }

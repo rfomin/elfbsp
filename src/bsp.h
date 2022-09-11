@@ -35,7 +35,7 @@ namespace ajbsp
 //
 #define DEFAULT_FACTOR  11
 
-class nodebuildinfo_t
+class buildinfo_t
 {
 public:
 	int factor;
@@ -62,7 +62,7 @@ public:
 	int total_minor_issues;
 
 public:
-	nodebuildinfo_t() :
+	buildinfo_t() :
 		factor(DEFAULT_FACTOR),
 
 		gl_nodes(true),
@@ -84,8 +84,12 @@ public:
 		total_minor_issues(0)
 	{ }
 
-	~nodebuildinfo_t()
+	~buildinfo_t()
 	{ }
+
+public:
+	virtual void Print(int level, const char *msg, ...) = 0;
+	virtual void Debug(const char *msg, ...) = 0;
 };
 
 
@@ -106,7 +110,7 @@ typedef enum
 build_result_e;
 
 
-build_result_e AJBSP_BuildLevel(nodebuildinfo_t *info, short lev_idx);
+build_result_e AJBSP_BuildLevel(buildinfo_t *info, short lev_idx);
 
 
 }  // namespace ajbsp

@@ -47,9 +47,9 @@ void Failure(const char *fmt, ...)
 	va_end(args);
 
 	if (opt_verbosity >= 2)
-		PrintVerbose("    FAILURE: %s", message_buf);
+		cur_info->Print(1, "    FAILURE: %s", message_buf);
 	else
-		PrintVerbose("    %s", message_buf);
+		cur_info->Print(1, "    %s", message_buf);
 }
 
 
@@ -62,9 +62,9 @@ void Warning(const char *fmt, ...)
 	va_end(args);
 
 	if (opt_verbosity >= 2)
-		PrintVerbose("    WARNING: %s", message_buf);
+		cur_info->Print(1, "    WARNING: %s", message_buf);
 	else
-		PrintVerbose("    %s", message_buf);
+		cur_info->Print(1, "    %s", message_buf);
 
 	cur_info->total_warnings++;
 }
@@ -80,7 +80,7 @@ void MinorIssue(const char *fmt, ...)
 		vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 		va_end(args);
 
-		PrintVerbose("    ISSUE: %s", message_buf);
+		cur_info->Print(1, "    ISSUE: %s", message_buf);
 	}
 
 	cur_info->total_minor_issues++;
@@ -108,9 +108,9 @@ static void MarkPolyobjSector(sector_t *sector)
 	if (! sector)
 		return;
 
-# if DEBUG_POLYOBJ
-	DebugPrintf("  Marking SECTOR %d\n", sector->index);
-# endif
+#if DEBUG_POLYOBJ
+	cur_info->Debug("  Marking SECTOR %d\n", sector->index);
+#endif
 
 	/* already marked ? */
 	if (sector->has_polyobj)
@@ -161,9 +161,9 @@ static void MarkPolyobjPoint(double x, double y)
 					(int) L->start->x, (int) L->start->y,
 					(int) L->end->x, (int) L->end->y))
 		{
-#     if DEBUG_POLYOBJ
-			DebugPrintf("  Touching line was %d\n", L->index);
-#     endif
+#if DEBUG_POLYOBJ
+			cur_info->Debug("  Touching line was %d\n", L->index);
+#endif
 
 			if (L->left)
 				MarkPolyobjSector(L->left->sector);
@@ -221,19 +221,19 @@ static void MarkPolyobjPoint(double x, double y)
 	y1 = best_match->start->y;
 	y2 = best_match->end->y;
 
-# if DEBUG_POLYOBJ
-	DebugPrintf("  Closest line was %d Y=%1.0f..%1.0f (dist=%1.1f)\n",
+#if DEBUG_POLYOBJ
+	cur_info->Debug("  Closest line was %d Y=%1.0f..%1.0f (dist=%1.1f)\n",
 			best_match->index, y1, y2, best_dist);
-# endif
+#endif
 
 	/* sanity check: shouldn't be directly on the line */
-# if DEBUG_POLYOBJ
+#if DEBUG_POLYOBJ
 	if (fabs(best_dist) < DIST_EPSILON)
 	{
-		DebugPrintf("  Polyobj FAILURE: directly on the line (%d)\n",
+		cur_info->Debug("  Polyobj FAILURE: directly on the line (%d)\n",
 				best_match->index);
 	}
-# endif
+#endif
 
 	/* check orientation of line, to determine which side the polyobj is
 	 * actually on.
@@ -243,10 +243,10 @@ static void MarkPolyobjPoint(double x, double y)
 	else
 		sector = best_match->left ? best_match->left->sector : NULL;
 
-# if DEBUG_POLYOBJ
-	DebugPrintf("  Sector %d contains the polyobj.\n",
+#if DEBUG_POLYOBJ
+	cur_info->Debug("  Sector %d contains the polyobj.\n",
 			sector ? sector->index : -1);
-# endif
+#endif
 
 	if (! sector)
 	{
@@ -304,10 +304,10 @@ void DetectPolyobjSectors(void)
 		}
 	}
 
-# if DEBUG_POLYOBJ
-	DebugPrintf("Using %s style polyobj things\n",
+#if DEBUG_POLYOBJ
+	cur_info->Debug("Using %s style polyobj things\n",
 			hexen_style ? "HEXEN" : "ZDOOM");
-# endif
+#endif
 
 	for (i = 0 ; i < num_things ; i++)
 	{
@@ -330,9 +330,9 @@ void DetectPolyobjSectors(void)
 				continue;
 		}
 
-#   if DEBUG_POLYOBJ
-		DebugPrintf("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n", i, x, y);
-#   endif
+#if DEBUG_POLYOBJ
+		cur_info->Debug("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n", i, x, y);
+#endif
 
 		MarkPolyobjPoint(x, y);
 	}
@@ -614,11 +614,11 @@ void CalculateWallTips(void)
 	{
 		vertex_t *V = lev_vertices[i];
 
-		DebugPrintf("WallTips for vertex %d:\n", i);
+		cur_info->Debug("WallTips for vertex %d:\n", i);
 
 		for (walltip_t *tip = V->tip_set ; tip ; tip = tip->next)
 		{
-			DebugPrintf("  Angle=%1.1f left=%d right=%d\n", tip->angle,
+			cur_info->Debug("  Angle=%1.1f left=%d right=%d\n", tip->angle,
 					tip->open_left  ? 1 : 0,
 					tip->open_right ? 1 : 0);
 		}
