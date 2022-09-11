@@ -40,8 +40,10 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
 #include <stdarg.h>
+
+#include <string.h>
 #include <ctype.h>
 #include <limits.h>
 #include <errno.h>
@@ -52,25 +54,20 @@
 #endif
 
 #include <vector>
+#include <algorithm>
 
 
-/*
- *  code headers
- */
+// sized types
 
-#include "sys_type.h"
-#include "sys_macro.h"
-#include "sys_endian.h"
+typedef int8_t  s8_t;
+typedef int16_t s16_t;
+typedef int32_t s32_t;
 
-#include "lib_util.h"
-#include "w_rawdef.h"
-#include "w_wad.h"
+typedef uint8_t  u8_t;
+typedef uint16_t u16_t;
+typedef uint32_t u32_t;
 
-#include "bsp.h"
-
-
-namespace ajbsp
-{
+typedef u8_t byte;
 
 /*
  *  Misc constants
@@ -81,52 +78,48 @@ namespace ajbsp
 #define MSG_BUF_LEN  1024
 
 
-/*
- *  Global variables
- */
+// basic macros
 
-extern int opt_verbosity;	// 0 is normal, 1+ is verbose
+#ifndef NULL
+#define NULL    ((void*) 0)
+#endif
 
-extern const char *Level_name;  // Name of map lump we are editing
+#ifndef M_PI
+#define M_PI  3.14159265358979323846
+#endif
 
-extern map_format_e Level_format; // format of current map
+#ifndef M_SQRT2
+#define M_SQRT2  1.41421356237309504880
+#endif
+
+#ifndef MAX
+#define MAX(a,b)  ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b)  ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef I_ROUND
+#define I_ROUND(x)  ((int) round(x))
+#endif
 
 
-/*
- *  Global functions
- */
+//
+// The packed attribute forces structures to be packed into the minimum
+// space necessary.  If this is not done, the compiler may align structure
+// fields differently to optimize memory access, inflating the overall
+// structure size.  It is important to use the packed attribute on certain
+// structures where alignment is important, particularly data read/written
+// to disk.
+//
 
 #ifdef __GNUC__
-__attribute__((noreturn))
-#endif
-void FatalError(const char *fmt, ...);
-
-void PrintMsg(const char *fmt, ...);
-void PrintVerbose(const char *fmt, ...);
-void PrintDetail(const char *fmt, ...);
-
-void DebugPrintf(const char *fmt, ...);
-
-void PrintMapName(const char *name);
-
-#define BugError  FatalError
-
-
-/*
- *  Assertions
- */
-
-#if defined(__GNUC__)
-#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
-        BugError("Assertion (%s) failed\nIn function %s (%s:%d)\n", #cond , __func__, __FILE__, __LINE__))
-
+#define PACKEDATTR __attribute__((packed))
 #else
-#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
-        BugError("Assertion (%s) failed\nIn file %s:%d\n", #cond , __FILE__, __LINE__))
+#define PACKEDATTR
 #endif
 
-
-} // namespace ajbsp
 
 #endif  /* __AJBSP_SYSTEM_H__ */
 

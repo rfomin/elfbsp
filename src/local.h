@@ -38,6 +38,53 @@ extern nodebuildinfo_t * cur_info;
 typedef double angle_g;  // degrees, 0 is E, 90 is N
 
 
+
+/*
+ *  Global variables
+ */
+
+extern int opt_verbosity;	// 0 is normal, 1+ is verbose
+
+extern const char *Level_name;  // Name of map lump we are editing
+
+extern map_format_e Level_format; // format of current map
+
+
+/*
+ *  Global functions
+ */
+
+#ifdef __GNUC__
+__attribute__((noreturn))
+#endif
+void FatalError(const char *fmt, ...);
+
+void PrintMsg(const char *fmt, ...);
+void PrintVerbose(const char *fmt, ...);
+void PrintDetail(const char *fmt, ...);
+
+void DebugPrintf(const char *fmt, ...);
+
+void PrintMapName(const char *name);
+
+#define BugError  FatalError
+
+
+/*
+ *  Assertions
+ */
+
+#if defined(__GNUC__)
+#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
+        BugError("Assertion (%s) failed\nIn function %s (%s:%d)\n", #cond , __func__, __FILE__, __LINE__))
+
+#else
+#define SYS_ASSERT(cond)  ((cond) ? (void)0 :  \
+        BugError("Assertion (%s) failed\nIn file %s:%d\n", #cond , __FILE__, __LINE__))
+#endif
+
+
+
 //------------------------------------------------------------------------
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
