@@ -43,8 +43,15 @@ bool FileCopy(const char *src_name, const char *dest_name);
 bool FileRename(const char *old_name, const char *new_name);
 bool FileDelete(const char *filename);
 
-// round a positive value up to the nearest power of two
+// memory allocation, guaranteed to not return NULL.
+void *UtilCalloc(int size);
+void *UtilRealloc(void *old, int size);
+void UtilFree(void *data);
+
+// math stuff
 int RoundPOW2(int x);
+double ComputeAngle(double dx, double dy);
+char *TimeToString();
 
 // string utilities
 int y_stricmp (const char *s1, const char *s2);
@@ -58,6 +65,11 @@ char *StringDup(const char *orig, int limit = -1);
 char *StringUpper(const char *name);
 char *StringPrintf(const char *str, ...);
 void  StringFree(const char *str);
+
+// checksum functions
+void Adler32_Begin(u32_t *crc);
+void Adler32_AddBlock(u32_t *crc, const u8_t *data, int length);
+void Adler32_Finish(u32_t *crc);
 
 } // namespace ajbsp
 

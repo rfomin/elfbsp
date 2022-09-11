@@ -76,7 +76,6 @@ void PrintMapName(const char *name);
 #endif
 
 
-
 //------------------------------------------------------------------------
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
@@ -84,28 +83,6 @@ void PrintMapName(const char *name);
 void Failure(const char *fmt, ...);
 void Warning(const char *fmt, ...);
 void MinorIssue(const char *fmt, ...);
-
-// allocate and clear some memory.  guaranteed not to fail.
-void *UtilCalloc(int size);
-
-// re-allocate some memory.  guaranteed not to fail.
-void *UtilRealloc(void *old, int size);
-
-// free some memory or a string.
-void UtilFree(void *data);
-
-// return an allocated string for the current data and time,
-// or NULL if an error occurred.
-char *UtilTimeString(void);
-
-// compute angle of line from (0,0) to (dx,dy).
-// result is degrees, where 0 is east and 90 is north.
-double UtilComputeAngle(double dx, double dy);
-
-// checksum functions
-void Adler32_Begin(u32_t *crc);
-void Adler32_AddBlock(u32_t *crc, const u8_t *data, int length);
-void Adler32_Finish(u32_t *crc);
 
 
 //------------------------------------------------------------------------

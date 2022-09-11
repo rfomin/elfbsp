@@ -1512,8 +1512,8 @@ void subsec_t::ClockwiseOrder()
 		seg_t *A = array[i];
 		seg_t *B = array[i+1];
 
-		double angle1 = UtilComputeAngle(A->start->x - mid_x, A->start->y - mid_y);
-		double angle2 = UtilComputeAngle(B->start->x - mid_x, B->start->y - mid_y);
+		double angle1 = ComputeAngle(A->start->x - mid_x, A->start->y - mid_y);
+		double angle2 = ComputeAngle(B->start->x - mid_x, B->start->y - mid_y);
 
 		if (angle1 + ANG_EPSILON < angle2)
 		{
@@ -1570,7 +1570,7 @@ void subsec_t::ClockwiseOrder()
 
 	for (seg=seg_list ; seg ; seg=seg->next)
 	{
-		double angle = UtilComputeAngle(seg->start->x - mid_x, seg->start->y - mid_y);
+		double angle = ComputeAngle(seg->start->x - mid_x, seg->start->y - mid_y);
 		DebugPrintf("  Seg %p: Angle %1.6f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				seg, angle, seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 	}

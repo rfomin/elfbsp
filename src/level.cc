@@ -1400,7 +1400,7 @@ static inline int VanillaSegAngle(const seg_t *seg)
 	double dx = I_ROUND(seg->end->x) - I_ROUND(seg->start->x);
 	double dy = I_ROUND(seg->end->y) - I_ROUND(seg->start->y);
 
-	double angle = UtilComputeAngle(dx, dy);
+	double angle = ComputeAngle(dx, dy);
 
 	if (angle < 0)
 		angle += 360.0;
@@ -2351,12 +2351,11 @@ void UpdateGLMarker(Lump_c *marker)
 	}
 
 	marker->Printf("BUILDER=%s\n", "AJBSP " AJBSP_VERSION);
-
 	marker->Printf("OPTIONS=%s\n", CalcOptionsString());
 
-	char *time_str = UtilTimeString();
+	char *time_str = TimeToString();
 
-	if (time_str)
+	if (time_str != NULL)
 	{
 		marker->Printf("TIME=%s\n", time_str);
 		StringFree(time_str);
