@@ -54,8 +54,8 @@ double ComputeAngle(double dx, double dy);
 char *TimeToString();
 
 // string utilities
-int y_stricmp (const char *s1, const char *s2);
-int y_strnicmp (const char *s1, const char *s2, size_t len);
+int StringCaseCmp   (const char *s1, const char *s2);
+int StringCaseCmpMax(const char *s1, const char *s2, size_t len);
 
 char *StringNew(int length);
 char *StringDup(const char *orig, int limit = -1);

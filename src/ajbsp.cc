@@ -790,7 +790,7 @@ int main(int argc, char *argv[])
 		if (total_files > 1)
 			config.FatalError("cannot use multiple input files with --output\n");
 
-		if (ajbsp::y_stricmp(wad_list[0], opt_output) == 0)
+		if (ajbsp::StringCaseCmp(wad_list[0], opt_output) == 0)
 			config.FatalError("input and output files are the same\n");
 	}
 
