@@ -823,8 +823,8 @@ void PutReject()
 
 const char *lev_current_name;
 
-short lev_current_idx;
-short lev_current_start;
+int lev_current_idx;
+int lev_current_start;
 
 bool lev_doing_hexen;
 
@@ -832,8 +832,7 @@ bool lev_force_v5;
 bool lev_force_xnod;
 
 bool lev_long_name;
-
-int lev_overflows;
+bool lev_overflows;
 
 
 // objects of loaded level, and stuff we've built
@@ -1422,7 +1421,7 @@ void MarkOverflow(int flags)
 {
 	// flags are ignored
 
-	lev_overflows++;
+	lev_overflows = true;
 }
 
 
@@ -2213,7 +2212,8 @@ void LoadLevel()
 	Lump_c *LEV = edit_wad->GetLump(lev_current_start);
 
 	lev_current_name = LEV->Name();
-	lev_overflows = 0;
+	lev_long_name = false;
+	lev_overflows = false;
 
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
@@ -2481,7 +2481,7 @@ build_result_e SaveLevel(node_t *root_node)
 
 	edit_wad->EndWrite();
 
-	if (lev_overflows > 0)
+	if (lev_overflows)
 	{
 		cur_info->total_failed_maps++;
 
@@ -2689,10 +2689,8 @@ buildinfo_t * cur_info = NULL;
 
 /* ----- build nodes for a single level ----- */
 
-build_result_e BuildNodesForLevel(buildinfo_t *info, short lev_idx)
+build_result_e BuildLevel(int lev_idx)
 {
-	cur_info = info;
-
 	node_t *root_node  = NULL;
 	subsec_t *root_sub = NULL;
 
@@ -2752,10 +2750,11 @@ build_result_e BuildNodesForLevel(buildinfo_t *info, short lev_idx)
 }
 
 
-build_result_e AJBSP_BuildLevel(buildinfo_t *info, short lev_idx)
+void SetInfo(buildinfo_t *info)
 {
-	return ajbsp::BuildNodesForLevel(info, lev_idx);
+	cur_info = info;
 }
+
 
 }  // namespace ajbsp
 

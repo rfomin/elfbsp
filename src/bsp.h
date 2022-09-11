@@ -21,9 +21,6 @@
 #ifndef __AJBSP_BSP_H__
 #define __AJBSP_BSP_H__
 
-namespace ajbsp
-{
-
 #define AJBSP_VERSION  "1.02"
 
 //
@@ -114,7 +111,12 @@ typedef enum
 build_result_e;
 
 
-build_result_e AJBSP_BuildLevel(buildinfo_t *info, short lev_idx);
+namespace ajbsp
+{
+
+void SetInfo(buildinfo_t *info);
+
+build_result_e BuildLevel(int lev_idx);
 
 
 }  // namespace ajbsp

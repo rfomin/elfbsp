@@ -23,21 +23,18 @@
 #include "utility.h"
 #include "wad.h"
 
-namespace ajbsp
-{
-
-bool opt_backup		= false;
-bool opt_help		= false;
-bool opt_version	= false;
+bool opt_backup   = false;
+bool opt_help     = false;
+bool opt_version  = false;
 
 const char *opt_output = NULL;
 
 std::vector< const char * > wad_list;
 
 int total_failed_files = 0;
-int total_empty_files = 0;
-int total_built_maps = 0;
-int total_failed_maps = 0;
+int total_empty_files  = 0;
+int total_built_maps   = 0;
+int total_failed_maps  = 0;
 
 typedef struct map_range_s
 {
@@ -167,15 +164,15 @@ bool CheckMapInRange(const map_range_t *range, const char *name)
 }
 
 
-bool CheckMapInMaplist(short lev_idx)
+bool CheckMapInMaplist(int lev_idx)
 {
 	// when --map is not used, allow everything
 	if (map_list.empty())
 		return true;
 
-	short lump_idx = edit_wad->LevelHeader(lev_idx);
+	int lump_idx = ajbsp::edit_wad->LevelHeader(lev_idx);
 
-	const char *name = edit_wad->GetLump(lump_idx)->Name();
+	const char *name = ajbsp::edit_wad->GetLump(lump_idx)->Name();
 
 	for (unsigned int i = 0 ; i < map_list.size() ; i++)
 		if (CheckMapInRange(&map_list[i], name))
@@ -187,7 +184,7 @@ bool CheckMapInMaplist(short lev_idx)
 
 build_result_e BuildFile()
 {
-	int num_levels = edit_wad->LevelCount();
+	int num_levels = ajbsp::edit_wad->LevelCount();
 
 	if (num_levels == 0)
 	{
@@ -212,7 +209,7 @@ build_result_e BuildFile()
 		if (n > 0 && config.verbosity >= 2)
 			config.Print(0, "\n");
 
-		res = AJBSP_BuildLevel(&config, n);
+		res = ajbsp::BuildLevel(n);
 
 		// handle a failed map (due to lump overflow)
 		if (res == BUILD_LumpOverflow)
@@ -280,31 +277,42 @@ void ValidateInputFilename(const char *filename)
 	// NOTE: these checks are case-insensitive
 
 	// files with ".bak" extension cannot be backed up, so refuse them
-	if (MatchExtension(filename, "bak"))
+	if (ajbsp::MatchExtension(filename, "bak"))
 		config.FatalError("cannot process a backup file: %s\n", filename);
 
 	// GWA files only contain GL-nodes, never any maps
-	if (MatchExtension(filename, "gwa"))
+	if (ajbsp::MatchExtension(filename, "gwa"))
 		config.FatalError("cannot process a GWA file: %s\n", filename);
 
 	// we do not support packages
-	if (MatchExtension(filename, "pak") || MatchExtension(filename, "pk2") ||
-		MatchExtension(filename, "pk3") || MatchExtension(filename, "pk4") ||
-		MatchExtension(filename, "pk7") ||
-		MatchExtension(filename, "epk") || MatchExtension(filename, "pack") ||
-		MatchExtension(filename, "zip") || MatchExtension(filename, "rar"))
+	if (ajbsp::MatchExtension(filename, "pak") ||
+		ajbsp::MatchExtension(filename, "pk2") ||
+		ajbsp::MatchExtension(filename, "pk3") ||
+		ajbsp::MatchExtension(filename, "pk4") ||
+		ajbsp::MatchExtension(filename, "pk7") ||
+		ajbsp::MatchExtension(filename, "epk") ||
+		ajbsp::MatchExtension(filename, "pack") ||
+		ajbsp::MatchExtension(filename, "zip") ||
+		ajbsp::MatchExtension(filename, "rar"))
 	{
 		config.FatalError("package files (like PK3) are not supported: %s\n", filename);
 	}
 
-	// check some very common formats
-	if (MatchExtension(filename, "exe") || MatchExtension(filename, "dll") ||
-		MatchExtension(filename, "com") || MatchExtension(filename, "bat") ||
-		MatchExtension(filename, "txt") || MatchExtension(filename, "doc") ||
-		MatchExtension(filename, "deh") || MatchExtension(filename, "bex") ||
-		MatchExtension(filename, "lmp") || MatchExtension(filename, "cfg") ||
-		MatchExtension(filename, "gif") || MatchExtension(filename, "png") ||
-		MatchExtension(filename, "jpg") || MatchExtension(filename, "jpeg"))
+	// reject some very common formats
+	if (ajbsp::MatchExtension(filename, "exe") ||
+		ajbsp::MatchExtension(filename, "dll") ||
+		ajbsp::MatchExtension(filename, "com") ||
+		ajbsp::MatchExtension(filename, "bat") ||
+		ajbsp::MatchExtension(filename, "txt") ||
+		ajbsp::MatchExtension(filename, "doc") ||
+		ajbsp::MatchExtension(filename, "deh") ||
+		ajbsp::MatchExtension(filename, "bex") ||
+		ajbsp::MatchExtension(filename, "lmp") ||
+		ajbsp::MatchExtension(filename, "cfg") ||
+		ajbsp::MatchExtension(filename, "gif") ||
+		ajbsp::MatchExtension(filename, "png") ||
+		ajbsp::MatchExtension(filename, "jpg") ||
+		ajbsp::MatchExtension(filename, "jpeg"))
 	{
 		config.FatalError("not a wad file: %s\n", filename);
 	}
@@ -313,14 +321,14 @@ void ValidateInputFilename(const char *filename)
 
 void BackupFile(const char *filename)
 {
-	const char *dest_name = ReplaceExtension(filename, "bak");
+	const char *dest_name = ajbsp::ReplaceExtension(filename, "bak");
 
-	if (! FileCopy(filename, dest_name))
+	if (! ajbsp::FileCopy(filename, dest_name))
 		config.FatalError("failed to create backup: %s\n", dest_name);
 
 	config.Print(1, "\nCreated backup: %s\n", dest_name);
 
-	StringFree(dest_name);
+	ajbsp::StringFree(dest_name);
 }
 
 
@@ -328,7 +336,7 @@ void VisitFile(unsigned int idx, const char *filename)
 {
 	if (opt_output != NULL)
 	{
-		if (! FileCopy(filename, opt_output))
+		if (! ajbsp::FileCopy(filename, opt_output))
 			config.FatalError("failed to create output file: %s\n", opt_output);
 
 		config.Print(0, "\nCopied input file: %s\n", filename);
@@ -342,13 +350,14 @@ void VisitFile(unsigned int idx, const char *filename)
 	config.Print(0, "\n");
 	config.Print(0, "Building %s\n", filename);
 
-	edit_wad = Wad_file::Open(filename, 'a');
-	if (! edit_wad)
+	ajbsp::edit_wad = ajbsp::Wad_file::Open(filename, 'a');
+	if (ajbsp::edit_wad == NULL)
 		config.FatalError("Cannot open file: %s\n", filename);
 
-	if (edit_wad->IsReadOnly())
+	if (ajbsp::edit_wad->IsReadOnly())
 	{
-		delete edit_wad; edit_wad = NULL;
+		delete ajbsp::edit_wad;
+		ajbsp::edit_wad = NULL;
 
 		config.FatalError("file is read only: %s\n", filename);
 	}
@@ -356,7 +365,8 @@ void VisitFile(unsigned int idx, const char *filename)
 	build_result_e res = BuildFile();
 
 	// this closes the file
-	delete edit_wad; edit_wad = NULL;
+	delete ajbsp::edit_wad;
+	ajbsp::edit_wad = NULL;
 
 	if (res == BUILD_Cancelled)
 		config.FatalError("CANCELLED\n");
@@ -483,7 +493,7 @@ void ParseMapList(const char *from_arg)
 {
 	// create a mutable copy of the string
 	// [ we will keep long-term pointers into this buffer ]
-	char *buf = StringDup(from_arg);
+	char *buf = ajbsp::StringDup(from_arg);
 
 	char *arg = buf;
 
@@ -642,7 +652,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 		if (opt_output != NULL)
 			config.FatalError("cannot use '--output' option twice\n");
 
-		opt_output = StringDup(argv[0]);
+		opt_output = ajbsp::StringDup(argv[0]);
 		used = 1;
 	}
 	else
@@ -741,13 +751,13 @@ void CheckTypeSizes()
 }
 
 
-int Main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
+	// need this early, especially for fatal errors in utility/wad code
+	ajbsp::SetInfo(&config);
+
 	// sanity check on type sizes (useful when porting)
 	CheckTypeSizes();
-
-	// TODO this is hacky!!
-	cur_info = &config;
 
 	ParseCommandLine(argc, argv);
 
@@ -780,7 +790,7 @@ int Main(int argc, char *argv[])
 		if (total_files > 1)
 			config.FatalError("cannot use multiple input files with --output\n");
 
-		if (y_stricmp(wad_list[0], opt_output) == 0)
+		if (ajbsp::y_stricmp(wad_list[0], opt_output) == 0)
 			config.FatalError("input and output files are the same\n");
 	}
 
@@ -793,7 +803,7 @@ int Main(int argc, char *argv[])
 
 		ValidateInputFilename(filename);
 
-		if (! FileExists(filename))
+		if (! ajbsp::FileExists(filename))
 			config.FatalError("no such file: %s\n", filename);
 	}
 
@@ -837,13 +847,6 @@ int Main(int argc, char *argv[])
 
 	// that's all folks!
 	return 0;
-}
-
-} // namespace ajbsp
-
-int main(int argc, char *argv[])
-{
-	return ajbsp::Main(argc, argv);
 }
 
 
