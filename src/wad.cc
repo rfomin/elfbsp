@@ -16,9 +16,11 @@
 //
 //------------------------------------------------------------------------
 
-#include "ajbsp.h"
-
-#include <algorithm>
+#include "system.h"
+#include "local.h"
+#include "raw_def.h"
+#include "utility.h"
+#include "wad.h"
 
 namespace ajbsp
 {

@@ -18,7 +18,12 @@
 //
 //------------------------------------------------------------------------
 
-#include "ajbsp.h"
+#include "system.h"
+#include "local.h"
+#include "raw_def.h"
+#include "utility.h"
+#include "wad.h"
+
 
 #ifndef WIN32
 #include <time.h>

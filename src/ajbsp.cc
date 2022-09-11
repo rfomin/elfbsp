@@ -16,7 +16,12 @@
 //
 //------------------------------------------------------------------------
 
-#include "ajbsp.h"
+#include "system.h"
+#include "bsp.h"
+#include "local.h"
+#include "raw_def.h"
+#include "utility.h"
+#include "wad.h"
 
 
 #define MAX_SPLIT_COST  32
@@ -45,10 +50,6 @@ bool opt_version	= false;
 
 
 std::vector< const char * > wad_list;
-
-const char *Level_name;
-
-map_format_e Level_format;
 
 int total_failed_files = 0;
 int total_empty_files = 0;
@@ -784,6 +785,33 @@ void ParseCommandLine(int argc, char *argv[])
 			argv += count;
 		}
 	}
+}
+
+
+//
+// sanity checks for the sizes and properties of certain types.
+// useful when porting.
+//
+#define assert_size(type,size)  \
+    do {  \
+        if (sizeof (type) != size)  \
+            FatalError("sizeof " #type " is %d (should be " #size ")\n", (int)sizeof(type));  \
+    } while (0)
+
+void CheckTypeSizes()
+{
+	assert_size(u8_t,  1);
+	assert_size(s8_t,  1);
+	assert_size(u16_t, 2);
+	assert_size(s16_t, 2);
+	assert_size(u32_t, 4);
+	assert_size(s32_t, 4);
+
+	assert_size(raw_linedef_t, 14);
+	assert_size(raw_sector_s,  26);
+	assert_size(raw_sidedef_t, 30);
+	assert_size(raw_thing_t,   10);
+	assert_size(raw_vertex_t,   4);
 }
 
 

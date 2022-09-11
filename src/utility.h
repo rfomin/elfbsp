@@ -43,8 +43,6 @@ bool FileCopy(const char *src_name, const char *dest_name);
 bool FileRename(const char *old_name, const char *new_name);
 bool FileDelete(const char *filename);
 
-void CheckTypeSizes();
-
 // round a positive value up to the nearest power of two
 int RoundPOW2(int x);
 

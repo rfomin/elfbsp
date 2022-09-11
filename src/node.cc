@@ -18,6 +18,11 @@
 //
 //------------------------------------------------------------------------
 
+#include "system.h"
+#include "local.h"
+#include "utility.h"
+#include "wad.h"
+
 
 //
 // To be able to divide the nodes down, this routine must decide which
@@ -36,9 +41,6 @@
 //
 // Rewritten again by Andrew Apted (-AJA-), 1999-2000.
 //
-
-#include "ajbsp.h"
-
 
 namespace ajbsp
 {

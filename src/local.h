@@ -21,6 +21,8 @@
 #ifndef __AJBSP_LOCAL_H__
 #define __AJBSP_LOCAL_H__
 
+#include "bsp.h"
+
 namespace ajbsp
 {
 
@@ -44,10 +46,6 @@ typedef double angle_g;  // degrees, 0 is E, 90 is N
  */
 
 extern int opt_verbosity;	// 0 is normal, 1+ is verbose
-
-extern const char *Level_name;  // Name of map lump we are editing
-
-extern map_format_e Level_format; // format of current map
 
 
 /*
