@@ -166,6 +166,8 @@ static inline uint64_t __Swap64(uint64_t n) {
 #endif
 
 // the Makefile or build system must define BIG_ENDIAN_CPU
+// WISH: some preprocessor checks to detect a big-endian cpu.
+
 #ifdef BIG_ENDIAN_CPU
 #define LE_U16(x)  __Swap16(x)
 #define LE_U32(x)  __Swap32(x)
