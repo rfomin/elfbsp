@@ -1339,7 +1339,7 @@ void SplitSegInSuper(superblock_t *block, seg_t *seg)
 }
 
 static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
-		sidedef_t *side, int side_num)
+		sidedef_t *side, int what_side)
 {
 	seg_t *seg = NewSeg();
 
@@ -1352,7 +1352,7 @@ static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
 	seg->start   = start;
 	seg->end     = end;
 	seg->linedef = line;
-	seg->side    = side_num;
+	seg->side    = what_side;
 	seg->partner = NULL;
 
 	seg->source_line = seg->linedef;
