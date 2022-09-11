@@ -170,9 +170,9 @@ bool CheckMapInMaplist(int lev_idx)
 	if (map_list.empty())
 		return true;
 
-	int lump_idx = ajbsp::edit_wad->LevelHeader(lev_idx);
+	int lump_idx = ajbsp::cur_wad->LevelHeader(lev_idx);
 
-	const char *name = ajbsp::edit_wad->GetLump(lump_idx)->Name();
+	const char *name = ajbsp::cur_wad->GetLump(lump_idx)->Name();
 
 	for (unsigned int i = 0 ; i < map_list.size() ; i++)
 		if (CheckMapInRange(&map_list[i], name))
@@ -184,7 +184,7 @@ bool CheckMapInMaplist(int lev_idx)
 
 build_result_e BuildFile()
 {
-	int num_levels = ajbsp::edit_wad->LevelCount();
+	int num_levels = ajbsp::cur_wad->LevelCount();
 
 	if (num_levels == 0)
 	{
@@ -350,14 +350,14 @@ void VisitFile(unsigned int idx, const char *filename)
 	config.Print(0, "\n");
 	config.Print(0, "Building %s\n", filename);
 
-	ajbsp::edit_wad = ajbsp::Wad_file::Open(filename, 'a');
-	if (ajbsp::edit_wad == NULL)
+	ajbsp::cur_wad = ajbsp::Wad_file::Open(filename, 'a');
+	if (ajbsp::cur_wad == NULL)
 		config.FatalError("Cannot open file: %s\n", filename);
 
-	if (ajbsp::edit_wad->IsReadOnly())
+	if (ajbsp::cur_wad->IsReadOnly())
 	{
-		delete ajbsp::edit_wad;
-		ajbsp::edit_wad = NULL;
+		delete ajbsp::cur_wad;
+		ajbsp::cur_wad = NULL;
 
 		config.FatalError("file is read only: %s\n", filename);
 	}
@@ -365,8 +365,8 @@ void VisitFile(unsigned int idx, const char *filename)
 	build_result_e res = BuildFile();
 
 	// this closes the file
-	delete ajbsp::edit_wad;
-	ajbsp::edit_wad = NULL;
+	delete ajbsp::cur_wad;
+	ajbsp::cur_wad = NULL;
 
 	if (res == BUILD_Cancelled)
 		config.FatalError("CANCELLED\n");

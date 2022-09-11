@@ -304,10 +304,6 @@ private:
 };
 
 
-// the current PWAD
-extern Wad_file * edit_wad;
-
-
 } // namespace ajbsp
 
 #endif  /* __AJBSP_WAD_H__ */

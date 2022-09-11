@@ -22,16 +22,10 @@
 #include "utility.h"
 #include "wad.h"
 
-namespace ajbsp
-{
-
 #define DEBUG_WAD  0
 
-Wad_file * edit_wad;
-
-
-#define MAX_LUMPS_IN_A_LEVEL	21
-
+namespace ajbsp
+{
 
 #if DEBUG_WAD
 #define FileMessage  cur_info->Debug
@@ -398,6 +392,8 @@ short Wad_file::FindLumpNum(const char *name)
 	return -1;  // not found
 }
 
+
+#define MAX_LUMPS_IN_A_LEVEL  21
 
 short Wad_file::LevelLookupLump(short lev_num, const char *name)
 {

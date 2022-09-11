@@ -27,16 +27,24 @@ namespace ajbsp
 {
 
 class Lump_c;
+class Wad_file;
 
 
 // storage of node building parameters
 
 extern buildinfo_t * cur_info;
 
+// current WAD file
 
-/*
- *  Assertions
- */
+extern Wad_file * cur_wad;
+
+
+//------------------------------------------------------------------------
+// UTILITY : general purpose functions
+//------------------------------------------------------------------------
+
+
+// Assertion macros
 
 #define BugError  cur_info->FatalError
 
@@ -49,10 +57,6 @@ extern buildinfo_t * cur_info;
         BugError("Assertion (%s) failed\nIn file %s:%d\n", #cond , __FILE__, __LINE__))
 #endif
 
-
-//------------------------------------------------------------------------
-// UTILITY : general purpose functions
-//------------------------------------------------------------------------
 
 void Failure(const char *fmt, ...);
 void Warning(const char *fmt, ...);
@@ -529,9 +533,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
 // SEG : Choose the best Seg to use for a node line.
 //------------------------------------------------------------------------
 
-
 #define IFFY_LEN  4.0
-
 
 // smallest distance between two points before being considered equal
 #define DIST_EPSILON  (1.0 / 128.0)
@@ -576,7 +578,6 @@ intersection_t;
 // partition line, returning it.  If no seg can be used, returns NULL.
 // The 'depth' parameter is the current depth in the tree, used for
 // computing the current progress.
-//
 seg_t *PickNode(superblock_t *seg_list, int depth, const bbox_t *bbox);
 
 // compute the boundary of the list of segs
@@ -590,7 +591,6 @@ void RecomputeSeg(seg_t *seg);
 // (perhaps both, when splitting it in two).  Handles partners as
 // well.  Updates the intersection list if the seg lies on or crosses
 // the partition line.
-//
 void DivideOneSeg(seg_t *cur, seg_t *part,
     superblock_t *left_list, superblock_t *right_list,
     intersection_t ** cut_list);
@@ -598,7 +598,6 @@ void DivideOneSeg(seg_t *cur, seg_t *part,
 // remove all the segs from the list, partitioning them into the left
 // or right lists based on the given partition line.  Adds any
 // intersections onto the intersection list as it goes.
-//
 void SeparateSegs(superblock_t *seg_list, seg_t *part,
     superblock_t *left_list, superblock_t *right_list,
     intersection_t ** cut_list);
@@ -606,7 +605,6 @@ void SeparateSegs(superblock_t *seg_list, seg_t *part,
 // analyse the intersection list, and add any needed minisegs to the
 // given seg lists (one miniseg on each side).  All the intersection
 // structures will be freed back into a quick-alloc list.
-//
 void AddMinisegs(seg_t *part,
     superblock_t *left_list, superblock_t *right_list,
     intersection_t *cut_list);
@@ -623,7 +621,6 @@ void FreeQuickAllocCuts(void);
 // check the relationship between the given box and the partition
 // line.  Returns -1 if box is on left side, +1 if box is on right
 // size, or 0 if the line intersects the box.
-//
 int BoxOnLineSide(superblock_t *box, seg_t *part);
 
 // add the seg to the given list
@@ -631,12 +628,10 @@ void AddSegToSuper(superblock_t *block, seg_t *seg);
 
 // increase the counts within the superblock, to account for the given
 // seg being split.
-//
 void SplitSegInSuper(superblock_t *block, seg_t *seg);
 
 // scan all the linedef of the level and convert each sidedef into a
 // seg (or seg pair).  Returns the list of segs.
-//
 superblock_t *CreateSegs(void);
 
 // free a super block.
@@ -648,7 +643,7 @@ void FreeSuper(superblock_t *block);
 // two halves, a node is created by calling this routine recursively,
 // and '*N' is the new node (and '*S' is set to NULL).  Normally
 // returns BUILD_OK, or BUILD_Cancelled if user stopped it.
-//
+
 build_result_e BuildNodes(superblock_t *seg_list,
     node_t ** N, subsec_t ** S, int depth, const bbox_t *bbox);
 
@@ -661,19 +656,16 @@ int ComputeBspHeight(node_t *node);
 // [ This cannot be done DURING BuildNodes() since splitting a seg with
 //   a partner will insert another seg into that partner's list, usually
 //   in the wrong place order-wise. ]
-//
 void ClockwiseBspTree();
 
 // traverse the BSP tree and do whatever is necessary to convert the
 // node information from GL standard to normal standard (for example,
 // removing minisegs).
-//
 void NormaliseBspTree();
 
 // traverse the BSP tree, doing whatever is necessary to round
 // vertices to integer coordinates (for example, removing segs whose
 // rounded coordinates degenerate to the same point).
-//
 void RoundOffBspTree();
 
 // free all the superblocks on the quick-alloc list

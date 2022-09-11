@@ -28,11 +28,17 @@
 #include <zlib.h>
 #endif
 
+#define DEBUG_BLOCKMAP  0
+#define DEBUG_REJECT    0
+
+#define DEBUG_LOAD      0
+#define DEBUG_BSP       0
+
 
 namespace ajbsp
 {
 
-#define DEBUG_BLOCKMAP  0
+Wad_file * cur_wad;
 
 
 static int block_x, block_y;
@@ -609,8 +615,6 @@ void PutBlockmap()
 //------------------------------------------------------------------------
 
 
-#define DEBUG_REJECT  0
-
 static u8_t *rej_matrix;
 static int   rej_total_size;	// in bytes
 
@@ -812,9 +816,6 @@ void PutReject()
 
 // Note: ZDoom format support based on code (C) 2002,2003 Randy Heit
 
-
-#define DEBUG_LOAD      0
-#define DEBUG_BSP       0
 
 #define ALLOC_BLKNUM  1024
 
@@ -2209,7 +2210,7 @@ void SaveZDFormat(node_t *root_node)
 
 void LoadLevel()
 {
-	Lump_c *LEV = edit_wad->GetLump(lev_current_start);
+	Lump_c *LEV = cur_wad->GetLump(lev_current_start);
 
 	lev_current_name = LEV->Name();
 	lev_long_name = false;
@@ -2344,7 +2345,7 @@ void UpdateGLMarker(Lump_c *marker)
 	// [ otherwise we write data into the wrong part of the file ]
 	u32_t crc = CalcGLChecksum();
 
-	edit_wad->RecreateLump(marker, max_size);
+	cur_wad->RecreateLump(marker, max_size);
 
 	if (lev_long_name)
 	{
@@ -2370,22 +2371,22 @@ void UpdateGLMarker(Lump_c *marker)
 
 static void AddMissingLump(const char *name, const char *after)
 {
-	if (edit_wad->LevelLookupLump(lev_current_idx, name) >= 0)
+	if (cur_wad->LevelLookupLump(lev_current_idx, name) >= 0)
 		return;
 
-	short exist = edit_wad->LevelLookupLump(lev_current_idx, after);
+	short exist = cur_wad->LevelLookupLump(lev_current_idx, after);
 
 	// if this happens, the level structure is very broken
 	if (exist < 0)
 	{
 		Warning("Missing %s lump -- level structure is broken\n", after);
 
-		exist = edit_wad->LevelLastLump(lev_current_idx);
+		exist = cur_wad->LevelLastLump(lev_current_idx);
 	}
 
-	edit_wad->InsertPoint(exist + 1);
+	cur_wad->InsertPoint(exist + 1);
 
-	edit_wad->AddLump(name)->Finish();
+	cur_wad->AddLump(name)->Finish();
 }
 
 
@@ -2393,10 +2394,10 @@ build_result_e SaveLevel(node_t *root_node)
 {
 	// Note: root_node may be NULL
 
-	edit_wad->BeginWrite();
+	cur_wad->BeginWrite();
 
 	// remove any existing GL-Nodes
-	edit_wad->RemoveGLNodes(lev_current_idx);
+	cur_wad->RemoveGLNodes(lev_current_idx);
 
 	// ensure all necessary level lumps are present
 	AddMissingLump("SEGS",     "VERTEXES");
@@ -2479,7 +2480,7 @@ build_result_e SaveLevel(node_t *root_node)
 		UpdateGLMarker(gl_marker);
 	}
 
-	edit_wad->EndWrite();
+	cur_wad->EndWrite();
 
 	if (lev_overflows)
 	{
@@ -2618,12 +2619,12 @@ void ZLibFinishLump(void)
 
 Lump_c * FindLevelLump(const char *name)
 {
-	short idx = edit_wad->LevelLookupLump(lev_current_idx, name);
+	short idx = cur_wad->LevelLookupLump(lev_current_idx, name);
 
 	if (idx < 0)
 		return NULL;
 
-	return edit_wad->GetLump(idx);
+	return cur_wad->GetLump(idx);
 }
 
 
@@ -2634,15 +2635,15 @@ Lump_c * CreateLevelLump(const char *name, int max_size)
 
 	if (lump)
 	{
-		edit_wad->RecreateLump(lump, max_size);
+		cur_wad->RecreateLump(lump, max_size);
 	}
 	else
 	{
-		short last_idx = edit_wad->LevelLastLump(lev_current_idx);
+		short last_idx = cur_wad->LevelLastLump(lev_current_idx);
 
-		edit_wad->InsertPoint(last_idx + 1);
+		cur_wad->InsertPoint(last_idx + 1);
 
-		lump = edit_wad->AddLump(name, max_size);
+		lump = cur_wad->AddLump(name, max_size);
 	}
 
 	return lump;
@@ -2667,11 +2668,11 @@ Lump_c * CreateGLMarker()
 		lev_long_name = true;
 	}
 
-	short last_idx = edit_wad->LevelLastLump(lev_current_idx);
+	short last_idx = cur_wad->LevelLastLump(lev_current_idx);
 
-	edit_wad->InsertPoint(last_idx + 1);
+	cur_wad->InsertPoint(last_idx + 1);
 
-	Lump_c *marker = edit_wad->AddLump(name_buf);
+	Lump_c *marker = cur_wad->AddLump(name_buf);
 
 	marker->Finish();
 
@@ -2700,7 +2701,7 @@ build_result_e BuildLevel(int lev_idx)
 		return BUILD_Cancelled;
 
 	lev_current_idx   = lev_idx;
-	lev_current_start = edit_wad->LevelHeader(lev_idx);
+	lev_current_start = cur_wad->LevelHeader(lev_idx);
 
 	LoadLevel();
 
