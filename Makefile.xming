@@ -12,7 +12,7 @@ CROSS=x86_64-w64-mingw32-
 CXX=$(CROSS)g++ -m64
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
-OPTIMISE=-O2 -std=c++03 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
+OPTIMISE=-O2 -fno-strict-aliasing -fwrapv -fno-exceptions -fno-rtti
 STRIP_FLAGS=--strip-unneeded
 
 

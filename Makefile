@@ -13,15 +13,11 @@ PREFIX ?= /usr/local
 # for BSD systems use: $(PREFIX)/man
 MANDIR ?= $(PREFIX)/share/man
 
+# CXX=g++
 # CXX=clang++
-# CXX=g++ -m32   (to compile 32-bit binary on 64-bit system)
-
-# flags controlling the dialect of C++
-# [ the code is old-school C++ without modern features ]
-CXX_DIALECT=-std=c++03 -fno-exceptions -fno-rtti -fno-strict-aliasing -fwrapv
 
 WARNINGS=-Wall -Wextra -Wshadow -Wno-unused-parameter
-OPTIMISE=-O2 -g
+OPTIMISE=-O2 -g -fno-exceptions -fno-rtti -fno-strict-aliasing -fwrapv
 STRIP_FLAGS=--strip-unneeded
 
 # default flags for compiler, preprocessor and linker
@@ -31,7 +27,6 @@ LDFLAGS ?= $(OPTIMISE)
 LIBS ?=
 
 # general things needed by AJBSP
-CXXFLAGS += $(CXX_DIALECT)
 LIBS += -lm
 
 # uncomment this for a fully statically linked binary:
