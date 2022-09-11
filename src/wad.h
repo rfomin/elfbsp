@@ -48,7 +48,7 @@ private:
 	int l_length;
 
 	// constructor is private
-	Lump_c(Wad_file *_par, const char *_nam, int _start, int _len);
+	Lump_c(Wad_file *_par, const char *_name, int _start, int _len);
 	Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry);
 
 	void MakeEntry(struct raw_wad_entry_s *entry);

@@ -296,30 +296,6 @@ int y_strnicmp(const char *s1, const char *s2, size_t len)
 }
 
 
-//
-// upper-case a string (in situ)
-//
-void y_strupr(char *str)
-{
-	for ( ; *str ; str++)
-	{
-		*str = toupper(*str);
-	}
-}
-
-
-//
-// lower-case a string (in situ)
-//
-void y_strlowr(char *str)
-{
-	for ( ; *str ; str++)
-	{
-		*str = tolower(*str);
-	}
-}
-
-
 char *StringNew(int length)
 {
 	// length does not include the trailing NUL.

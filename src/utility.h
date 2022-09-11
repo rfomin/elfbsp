@@ -57,9 +57,6 @@ char *TimeToString();
 int y_stricmp (const char *s1, const char *s2);
 int y_strnicmp (const char *s1, const char *s2, size_t len);
 
-void y_strupr (char *str);
-void y_strlowr (char *str);
-
 char *StringNew(int length);
 char *StringDup(const char *orig, int limit = -1);
 char *StringUpper(const char *name);

@@ -47,15 +47,11 @@ void LumpWarning(const char *fmt, ...)
 //  LUMP Handling
 //------------------------------------------------------------------------
 
-Lump_c::Lump_c(Wad_file *_par, const char *_nam, int _start, int _len) :
+Lump_c::Lump_c(Wad_file *_par, const char *_name, int _start, int _len) :
 	parent(_par), l_start(_start), l_length(_len)
 {
-	name = StringDup(_nam);
-
-	SYS_ASSERT(name);
-
 	// ensure lump name is uppercase
-	y_strupr((char *)name);
+	name = StringUpper(_name);
 }
 
 
@@ -99,11 +95,8 @@ void Lump_c::Rename(const char *new_name)
 {
 	StringFree(name);
 
-	name = StringDup(new_name);
-	SYS_ASSERT(name);
-
 	// ensure lump name is uppercase
-	y_strupr((char *)name);
+	name = StringUpper(new_name);
 }
 
 
