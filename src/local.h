@@ -148,7 +148,7 @@ public:
 
 	void AddWallTip(double dx, double dy, bool open_left, bool open_right);
 
-	bool Overlaps(const vertex_t *other) const;
+	bool Overlaps(const vertex_s *other) const;
 }
 vertex_t;
 

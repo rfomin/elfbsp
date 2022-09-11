@@ -29,6 +29,11 @@
 #include <time.h>
 #endif
 
+#define DEBUG_WALLTIPS   0
+#define DEBUG_POLYOBJ    0
+#define DEBUG_WINDOW_FX  0
+#define DEBUG_OVERLAPS   0
+
 
 namespace ajbsp
 {
@@ -85,10 +90,6 @@ void MinorIssue(const char *fmt, ...)
 // ANALYZE : Analyzing level structures
 //------------------------------------------------------------------------
 
-
-#define DEBUG_WALLTIPS   0
-#define DEBUG_POLYOBJ    0
-#define DEBUG_WINDOW_FX  0
 
 #define POLY_BOX_SZ  10
 
@@ -340,61 +341,58 @@ bool vertex_t::Overlaps(const vertex_t *other) const
 	double dx = fabs(other->x - x);
 	double dy = fabs(other->y - y);
 
-	return dx < DIST_EPSILON && dy < DIST_EPSILON
+	return (dx < DIST_EPSILON) && (dy < DIST_EPSILON);
 }
 
-static int VertexCompare(const void *p1, const void *p2)
+struct Compare_vertex_X_pred
 {
-	int vert1 = ((const u16_t *) p1)[0];
-	int vert2 = ((const u16_t *) p2)[0];
-
-	vertex_t *A = lev_vertices[vert1];
-	vertex_t *B = lev_vertices[vert2];
-
-	if (vert1 == vert2)
-		return 0;
-
-	if ((int)A->x != (int)B->x)
-		return (int)A->x - (int)B->x;
-
-	return (int)A->y - (int)B->y;
-}
-
+	inline bool operator() (const vertex_t *A, const vertex_t *B) const
+	{
+		return A->x < B->x;
+	}
+};
 
 void DetectOverlappingVertices(void)
 {
-	int i;
-	u16_t *array = (u16_t *)UtilCalloc(num_vertices * sizeof(u16_t));
+	if (num_vertices < 2)
+		return;
 
-	// sort array of indices
-	for (i=0 ; i < num_vertices ; i++)
-		array[i] = i;
+	// copy the vertex pointers
+	std::vector<vertex_t *> array(lev_vertices);
 
-	qsort(array, num_vertices, sizeof(u16_t), VertexCompare);
+	// sort the vertices by increasing X coordinate.
+	// hence any overlapping vertices will be near each other.
+	std::sort(array.begin(), array.end(), Compare_vertex_X_pred());
 
 	// now mark them off
-	for (i=0 ; i < num_vertices - 1 ; i++)
+	for (int i=0 ; i < num_vertices - 1 ; i++)
 	{
-		// duplicate ?
-		if (VertexCompare(array + i, array + i+1) == 0)
-		{
-			vertex_t *A = lev_vertices[array[i]];
-			vertex_t *B = lev_vertices[array[i+1]];
+		vertex_t *A = array[i];
 
-			// found an overlap !
-			B->overlap = A->overlap ? A->overlap : A;
+		for (int k = i+1 ; k < num_vertices ; k++)
+		{
+			vertex_t *B = array[k];
+
+			if (B->x > A->x + DIST_EPSILON)
+				break;
+
+			if (A->Overlaps(B))
+			{
+				// found an overlap !
+				B->overlap = A->overlap ? A->overlap : A;
+
+#if DEBUG_OVERLAPS
+				cur_info->Print(0, "Overlap: #%d + #%d\n", array[i]->index, array[i+1]->index);
+#endif
+			}
 		}
 	}
 
-	UtilFree(array);
-
-	// update the linedefs
-
-	// update all in-memory linedefs.
+	// update the in-memory linedefs.
 	// DOES NOT affect the on-disk linedefs.
 	// this is mainly to help the miniseg creation code.
 
-	for (i=0 ; i < num_linedefs ; i++)
+	for (int i=0 ; i < num_linedefs ; i++)
 	{
 		linedef_t *L = lev_linedefs[i];
 
