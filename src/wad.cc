@@ -25,6 +25,8 @@
 namespace ajbsp
 {
 
+#define DEBUG_WAD  0
+
 Wad_file * edit_wad;
 
 
@@ -71,7 +73,9 @@ Lump_c::Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry) :
 	l_start  = LE_U32(entry->pos);
 	l_length = LE_U32(entry->size);
 
-//	cur_info->Debug("new lump '%s' @ %d len:%d\n", name, l_start, l_length);
+#if DEBUG_WAD
+	cur_info->Debug("new lump '%s' @ %d len:%d\n", name, l_start, l_length);
+#endif
 }
 
 
@@ -261,7 +265,9 @@ retry:
 
 	w->total_size = (int)ftell(fp);
 
+#if DEBUG_WAD
 	cur_info->Debug("total_size = %d\n", w->total_size);
+#endif
 
 	if (w->total_size < 0)
 		FatalError("Error determining WAD size.\n");
@@ -613,7 +619,9 @@ void Wad_file::DetectLevels()
 		{
 			levels.push_back(k);
 
+#if DEBUG_WAD
 			cur_info->Debug("Detected level : %s\n", directory[k]->name);
+#endif
 		}
 	}
 
@@ -740,7 +748,9 @@ void Wad_file::ProcessNamespaces()
 				continue;
 			}
 
-//			cur_info->Debug("Namespace %c lump : %s\n", active, name);
+#if DEBUG_WAD
+			cur_info->Debug("Namespace %c lump : %s\n", active, name);
+#endif
 
 			switch (active)
 			{
@@ -1112,7 +1122,9 @@ int Wad_file::PositionForWrite(int max_size)
 			FatalError("Error seeking to new write position.\n");
 	}
 
+#if DEBUG_WAD
 	cur_info->Debug("POSITION FOR WRITE: %d  (total_size %d)\n", want_pos, total_size);
+#endif
 
 	return want_pos;
 }
@@ -1171,8 +1183,10 @@ void Wad_file::WriteDirectory()
 	dir_start = PositionForWrite();
 	dir_count = NumLumps();
 
+#if DEBUG_WAD
 	cur_info->Debug("WriteDirectory...\n");
 	cur_info->Debug("dir_start:%d  dir_count:%d\n", dir_start, dir_count);
+#endif
 
 	for (short k = 0 ; k < dir_count ; k++)
 	{
@@ -1190,7 +1204,10 @@ void Wad_file::WriteDirectory()
 	fflush(fp);
 
 	total_size = (int)ftell(fp);
+
+#if DEBUG_WAD
 	cur_info->Debug("total_size: %d\n", total_size);
+#endif
 
 	if (total_size < 0)
 		FatalError("Error determining WAD size.\n");
