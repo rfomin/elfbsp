@@ -93,17 +93,18 @@ void PutReject();
 // LEVEL : Level structures & read/write functions.
 //------------------------------------------------------------------------
 
-struct node_s;
-struct sector_s;
+class node_t;
+class sector_t;
 struct superblock_s;
 
 
 // a wall-tip is where a wall meets a vertex
-typedef struct walltip_s
+class walltip_t
 {
+public:
 	// link in list.  List is kept in ANTI-clockwise order.
-	struct walltip_s *next;
-	struct walltip_s *prev;
+	walltip_t *next;
+	walltip_t *prev;
 
 	// angle that line makes at vertex (degrees).
 	double angle;
@@ -113,12 +114,12 @@ typedef struct walltip_s
 	// right is the side of decreasing angles.
 	bool open_left;
 	bool open_right;
-}
-walltip_t;
+};
 
 
-typedef struct vertex_s
+class vertex_t
 {
+public:
 	// coordinates
 	double x, y;
 
@@ -134,7 +135,7 @@ typedef struct vertex_s
 
 	// usually NULL, unless this vertex occupies the same location as a
 	// previous vertex.
-	struct vertex_s *overlap;
+	vertex_t *overlap;
 
 	// list of wall-tips
 	walltip_t *tip_set;
@@ -147,13 +148,13 @@ public:
 
 	void AddWallTip(double dx, double dy, bool open_left, bool open_right);
 
-	bool Overlaps(const vertex_s *other) const;
-}
-vertex_t;
+	bool Overlaps(const vertex_t *other) const;
+};
 
 
-typedef struct sector_s
+class sector_t
 {
+public:
 	// sector index.  Always valid after loading & pruning.
 	int index;
 
@@ -179,14 +180,14 @@ typedef struct sector_s
 	// RING, containing all sectors of the same group.
 	int rej_group;
 
-	struct sector_s *rej_next;
-	struct sector_s *rej_prev;
-}
-sector_t;
+	sector_t *rej_next;
+	sector_t *rej_prev;
+};
 
 
-typedef struct sidedef_s
+class sidedef_t
 {
+public:
 	// adjacent sector.  Can be NULL (invalid sidedef)
 	sector_t *sector;
 
@@ -201,22 +202,18 @@ typedef struct sidedef_s
 	// sidedef index.  Always valid after loading & pruning.
 	int index;
 
-	// usually NULL, unless this sidedef is exactly the same as a
-	// previous one.  Only used during the pruning phase.
-	struct sidedef_s *equiv;
-
 	// this is true if the sidedef is on a special line.  We don't merge
 	// these sidedefs together, as they might scroll, or change texture
 	// when a switch is pressed.
 	int on_special;
-}
-sidedef_t;
+};
 
 
-typedef struct linedef_s
+class linedef_t
 {
+public:
 	// link for list
-	struct linedef_s *next;
+	linedef_t *Next;
 
 	vertex_t *start;    // from this vertex...
 	vertex_t *end;      // ... to this vertex
@@ -246,7 +243,7 @@ typedef struct linedef_s
 	// normally NULL, except when this linedef directly overlaps an earlier
 	// one (a rarely-used trick to create higher mid-masked textures).
 	// No segs should be created for these overlapping linedefs.
-	struct linedef_s *overlap;
+	linedef_t *overlap;
 
 	// linedef index.  Always valid after loading & pruning of zero
 	// length lines has occurred.
@@ -257,12 +254,12 @@ public:
 	{
 		return std::min(start->x, end->x);
 	}
-}
-linedef_t;
+};
 
 
-typedef struct thing_s
+class thing_t
 {
+public:
 	int x, y;
 	int type;
 
@@ -271,14 +268,14 @@ typedef struct thing_s
 
 	// Always valid (thing indices never change).
 	int index;
-}
-thing_t;
+};
 
 
-typedef struct seg_s
+class seg_t
 {
+public:
 	// link for list
-	struct seg_s *next;
+	seg_t *next;
 
 	vertex_t *start;   // from this vertex...
 	vertex_t *end;     // ... to this vertex
@@ -292,7 +289,7 @@ typedef struct seg_s
 	// seg on other side, or NULL if one-sided.  This relationship is
 	// always one-to-one -- if one of the segs is split, the partner seg
 	// must also be split.
-	struct seg_s *partner;
+	seg_t *partner;
 
 	// seg index.  Only valid once the seg has been added to a
 	// subsector.  A negative value means it is invalid -- there
@@ -341,12 +338,12 @@ public:
 	{
 		return (x * pdy - y * pdx + p_perp) / p_length;
 	}
-}
-seg_t;
+};
 
 
-typedef struct subsec_s
+class subsec_t
 {
+public:
 	// list of segs
 	seg_t *seg_list;
 
@@ -371,32 +368,32 @@ public:
 
 	void SanityCheckClosed() const;
 	void SanityCheckHasRealSeg() const;
-}
-subsec_t;
+};
 
 
-typedef struct bbox_s
+class bbox_t
 {
+public:
 	int minx, miny;
 	int maxx, maxy;
-}
-bbox_t;
+};
 
 
-typedef struct child_s
+class child_t
 {
+public:
 	// child node or subsector (one must be NULL)
-	struct node_s *node;
+	node_t   *node;
 	subsec_t *subsec;
 
 	// child bounding box
 	bbox_t bounds;
-}
-child_t;
+};
 
 
-typedef struct node_s
+class node_t
 {
+public:
 	int x, y;     // starting point
 	int dx, dy;   // offset to ending point
 
@@ -411,8 +408,7 @@ typedef struct node_s
 	// the node is too long, and the (dx,dy) values should be halved
 	// when writing into the NODES lump.
 	int too_long;
-}
-node_t;
+};
 
 
 typedef struct superblock_s
@@ -555,12 +551,13 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
 // an "intersection" remembers the vertex that touches a BSP divider
 // line (especially a new vertex that is created at a seg split).
 
-typedef struct intersection_s
+class intersection_t
 {
+public:
 	// link in list.  The intersection list is kept sorted by
 	// along_dist, in ascending order.
-	struct intersection_s *next;
-	struct intersection_s *prev;
+	intersection_t *next;
+	intersection_t *prev;
 
 	// vertex in question
 	vertex_t *vertex;
@@ -578,8 +575,7 @@ typedef struct intersection_s
 	// true if OPEN and false if CLOSED.
 	bool open_before;
 	bool open_after;
-}
-intersection_t;
+};
 
 
 /* -------- functions ---------------------------- */

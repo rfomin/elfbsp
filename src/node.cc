@@ -60,7 +60,7 @@ namespace ajbsp
 
 
 
-typedef struct eval_info_s
+struct eval_info_t
 {
 	int cost;
 	int splits;
@@ -71,8 +71,7 @@ typedef struct eval_info_s
 	int real_right;
 	int mini_left;
 	int mini_right;
-}
-eval_info_t;
+};
 
 
 static intersection_t *quick_alloc_cuts = NULL;
@@ -1082,7 +1081,7 @@ static superblock_t *quick_alloc_supers = NULL;
 //
 // Returns -1 for left, +1 for right, or 0 for intersect.
 //
-int seg_s::PointOnLineSide(double x, double y) const
+int seg_t::PointOnLineSide(double x, double y) const
 {
 	double perp = PerpDist(x, y);
 

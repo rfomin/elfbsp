@@ -36,12 +36,11 @@ int total_empty_files  = 0;
 int total_built_maps   = 0;
 int total_failed_maps  = 0;
 
-typedef struct map_range_s
+struct map_range_t
 {
 	const char *low;
 	const char *high;
-
-} map_range_t;
+};
 
 std::vector< map_range_t > map_list;
 
