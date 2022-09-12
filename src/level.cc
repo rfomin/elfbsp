@@ -2374,7 +2374,7 @@ static void AddMissingLump(const char *name, const char *after)
 	if (cur_wad->LevelLookupLump(lev_current_idx, name) >= 0)
 		return;
 
-	short exist = cur_wad->LevelLookupLump(lev_current_idx, after);
+	int exist = cur_wad->LevelLookupLump(lev_current_idx, after);
 
 	// if this happens, the level structure is very broken
 	if (exist < 0)
@@ -2619,7 +2619,7 @@ void ZLibFinishLump(void)
 
 Lump_c * FindLevelLump(const char *name)
 {
-	short idx = cur_wad->LevelLookupLump(lev_current_idx, name);
+	int idx = cur_wad->LevelLookupLump(lev_current_idx, name);
 
 	if (idx < 0)
 		return NULL;
@@ -2639,7 +2639,7 @@ Lump_c * CreateLevelLump(const char *name, int max_size)
 	}
 	else
 	{
-		short last_idx = cur_wad->LevelLastLump(lev_current_idx);
+		int last_idx = cur_wad->LevelLastLump(lev_current_idx);
 
 		cur_wad->InsertPoint(last_idx + 1);
 
@@ -2668,7 +2668,7 @@ Lump_c * CreateGLMarker()
 		lev_long_name = true;
 	}
 
-	short last_idx = cur_wad->LevelLastLump(lev_current_idx);
+	int last_idx = cur_wad->LevelLastLump(lev_current_idx);
 
 	cur_wad->InsertPoint(last_idx + 1);
 
