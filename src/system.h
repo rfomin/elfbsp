@@ -57,6 +57,10 @@
 #include <unistd.h>
 #endif
 
+// allow using std::min, std::max with MSVC
+#undef min
+#undef max
+
 
 // sized types
 
@@ -72,9 +76,8 @@ typedef uint64_t u64_t;
 
 typedef u8_t byte;
 
-/*
- *  Misc constants
- */
+
+// misc constants
 
 #define AJ_PATH_MAX  4096
 
@@ -83,29 +86,14 @@ typedef u8_t byte;
 
 // basic macros
 
-#ifndef NULL
-#define NULL    ((void*) 0)
-#endif
+#undef  NULL
+#define NULL  nullptr
 
-#ifndef M_PI
+#undef  M_PI
 #define M_PI  3.14159265358979323846
-#endif
 
-#ifndef M_SQRT2
-#define M_SQRT2  1.41421356237309504880
-#endif
-
-#ifndef MAX
-#define MAX(a,b)  ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a,b)  ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef I_ROUND
+#undef  I_ROUND
 #define I_ROUND(x)  ((int) round(x))
-#endif
 
 
 //
