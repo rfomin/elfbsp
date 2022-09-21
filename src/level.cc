@@ -2712,7 +2712,7 @@ build_result_e BuildLevel(int lev_idx)
 		bbox_t seg_bbox;
 
 		// create initial segs
-		superblock_t * seg_list = CreateSegs();
+		quadtree_c * seg_list = CreateSegs();
 
 		FindLimits(seg_list, &seg_bbox);
 
