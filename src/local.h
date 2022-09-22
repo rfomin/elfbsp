@@ -605,7 +605,7 @@ public:
 // partition line, returning it.  If no seg can be used, returns NULL.
 // The 'depth' parameter is the current depth in the tree, used for
 // computing the current progress.
-seg_t *PickNode(quadtree_c *seg_list, int depth, const bbox_t *bbox);
+seg_t *PickNode(quadtree_c *tree, int depth);
 
 // compute the boundary of the list of segs
 void FindLimits2(seg_t *list, bbox_t *bbox);
@@ -658,8 +658,8 @@ quadtree_c *TreeFromSegList(seg_t *list);
 // and '*N' is the new node (and '*S' is set to NULL).  Normally
 // returns BUILD_OK, or BUILD_Cancelled if user stopped it.
 
-build_result_e BuildNodes(seg_t *list, bbox_t *bounds /* output */,
-		node_t ** N, subsec_t ** S, int depth);
+build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
+		node_t ** N, subsec_t ** S);
 
 // compute the height of the bsp tree, starting at 'node'.
 int ComputeBspHeight(node_t *node);

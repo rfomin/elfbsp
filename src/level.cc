@@ -2695,8 +2695,6 @@ build_result_e BuildLevel(int lev_idx)
 	node_t *root_node  = NULL;
 	subsec_t *root_sub = NULL;
 
-	build_result_e ret = BUILD_OK;
-
 	if (cur_info->cancelled)
 		return BUILD_Cancelled;
 
@@ -2707,19 +2705,17 @@ build_result_e BuildLevel(int lev_idx)
 
 	InitBlockmap();
 
+	build_result_e ret = BUILD_OK;
+
 	if (num_real_lines > 0)
 	{
-		bbox_t seg_bbox;
+		bbox_t dummy;
 
 		// create initial segs
-		quadtree_c * seg_list = CreateSegs();
-
-		FindLimits(seg_list, &seg_bbox);
+		seg_t *list = CreateSegs();
 
 		// recursively create nodes
-		ret = BuildNodes(seg_list, &root_node, &root_sub, 0, &seg_bbox);
-
-		FreeSuper(seg_list);
+		ret = BuildNodes(list, 0, &dummy, &root_node, &root_sub);
 	}
 
 	if (ret == BUILD_OK)
@@ -2727,7 +2723,7 @@ build_result_e BuildLevel(int lev_idx)
 		cur_info->Print(2, "    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
 				num_nodes, num_subsecs, num_segs, num_old_vert + num_new_vert);
 
-		if (root_node)
+		if (root_node != NULL)
 		{
 			cur_info->Print(2, "    Heights of subtrees: %d / %d\n",
 					ComputeBspHeight(root_node->r.node),
@@ -2745,7 +2741,6 @@ build_result_e BuildLevel(int lev_idx)
 
 	FreeLevel();
 	FreeQuickAllocCuts();
-	FreeQuickAllocSupers();
 
 	return ret;
 }
