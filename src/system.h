@@ -79,8 +79,6 @@ typedef u8_t byte;
 
 // misc constants
 
-#define AJ_PATH_MAX  4096
-
 #define MSG_BUF_LEN  1024
 
 
