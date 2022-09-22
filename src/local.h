@@ -407,7 +407,10 @@ public:
 
 	// the node is too long, and the (dx,dy) values should be halved
 	// when writing into the NODES lump.
-	int too_long;
+	bool too_long;
+
+public:
+	void SetPartition(const seg_t *part);
 };
 
 

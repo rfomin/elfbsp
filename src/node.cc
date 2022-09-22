@@ -1038,6 +1038,40 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 //
 
 
+void node_t::SetPartition(const seg_t *part)
+{
+	SYS_ASSERT(part->linedef);
+
+	if (part->side == 0)
+	{
+		x  = part->linedef->start->x;
+		y  = part->linedef->start->y;
+		dx = part->linedef->end->x - x;
+		dy = part->linedef->end->y - y;
+	}
+	else  /* left side */
+	{
+		x  = part->linedef->end->x;
+		y  = part->linedef->end->y;
+		dx = part->linedef->start->x - x;
+		dy = part->linedef->start->y - y;
+	}
+
+	/* check for really long partition (overflows dx,dy in NODES) */
+	if (part->p_length >= 30000)
+	{
+/* FIXME REVIEW THIS
+		if (dx && dy && ((dx & 1) || (dy & 1)))
+		{
+			MinorIssue("Loss of accuracy on VERY long node: "
+					"(%d,%d) -> (%d,%d)\n", x, y, x + dx, y + dy);
+		}
+*/
+		too_long = true;
+	}
+}
+
+
 //
 // Returns -1 for left, +1 for right, or 0 for intersect.
 //
@@ -1632,35 +1666,7 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 	if (cut_list != NULL)
 		AddMinisegs(cut_list, part, &lefts, &rights);
 
-	SYS_ASSERT(part->linedef);
-
-	if (part->side == 0)
-	{
-		node->x  = part->linedef->start->x;
-		node->y  = part->linedef->start->y;
-		node->dx = part->linedef->end->x - node->x;
-		node->dy = part->linedef->end->y - node->y;
-	}
-	else  /* left side */
-	{
-		node->x  = part->linedef->end->x;
-		node->y  = part->linedef->end->y;
-		node->dx = part->linedef->start->x - node->x;
-		node->dy = part->linedef->start->y - node->y;
-	}
-
-	/* check for really long partition (overflows dx,dy in NODES) */
-	if (part->p_length >= 30000)
-	{
-		if (node->dx && node->dy && ((node->dx & 1) || (node->dy & 1)))
-		{
-			MinorIssue("Loss of accuracy on VERY long node: "
-					"(%d,%d) -> (%d,%d)\n", node->x, node->y,
-					node->x + node->dx, node->y + node->dy);
-		}
-
-		node->too_long = 1;
-	}
+	node->SetPartition(part);
 
 #if DEBUG_BUILDER
 	cur_info->Debug("Build: Going LEFT\n");
@@ -1702,6 +1708,7 @@ void ClockwiseBspTree()
 		sub->SanityCheckHasRealSeg();
 	}
 }
+
 
 void subsec_t::Normalise()
 {
