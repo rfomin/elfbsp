@@ -622,9 +622,7 @@ static void Reject_Init()
 	rej_total_size = (num_sectors * num_sectors + 7) / 8;
 
 	rej_matrix = new u8_t[rej_total_size];
-
 	memset(rej_matrix, 0, rej_total_size);
-
 
 	for (int i=0 ; i < num_sectors ; i++)
 	{
@@ -644,24 +642,17 @@ static void Reject_Free()
 
 
 //
-// Algorithm: Initially all sectors are in individual groups.  Now we
-// scan the linedef list.  For each 2-sectored line, merge the two
-// sector groups into one.  That's it !
+// Algorithm: Initially all sectors are in individual groups.
+// Now we scan the linedef list.  For each two-sectored line,
+// merge the two sector groups into one.  That's it !
 //
 static void Reject_GroupSectors()
 {
-	int i;
-
-	for (i=0 ; i < num_linedefs ; i++)
+	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *line = lev_linedefs[i];
+		const linedef_t *line = lev_linedefs[i];
 
 		if (! line->right || ! line->left)
-			continue;
-
-		// the standard DOOM engine will not allow sight past lines
-		// lacking the TWOSIDED flag, so we can skip them here too.
-		if (! line->two_sided)
 			continue;
 
 		sector_t *sec1 = line->right->sector;
@@ -678,9 +669,8 @@ static void Reject_GroupSectors()
 		// swap sectors so that the smallest group is added to the biggest
 		// group.  This is based on the assumption that sector numbers in
 		// wads will generally increase over the set of linedefs, and so
-		// (by swapping) we'll tend to add small groups into larger
-		// groups, thereby minimising the updates to 'rej_group' fields
-		// that is required when merging.
+		// (by swapping) we'll tend to add small groups into larger groups,
+		// thereby minimising the updates to 'rej_group' fields when merging.
 
 		if (sec1->rej_group > sec2->rej_group)
 		{
@@ -711,9 +701,7 @@ static void Reject_DebugGroups()
 {
 	// Note: this routine is destructive to the group numbers
 
-	int i;
-
-	for (i=0 ; i < num_sectors ; i++)
+	for (int i=0 ; i < num_sectors ; i++)
 	{
 		sector_t *sec = lev_sectors[i];
 		sector_t *tmp;
@@ -748,15 +736,13 @@ static void Reject_ProcessSectors()
 			sector_t *view_sec = lev_sectors[view];
 			sector_t *targ_sec = lev_sectors[target];
 
-			int p1, p2;
-
 			if (view_sec->rej_group == targ_sec->rej_group)
 				continue;
 
 			// for symmetry, do both sides at same time
 
-			p1 = view * num_sectors + target;
-			p2 = target * num_sectors + view;
+			int p1 = view * num_sectors + target;
+			int p2 = target * num_sectors + view;
 
 			rej_matrix[p1 >> 3] |= (1 << (p1 & 7));
 			rej_matrix[p2 >> 3] |= (1 << (p2 & 7));
