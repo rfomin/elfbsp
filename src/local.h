@@ -296,7 +296,7 @@ public:
 	// shouldn't be any of these once the BSP tree has been built.
 	int index;
 
-	// when 1, this seg has become zero length (integer rounding of the
+	// when true, this seg has become zero length (integer rounding of the
 	// start and end vertices produces the same location).  It should be
 	// ignored when writing the SEGS or V1 GL_SEGS lumps.  [Note: there
 	// won't be any of these when writing the V2 GL_SEGS lump].

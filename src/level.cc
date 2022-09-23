@@ -177,14 +177,14 @@ static void BlockAdd(int blk_num, int line_index)
 	}
 
 	// compute new checksum
-	cur[BK_XOR] = ((cur[BK_XOR] << 4) | (cur[BK_XOR] >> 12)) ^ line_index;
+	cur[BK_XOR] = (u16_t) (((cur[BK_XOR] << 4) | (cur[BK_XOR] >> 12)) ^ line_index);
 
 	cur[BK_FIRST + cur[BK_NUM]] = LE_U16(line_index);
 	cur[BK_NUM]++;
 }
 
 
-static void BlockAddLine(linedef_t *L)
+static void BlockAddLine(const linedef_t *L)
 {
 	int x1 = (int) L->start->x;
 	int y1 = (int) L->start->y;
@@ -257,13 +257,11 @@ static void BlockAddLine(linedef_t *L)
 
 static void CreateBlockmap(void)
 {
-	int i;
-
 	block_lines = (u16_t **) UtilCalloc(block_count * sizeof(u16_t *));
 
-	for (i=0 ; i < num_linedefs ; i++)
+	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = lev_linedefs[i];
+		const linedef_t *L = lev_linedefs[i];
 
 		// ignore zero-length lines
 		if (L->zero_len)
@@ -318,7 +316,7 @@ static void CompressBlockmap(void)
 	// of the blocklists in the BLOCKMAP lump.
 
 	for (i=0 ; i < block_count ; i++)
-		block_dups[i] = i;
+		block_dups[i] = (u16_t) i;
 
 	qsort(block_dups, block_count, sizeof(u16_t), BlockCompare);
 
@@ -337,7 +335,7 @@ static void CompressBlockmap(void)
 		// empty block ?
 		if (block_lines[blk_num] == NULL)
 		{
-			block_ptrs[blk_num] = 4 + block_count;
+			block_ptrs[blk_num] = (u16_t) (4 + block_count);
 			block_dups[i] = DUMMY_DUP;
 
 			orig_size += 2;
@@ -349,10 +347,9 @@ static void CompressBlockmap(void)
 		// duplicate ?  Only the very last one of a sequence of duplicates
 		// will update the current offset value.
 
-		if (i+1 < block_count &&
-				BlockCompare(block_dups + i, block_dups + i+1) == 0)
+		if (i+1 < block_count && BlockCompare(block_dups + i, block_dups + i+1) == 0)
 		{
-			block_ptrs[blk_num] = cur_offset;
+			block_ptrs[blk_num] = (u16_t) cur_offset;
 			block_dups[i] = DUMMY_DUP;
 
 			// free the memory of the duplicated block
@@ -368,7 +365,7 @@ static void CompressBlockmap(void)
 		// OK, this block is either the last of a series of duplicates, or
 		// just a singleton.
 
-		block_ptrs[blk_num] = cur_offset;
+		block_ptrs[blk_num] = (u16_t) cur_offset;
 
 		cur_offset += count;
 
@@ -499,17 +496,15 @@ static void FreeBlockmap(void)
 
 static void FindBlockmapLimits(bbox_t *bbox)
 {
-	int i;
-
-	int mid_x = 0;
-	int mid_y = 0;
+	double mid_x = 0;
+	double mid_y = 0;
 
 	bbox->minx = bbox->miny = SHRT_MAX;
 	bbox->maxx = bbox->maxy = SHRT_MIN;
 
-	for (i=0 ; i < num_linedefs ; i++)
+	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = lev_linedefs[i];
+		const linedef_t *L = lev_linedefs[i];
 
 		if (! L->zero_len)
 		{
@@ -528,16 +523,16 @@ static void FindBlockmapLimits(bbox_t *bbox)
 			if (hx > bbox->maxx) bbox->maxx = hx;
 			if (hy > bbox->maxy) bbox->maxy = hy;
 
-			// compute middle of cluster (roughly, so we don't overflow)
-			mid_x += (lx + hx) / 32;
-			mid_y += (ly + hy) / 32;
+			// compute middle of cluster
+			mid_x += (lx + hx) / 2;
+			mid_y += (ly + hy) / 2;
 		}
 	}
 
 	if (num_linedefs > 0)
 	{
-		block_mid_x = (mid_x / num_linedefs) * 16;
-		block_mid_y = (mid_y / num_linedefs) * 16;
+		block_mid_x = I_ROUND(mid_x / (double)num_linedefs);
+		block_mid_y = I_ROUND(mid_y / (double)num_linedefs);
 	}
 
 #if DEBUG_BLOCKMAP
