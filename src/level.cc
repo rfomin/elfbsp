@@ -2050,7 +2050,7 @@ void PutXGL3Segs()
 
 		u32_t v1      = LE_U32(VertexIndex_XNOD(seg->start));
 		u32_t partner = LE_U32(seg->partner ? seg->partner->index : -1);
-		u32_t line    = LE_U32(seg->linedef);
+		u32_t line    = LE_U32(seg->linedef->index);
 		u8_t  side    = (u8_t) seg->side;
 
 		ZLibAppendLump(&v1,      4);
@@ -2253,7 +2253,7 @@ void LoadLevel()
 }
 
 
-void FreeLevel(void)
+void FreeLevel()
 {
 	FreeVertices();
 	FreeSidedefs();
@@ -2307,28 +2307,6 @@ static u32_t CalcGLChecksum(void)
 }
 
 
-static const char *CalcOptionsString()
-{
-	static char buffer[256];
-
-	sprintf(buffer, "--cost %d", cur_info->split_cost);
-
-	if (cur_info->fast)
-		strcat(buffer, " --fast");
-
-	if (! cur_info->gl_nodes)
-		strcat(buffer, " --nogl");
-
-	if (cur_info->force_v5)
-		strcat(buffer, " --gl5");
-
-	if (cur_info->force_xnod)
-		strcat(buffer, " --xnod");
-
-	return buffer;
-}
-
-
 void UpdateGLMarker(Lump_c *marker)
 {
 	// this is very conservative, around 4 times the actual size
@@ -2346,16 +2324,6 @@ void UpdateGLMarker(Lump_c *marker)
 	}
 
 	marker->Printf("BUILDER=%s\n", "AJBSP " AJBSP_VERSION);
-	marker->Printf("OPTIONS=%s\n", CalcOptionsString());
-
-	char *time_str = TimeToString();
-
-	if (time_str != NULL)
-	{
-		marker->Printf("TIME=%s\n", time_str);
-		StringFree(time_str);
-	}
-
 	marker->Printf("CHECKSUM=0x%08x\n", crc);
 
 	marker->Finish();
@@ -2399,13 +2367,12 @@ build_result_e SaveLevel(node_t *root_node)
 	AddMissingLump("REJECT",   "SECTORS");
 	AddMissingLump("BLOCKMAP", "REJECT");
 
-
+	// user preferences
 	lev_force_v5   = cur_info->force_v5;
 	lev_force_xnod = cur_info->force_xnod;
 
-
 	// check for overflows...
-
+	// this sets the force_xxx vars if certain limits are breached
 	CheckLimits();
 
 
@@ -2441,7 +2408,7 @@ build_result_e SaveLevel(node_t *root_node)
 
 	/* --- Normal nodes --- */
 
-	// remove all the mini-segs
+	// remove all the mini-segs from subsectors
 	NormaliseBspTree();
 
 	if (lev_force_xnod && num_real_lines > 0)
@@ -2452,6 +2419,9 @@ build_result_e SaveLevel(node_t *root_node)
 	}
 	else
 	{
+		// reduce vertex precision for classic DOOM nodes.
+		// some segs can become "degenerate" after this, and these
+		// are removed from subsectors.
 		RoundOffBspTree();
 
 		SortSegs();
@@ -2609,7 +2579,6 @@ void ZLibFinishLump(void)
 
 /* ---------------------------------------------------------------- */
 
-
 Lump_c * FindLevelLump(const char *name)
 {
 	int idx = cur_wad->LevelLookupLump(lev_current_idx, name);
@@ -2677,7 +2646,6 @@ Lump_c * CreateGLMarker()
 // MAIN STUFF
 //------------------------------------------------------------------------
 
-
 buildinfo_t * cur_info = NULL;
 
 
@@ -2685,11 +2653,11 @@ buildinfo_t * cur_info = NULL;
 
 build_result_e BuildLevel(int lev_idx)
 {
-	node_t *root_node  = NULL;
-	subsec_t *root_sub = NULL;
-
 	if (cur_info->cancelled)
 		return BUILD_Cancelled;
+
+	node_t   *root_node = NULL;
+	subsec_t *root_sub  = NULL;
 
 	lev_current_idx   = lev_idx;
 	lev_current_start = cur_wad->LevelHeader(lev_idx);

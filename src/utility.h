@@ -51,7 +51,6 @@ void UtilFree(void *data);
 // math stuff
 int RoundPOW2(int x);
 double ComputeAngle(double dx, double dy);
-char *TimeToString();
 
 // string utilities
 int StringCaseCmp   (const char *s1, const char *s2);

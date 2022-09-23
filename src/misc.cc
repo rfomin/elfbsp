@@ -25,10 +25,6 @@
 #include "wad.h"
 
 
-#ifndef WIN32
-#include <time.h>
-#endif
-
 #define DEBUG_WALLTIPS   0
 #define DEBUG_POLYOBJ    0
 #define DEBUG_WINDOW_FX  0
