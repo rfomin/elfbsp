@@ -798,9 +798,6 @@ void PutReject()
 // Note: ZDoom format support based on code (C) 2002,2003 Randy Heit
 
 
-#define ALLOC_BLKNUM  1024
-
-
 // per-level variables
 
 const char *lev_current_name;
@@ -1010,26 +1007,26 @@ static inline sidedef_t *SafeLookupSidedef(u16_t num)
 }
 
 
-void GetVertices(void)
+void GetVertices()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("VERTEXES");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_vertex_t);
+		count = lump->Length() / (int)sizeof(raw_vertex_t);
 
 #if DEBUG_LOAD
 	cur_info->Debug("GetVertices: num = %d\n", count);
 #endif
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to vertices.\n");
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_vertex_t raw;
 
@@ -1048,16 +1045,16 @@ void GetVertices(void)
 }
 
 
-void GetSectors(void)
+void GetSectors()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("SECTORS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_sector_t);
+		count = lump->Length() / (int)sizeof(raw_sector_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1067,7 +1064,7 @@ void GetSectors(void)
 	cur_info->Debug("GetSectors: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_sector_t raw;
 
@@ -1092,16 +1089,16 @@ void GetSectors(void)
 }
 
 
-void GetThings(void)
+void GetThings()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("THINGS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_thing_t);
+		count = lump->Length() / (int)sizeof(raw_thing_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1111,7 +1108,7 @@ void GetThings(void)
 	cur_info->Debug("GetThings: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_thing_t raw;
 
@@ -1129,16 +1126,16 @@ void GetThings(void)
 }
 
 
-void GetThingsHexen(void)
+void GetThingsHexen()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("THINGS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_hexen_thing_t);
+		count = lump->Length() / (int)sizeof(raw_hexen_thing_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1148,7 +1145,7 @@ void GetThingsHexen(void)
 	cur_info->Debug("GetThingsHexen: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_hexen_thing_t raw;
 
@@ -1166,16 +1163,16 @@ void GetThingsHexen(void)
 }
 
 
-void GetSidedefs(void)
+void GetSidedefs()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("SIDEDEFS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_sidedef_t);
+		count = lump->Length() / (int)sizeof(raw_sidedef_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1185,7 +1182,7 @@ void GetSidedefs(void)
 	cur_info->Debug("GetSidedefs: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_sidedef_t raw;
 
@@ -1209,16 +1206,16 @@ void GetSidedefs(void)
 }
 
 
-void GetLinedefs(void)
+void GetLinedefs()
 {
-	int i, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_linedef_t);
+		count = lump->Length() / (int)sizeof(raw_linedef_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1228,7 +1225,7 @@ void GetLinedefs(void)
 	cur_info->Debug("GetLinedefs: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_linedef_t raw;
 
@@ -1254,8 +1251,8 @@ void GetLinedefs(void)
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
 		line->flags = LE_U16(raw.flags);
-		line->type = LE_U16(raw.type);
-		line->tag  = LE_S16(raw.tag);
+		line->type  = LE_U16(raw.type);
+		line->tag   = LE_S16(raw.tag);
 
 		line->two_sided = (line->flags & MLF_TwoSided) != 0;
 		line->is_precious = (line->tag >= 900 && line->tag < 1000);
@@ -1284,16 +1281,16 @@ void GetLinedefs(void)
 }
 
 
-void GetLinedefsHexen(void)
+void GetLinedefsHexen()
 {
-	int i, j, count=-1;
+	int count = 0;
 
 	Lump_c *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
-		count = lump->Length() / sizeof(raw_hexen_linedef_t);
+		count = lump->Length() / (int)sizeof(raw_hexen_linedef_t);
 
-	if (!lump || count == 0)
+	if (lump == NULL || count == 0)
 		return;
 
 	if (! lump->Seek())
@@ -1303,7 +1300,7 @@ void GetLinedefsHexen(void)
 	cur_info->Debug("GetLinedefsHexen: num = %d\n", count);
 #endif
 
-	for (i = 0 ; i < count ; i++)
+	for (int i = 0 ; i < count ; i++)
 	{
 		raw_hexen_linedef_t raw;
 
@@ -1329,12 +1326,12 @@ void GetLinedefsHexen(void)
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
 		line->flags = LE_U16(raw.flags);
-		line->type = (u8_t)(raw.type);
-		line->tag  = 0;
+		line->type  = (u8_t) raw.type;
+		line->tag   = 0;
 
 		// read specials
-		for (j=0 ; j < 5 ; j++)
-			line->specials[j] = (u8_t)(raw.args[j]);
+		for (int k=0 ; k < 5 ; k++)
+			line->specials[k] = (u8_t) raw.args[k];
 
 		// -JL- Added missing twosided flag handling that caused a broken reject
 		line->two_sided = (line->flags & MLF_TwoSided) != 0;
@@ -1370,8 +1367,8 @@ static inline int VanillaSegDist(const seg_t *seg)
 	double ly = seg->side ? seg->linedef->end->y : seg->linedef->start->y;
 
 	// use the "true" starting coord (as stored in the wad)
-	double sx = I_ROUND(seg->start->x);
-	double sy = I_ROUND(seg->start->y);
+	double sx = round(seg->start->x);
+	double sy = round(seg->start->y);
 
 	return (int) floor(hypot(sx - lx, sy - ly) + 0.5);
 }
@@ -1379,8 +1376,8 @@ static inline int VanillaSegDist(const seg_t *seg)
 static inline int VanillaSegAngle(const seg_t *seg)
 {
 	// compute the "true" delta
-	double dx = I_ROUND(seg->end->x) - I_ROUND(seg->start->x);
-	double dy = I_ROUND(seg->end->y) - I_ROUND(seg->start->y);
+	double dx = round(seg->end->x) - round(seg->start->x);
+	double dy = round(seg->end->y) - round(seg->start->y);
 
 	double angle = ComputeAngle(dx, dy);
 
