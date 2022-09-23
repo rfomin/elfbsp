@@ -1135,12 +1135,12 @@ void quadtree_c::AddSeg(seg_t *seg)
 }
 
 
-void quadtree_c::AddList(seg_t *seg_list)
+void quadtree_c::AddList(seg_t *new_list)
 {
-	while (seg_list != NULL)
+	while (new_list != NULL)
 	{
-		seg_t *seg = seg_list;
-		seg_list = seg->next;
+		seg_t *seg = new_list;
+		new_list = seg->next;
 
 		AddSeg(seg);
    }
@@ -1260,7 +1260,7 @@ seg_t *CreateSegs()
 
 	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		const linedef_t *line = lev_linedefs[i];
+		linedef_t *line = lev_linedefs[i];
 
 		seg_t *left  = NULL;
 		seg_t *right = NULL;
@@ -1352,9 +1352,26 @@ void subsec_t::DetermineMiddle()
 }
 
 
+void subsec_t::AddToTail(seg_t *seg)
+{
+	seg->next = NULL;
+
+	if (seg_list == NULL)
+	{
+		seg_list = seg;
+		return;
+	}
+
+	seg_t *tail = seg_list;
+	while (tail->next != NULL)
+		tail = tail->next;
+
+	tail->next = seg;
+}
+
+
 void subsec_t::ClockwiseOrder()
 {
-	int i;
 	seg_t *seg;
 
 #if DEBUG_SUBSEC
@@ -1363,7 +1380,7 @@ void subsec_t::ClockwiseOrder()
 
 	std::vector<seg_t *> array;
 
-	for (seg=seg_list, i=0 ; seg ; seg=seg->next, i++)
+	for (seg=seg_list ; seg ; seg=seg->next)
 	{
 		// compute angles now
 		seg->cmp_angle = ComputeAngle(seg->start->x - mid_x, seg->start->y - mid_y);
@@ -1375,9 +1392,9 @@ void subsec_t::ClockwiseOrder()
 	// the desired order (clockwise) means descending angles.
 	// since # of segs is usually small, a bubble sort is fast enough.
 
-	i = 0;
+	size_t i = 0;
 
-	while (i+1 < (int)array.size())
+	while (i+1 < array.size())
 	{
 		seg_t *A = array[i];
 		seg_t *B = array[i+1];
@@ -1405,7 +1422,7 @@ void subsec_t::ClockwiseOrder()
 	int first = 0;
 	int score = -1;
 
-	for (i=0 ; i < (int)array.size() ; i++)
+	for (i=0 ; i < array.size() ; i++)
 	{
 		int cur_score = 3;
 
@@ -1424,11 +1441,10 @@ void subsec_t::ClockwiseOrder()
 	// transfer sorted array back into sub
 	seg_list = NULL;
 
-	for (i=(int)array.size()-1 ; i >= 0 ; i--)
+	for (i = 0 ; i < array.size() ; i++)
 	{
-		int k = (i + first) % (int)array.size();
-
-		ListAddSeg(&seg_list, array[k]);
+		size_t k = (first + i) % array.size();
+		AddToTail(array[k]);
 	}
 
 #if DEBUG_SORTER
@@ -1445,14 +1461,19 @@ void subsec_t::ClockwiseOrder()
 
 void subsec_t::SanityCheckClosed() const
 {
+	int gaps  = 0;
+	int total = 0;
+
 	seg_t *seg, *next;
-	int total=0, gaps=0;
 
 	for (seg=seg_list ; seg ; seg=seg->next)
 	{
 		next = seg->next ? seg->next : seg_list;
 
-		if (seg->end->x != next->start->x || seg->end->y != next->start->y)
+		double dx = seg->end->x - next->start->x;
+		double dy = seg->end->y - next->start->y;
+
+		if (fabs(dx) > DIST_EPSILON || fabs(dy) > DIST_EPSILON)
 			gaps++;
 
 		total++;
@@ -1476,30 +1497,23 @@ void subsec_t::SanityCheckClosed() const
 
 void subsec_t::SanityCheckHasRealSeg() const
 {
-	seg_t *seg;
-
-	for (seg=seg_list ; seg ; seg=seg->next)
-	{
-		if (seg->linedef)
+	for (seg_t *seg=seg_list ; seg ; seg=seg->next)
+		if (seg->linedef != NULL)
 			return;
-	}
 
-	BugError("Subsector #%d near (%1.1f,%1.1f) has no real seg!\n",
-			index, mid_x, mid_y);
+	BugError("Subsector #%d near (%1.1f,%1.1f) has no real seg!\n", index, mid_x, mid_y);
 }
 
 
 void subsec_t::RenumberSegs()
 {
-	seg_t *seg;
-
 #if DEBUG_SUBSEC
 	cur_info->Debug("Subsec: Renumbering %d\n", index);
 #endif
 
 	seg_count = 0;
 
-	for (seg=seg_list ; seg ; seg=seg->next)
+	for (seg_t *seg=seg_list ; seg ; seg=seg->next)
 	{
 		seg->index = num_complete_seg;
 		num_complete_seg++;
@@ -1537,26 +1551,22 @@ subsec_t *CreateSubsec(quadtree_c *tree)
 }
 
 
-int ComputeBspHeight(node_t *node)
+int ComputeBspHeight(const node_t *node)
 {
-	if (node)
-	{
-		int left, right;
+	if (node == NULL)
+		return 1;
 
-		right = ComputeBspHeight(node->r.node);
-		left  = ComputeBspHeight(node->l.node);
+	int right = ComputeBspHeight(node->r.node);
+	int left  = ComputeBspHeight(node->l.node);
 
-		return std::max(left, right) + 1;
-	}
-
-	return 1;
+	return std::max(left, right) + 1;
 }
 
 
 #if DEBUG_BUILDER
-void DebugShowSegs(seg_t *list)
+void DebugShowSegs(const seg_t *list)
 {
-	for (seg_t *seg=list ; seg ; seg=seg->next)
+	for (const seg_t *seg=list ; seg ; seg=seg->next)
 	{
 		cur_info->Debug("Build:   %sSEG %p  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				seg->linedef ? "" : "MINI", seg,
@@ -1585,8 +1595,11 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 
 	quadtree_c *tree = TreeFromSegList(list, bounds);
 
-	/* pick partition line  None indicates convexicity */
+	/* pick partition line, NONE indicates convexicity */
 	seg_t *part = PickNode(tree, depth);
+
+	if (cur_info->cancelled)
+		return BUILD_Cancelled;
 
 	if (part == NULL)
 	{
@@ -1596,9 +1609,6 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 
 		*S = CreateSubsec(tree);
 		delete tree;
-
-		if (cur_info->cancelled)
-			return BUILD_Cancelled;
 
 		return BUILD_OK;
 	}
@@ -1641,8 +1651,9 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 #endif
 
 	build_result_e ret;
-	ret = BuildNodes(lefts, depth+1, &node->l.bounds, &node->l.node, &node->l.subsec);
 
+	// recursively build the left side
+	ret = BuildNodes(lefts, depth+1, &node->l.bounds, &node->l.node, &node->l.subsec);
 	if (ret != BUILD_OK)
 		return ret;
 
@@ -1650,13 +1661,16 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 	cur_info->Debug("Build: Going RIGHT\n");
 #endif
 
+	// recursively build the right side
 	ret = BuildNodes(rights, depth+1, &node->r.bounds, &node->r.node, &node->r.subsec);
+	if (ret != BUILD_OK)
+		return ret;
 
 #if DEBUG_BUILDER
 	cur_info->Debug("Build: DONE\n");
 #endif
 
-	return ret;
+	return BUILD_OK;
 }
 
 
@@ -1694,22 +1708,8 @@ void subsec_t::Normalise()
 		seg_t *seg = seg_list;
 		seg_list = seg->next;
 
-		// only add non-minisegs to new list
-		if (seg->linedef)
-		{
-			seg->next = NULL;
-
-			if (new_tail)
-				new_tail->next = seg;
-			else
-				new_head = seg;
-
-			new_tail = seg;
-
-			// this updated later
-			seg->index = -1;
-		}
-		else
+		// filter out minisegs
+		if (seg->linedef == NULL)
 		{
 #if DEBUG_SUBSEC
 			cur_info->Debug("Subsec: Removing miniseg %p\n", seg);
@@ -1717,8 +1717,22 @@ void subsec_t::Normalise()
 
 			// set index to a really high value, so that SortSegs() will
 			// move all the minisegs to the top of the seg array.
-			seg->index = 1<<24;
+			seg->index = 1<<24;  // FIXME SEG_IS_GARBAGE
+			continue;
 		}
+
+		// add it to the new list
+		seg->next = NULL;
+
+		if (new_tail)
+			new_tail->next = seg;
+		else
+			new_head = seg;
+
+		new_tail = seg;
+
+		// this updated later
+		seg->index = -1;
 	}
 
 	if (new_head == NULL)
@@ -1763,6 +1777,7 @@ void RoundOffVertices()
 
 void subsec_t::RoundOff()
 {
+	// use head + tail to maintain same order of segs
 	seg_t *new_head = NULL;
 	seg_t *new_tail = NULL;
 
@@ -1785,14 +1800,14 @@ void subsec_t::RoundOff()
 		{
 			seg->is_degenerate = true;
 
-			if (seg->linedef)
+			if (seg->linedef != NULL)
 				last_real_degen = seg;
 
 			degen_total++;
 			continue;
 		}
 
-		if (seg->linedef)
+		if (seg->linedef != NULL)
 			real_total++;
 	}
 
@@ -1829,27 +1844,13 @@ void subsec_t::RoundOff()
 	}
 
 	// second pass, remove the blighters...
-	while (seg_list)
+	while (seg_list != NULL)
 	{
 		// remove head
 		seg = seg_list;
 		seg_list = seg->next;
 
-		if (! seg->is_degenerate)
-		{
-			seg->next = NULL;
-
-			if (new_tail)
-				new_tail->next = seg;
-			else
-				new_head = seg;
-
-			new_tail = seg;
-
-			// this updated later
-			seg->index = -1;
-		}
-		else
+		if (seg->is_degenerate)
 		{
 #if DEBUG_SUBSEC
 			cur_info->Debug("Subsec: Removing degenerate %p\n", seg);
@@ -1857,8 +1858,21 @@ void subsec_t::RoundOff()
 
 			// set index to a really high value, so that SortSegs() will
 			// move all the minisegs to the top of the seg array.
-			seg->index = 1<<24;
+			seg->index = 1<<24;  // FIXME SEG_IS_GARBAGE
+			continue;
 		}
+
+		seg->next = NULL;
+
+		if (new_tail)
+			new_tail->next = seg;
+		else
+			new_head = seg;
+
+		new_tail = seg;
+
+		// this updated later
+		seg->index = -1;
 	}
 
 	if (new_head == NULL)

@@ -349,7 +349,7 @@ public:
 	// list of segs
 	seg_t *seg_list;
 
-	// count of segs
+	// count of segs -- only valid after RenumberSegs() is called
 	int seg_count;
 
 	// subsector index.  Always valid, set when the subsector is
@@ -361,6 +361,8 @@ public:
 	double mid_y;
 
 public:
+	void AddToTail(seg_t *seg);
+
 	void DetermineMiddle();
 	void ClockwiseOrder();
 	void RenumberSegs();
@@ -661,7 +663,7 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 		node_t ** N, subsec_t ** S);
 
 // compute the height of the bsp tree, starting at 'node'.
-int ComputeBspHeight(node_t *node);
+int ComputeBspHeight(const node_t *node);
 
 // put all the segs in each subsector into clockwise order, and renumber
 // the seg indices.
