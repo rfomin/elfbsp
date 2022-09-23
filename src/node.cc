@@ -109,22 +109,22 @@ intersection_t *NewIntersection()
 //
 // Fill in the fields 'angle', 'len', 'pdx', 'pdy', etc...
 //
-void RecomputeSeg(seg_t *seg)
+void seg_t::Recompute()
 {
-	seg->psx = seg->start->x;
-	seg->psy = seg->start->y;
-	seg->pex = seg->end->x;
-	seg->pey = seg->end->y;
-	seg->pdx = seg->pex - seg->psx;
-	seg->pdy = seg->pey - seg->psy;
+	psx = start->x;
+	psy = start->y;
+	pex = end->x;
+	pey = end->y;
+	pdx = pex - psx;
+	pdy = pey - psy;
 
-	seg->p_length = hypot(seg->pdx, seg->pdy);
+	p_length = hypot(pdx, pdy);
 
-	if (seg->p_length <= 0)
-		BugError("Seg %p has zero p_length.\n", seg);
+	if (p_length <= 0)
+		BugError("Seg %p has zero p_length.\n", this);
 
-	seg->p_perp =  seg->psy * seg->pdx - seg->psx * seg->pdy;
-	seg->p_para = -seg->psx * seg->pdx - seg->psy * seg->pdy;
+	p_perp =  psy * pdx - psx * pdy;
+	p_para = -psx * pdx - psy * pdy;
 }
 
 
@@ -161,10 +161,10 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 	new_seg->next = NULL;
 
 	old_seg->end = new_vert;
-	RecomputeSeg(old_seg);
+	old_seg->Recompute();
 
 	new_seg->start = new_vert;
-	RecomputeSeg(new_seg);
+	new_seg->Recompute();
 
 #if DEBUG_SPLIT
 	cur_info->Debug("Splitting Vertex is %04X at (%1.1f,%1.1f)\n",
@@ -189,10 +189,10 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 		new_seg->partner->partner = new_seg;
 
 		old_seg->partner->start = new_vert;
-		RecomputeSeg(old_seg->partner);
+		old_seg->partner->Recompute();
 
 		new_seg->partner->end = new_vert;
-		RecomputeSeg(new_seg->partner);
+		new_seg->partner->Recompute();
 
 		// link it into list
 		old_seg->partner->next = new_seg->partner;
@@ -979,8 +979,8 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 
 		seg->source_line = buddy->source_line = part->linedef;
 
-		RecomputeSeg(seg);
-		RecomputeSeg(buddy);
+		seg  ->Recompute();
+		buddy->Recompute();
 
 		// add the new segs to the appropriate lists
 		ListAddSeg(right_list, seg);
@@ -1260,7 +1260,7 @@ seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
 	seg->source_line = seg->linedef;
 	seg->index = -1;
 
-	RecomputeSeg(seg);
+	seg->Recompute();
 
 	return seg;
 }

@@ -324,11 +324,13 @@ public:
 	double cmp_angle;
 
 public:
+	// compute the seg private info (psx/y, pex/y, pdx/y, etc).
+	void Recompute();
+
 	int PointOnLineSide(double x, double y) const;
 
 	// compute the parallel and perpendicular distances from a partition
 	// line to a point.
-	//
 	inline double ParallelDist(double x, double y) const
 	{
 		return (x * pdx + y * pdy + p_para) / p_length;
@@ -612,9 +614,6 @@ seg_t *PickNode(quadtree_c *tree, int depth);
 
 // compute the boundary of the list of segs
 void FindLimits2(seg_t *list, bbox_t *bbox);
-
-// compute the seg private info (psx/y, pex/y, pdx/y, etc).
-void RecomputeSeg(seg_t *seg);
 
 // take the given seg 'cur', compare it with the partition line, and
 // determine it's fate: moving it into either the left or right lists
