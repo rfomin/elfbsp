@@ -639,9 +639,6 @@ void AddMinisegs(seg_t *part,
 		quadtree_c *left_list, quadtree_c *right_list,
 		intersection_t *cut_list);
 
-// free the quick allocation cut list
-void FreeQuickAllocCuts(void);
-
 
 //------------------------------------------------------------------------
 // NODE : Recursively create nodes and return the pointers.

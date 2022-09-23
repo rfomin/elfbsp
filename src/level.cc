@@ -2701,7 +2701,6 @@ build_result_e BuildLevel(int lev_idx)
 	}
 
 	FreeLevel();
-	FreeQuickAllocCuts();
 
 	return ret;
 }

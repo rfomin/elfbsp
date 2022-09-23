@@ -59,9 +59,9 @@ namespace ajbsp
 #define SEG_FAST_THRESHHOLD  200
 
 
-
-struct eval_info_t
+class eval_info_t
 {
+public:
 	int cost;
 	int splits;
 	int iffy;
@@ -71,39 +71,38 @@ struct eval_info_t
 	int real_right;
 	int mini_left;
 	int mini_right;
+
+public:
+	void BumpLeft(const linedef_t * linedef)
+	{
+		if (linedef != NULL)
+			real_left++;
+		else
+			mini_left++;
+	}
+
+	void BumpRight(const linedef_t * linedef)
+	{
+		if (linedef != NULL)
+			real_right++;
+		else
+			mini_right++;
+	}
 };
 
 
-intersection_t *quick_alloc_cuts = NULL;
+std::vector<intersection_t *> alloc_cuts;
 
+size_t used_intersections = 0;
 
-intersection_t *NewIntersection(void)
+intersection_t *NewIntersection()
 {
-	intersection_t *cut;
+	SYS_ASSERT(used_intersections <= alloc_cuts.size());
 
-	if (quick_alloc_cuts)
-	{
-		cut = quick_alloc_cuts;
-		quick_alloc_cuts = cut->next;
-	}
-	else
-	{
-		cut = (intersection_t *) UtilCalloc(sizeof(intersection_t));
-	}
+	if (used_intersections == alloc_cuts.size())
+		alloc_cuts.push_back(new intersection_t);
 
-	return cut;
-}
-
-
-void FreeQuickAllocCuts(void)
-{
-	while (quick_alloc_cuts)
-	{
-		intersection_t *cut = quick_alloc_cuts;
-		quick_alloc_cuts = cut->next;
-
-		UtilFree(cut);
-	}
+	return alloc_cuts[used_intersections++];
 }
 
 
@@ -372,15 +371,9 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 			// whether it goes in the same direction or the opposite.
 
 			if (check->pdx*part->pdx + check->pdy*part->pdy < 0)
-			{
-				if (check->linedef) info->real_left += 1;
-				else                info->mini_left += 1;
-			}
+				info->BumpLeft(check->linedef);
 			else
-			{
-				if (check->linedef) info->real_right += 1;
-				else                info->mini_right += 1;
-			}
+				info->BumpRight(check->linedef);
 
 			continue;
 		}
@@ -400,8 +393,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 		/* check for right side */
 		if (a > -DIST_EPSILON && b > -DIST_EPSILON)
 		{
-			if (check->linedef) info->real_right += 1;
-			else                info->mini_right += 1;
+			info->BumpRight(check->linedef);
 
 			/* check for a near miss */
 			if ((a >= IFFY_LEN && b >= IFFY_LEN) ||
@@ -430,8 +422,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 		/* check for left side */
 		if (a < DIST_EPSILON && b < DIST_EPSILON)
 		{
-			if (check->linedef) info->real_left += 1;
-			else                info->mini_left += 1;
+			info->BumpLeft(check->linedef);
 
 			/* check for a near miss */
 			if ((a <= -IFFY_LEN && b <= -IFFY_LEN) ||
@@ -1002,16 +993,6 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 		cur_info->Debug("AddMiniseg: %p LEFT   (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				buddy->start->x, buddy->start->y, buddy->end->x, buddy->end->y);
 #endif
-	}
-
-	// free intersection structures into quick-alloc list
-	while (cut_list)
-	{
-		cur = cut_list;
-		cut_list = cur->next;
-
-		cur->next = quick_alloc_cuts;
-		quick_alloc_cuts = cur;
 	}
 }
 
@@ -1645,6 +1626,9 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 
 	node_t *node = NewNode();
 	*N = node;
+
+	// re-use any previous intersections
+	used_intersections = 0;
 
 	/* divide the segs into two lists: left & right */
 	seg_t *lefts  = NULL;
