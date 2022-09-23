@@ -142,9 +142,6 @@ void seg_t::Recompute()
 //
 seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 {
-	seg_t *new_seg;
-	vertex_t *new_vert;
-
 #if DEBUG_SPLIT
 	if (old_seg->linedef)
 		cur_info->Debug("Splitting Linedef %d (%p) at (%1.1f,%1.1f)\n",
@@ -153,17 +150,17 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 		cur_info->Debug("Splitting Miniseg %p at (%1.1f,%1.1f)\n", old_seg, x, y);
 #endif
 
-	new_vert = NewVertexFromSplitSeg(old_seg, x, y);
-	new_seg  = NewSeg();
+	vertex_t *new_vert = NewVertexFromSplitSeg(old_seg, x, y);
+	seg_t    *new_seg  = NewSeg();
 
 	// copy seg info
 	new_seg[0] = old_seg[0];
 	new_seg->next = NULL;
 
-	old_seg->end = new_vert;
-	old_seg->Recompute();
-
+	old_seg->end   = new_vert;
 	new_seg->start = new_vert;
+
+	old_seg->Recompute();
 	new_seg->Recompute();
 
 #if DEBUG_SPLIT
@@ -189,9 +186,9 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 		new_seg->partner->partner = new_seg;
 
 		old_seg->partner->start = new_vert;
-		old_seg->partner->Recompute();
+		new_seg->partner->end   = new_vert;
 
-		new_seg->partner->end = new_vert;
+		old_seg->partner->Recompute();
 		new_seg->partner->Recompute();
 
 		// link it into list
@@ -211,8 +208,6 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 inline void ComputeIntersection(seg_t *seg, seg_t *part,
 		double perp_c, double perp_d, double *x, double *y)
 {
-	double ds;
-
 	// horizontal partition against vertical seg
 	if (part->pdy == 0 && seg->pdx == 0)
 	{
@@ -230,7 +225,7 @@ inline void ComputeIntersection(seg_t *seg, seg_t *part,
 	}
 
 	// 0 = start, 1 = end
-	ds = perp_c / (perp_c - perp_d);
+	double ds = perp_c / (perp_c - perp_d);
 
 	if (seg->pdx == 0)
 		*x = seg->psx;
@@ -303,25 +298,18 @@ void AddIntersection(intersection_t ** cut_list,
 //
 // Returns true if a "bad seg" was found early.
 //
-int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
-		int best_cost, eval_info_t *info)
+int EvalPartitionWorker(quadtree_c *tree, seg_t *part, int best_cost, eval_info_t *info)
 {
-	seg_t *check;
-
-	double qnty;
-	double a, b, fa, fb;
-
-	int num;
 	int split_cost = cur_info->split_cost;
 
-	// -AJA- this is the heart of my superblock idea, it tests the
-	//       _whole_ block against the partition line to quickly handle
+	// -AJA- this is the heart of the superblock idea, it tests the
+	//       *whole* quad against the partition line to quickly handle
 	//       all the segs within it at once.  Only when the partition
 	//       line intercepts the box do we need to go deeper into it.
 
-	num = tree->OnLineSide(part);
+	int side = tree->OnLineSide(part);
 
-	if (num < 0)
+	if (side < 0)
 	{
 		// LEFT
 
@@ -330,7 +318,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 
 		return false;
 	}
-	else if (num > 0)
+	else if (side > 0)
 	{
 		// RIGHT
 
@@ -342,7 +330,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 
 	/* check partition against all Segs */
 
-	for (check=tree->list ; check ; check=check->next)
+	for (seg_t *check=tree->list ; check ; check=check->next)
 	{
 		// This is the heart of my pruning idea - it catches
 		// bad segs early on. Killough
@@ -350,12 +338,13 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 		if (info->cost > best_cost)
 			return true;
 
+		double qnty;
+
+		double a = 0, fa = 0;
+		double b = 0, fb = 0;
+
 		/* get state of lines' relation to each other */
-		if (check->source_line == part->source_line)
-		{
-			a = b = fa = fb = 0;
-		}
-		else
+		if (check->source_line != part->source_line)
 		{
 			a = part->PerpDist(check->psx, check->psy);
 			b = part->PerpDist(check->pex, check->pey);
@@ -386,7 +375,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 
 		if (fa <= DIST_EPSILON || fb <= DIST_EPSILON)
 		{
-			if (check->linedef && check->linedef->is_precious)
+			if (check->linedef != NULL && check->linedef->is_precious)
 				info->cost += 40 * split_cost * PRECIOUS_MULTIPLY;
 		}
 
@@ -415,7 +404,7 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 			else
 				qnty = IFFY_LEN / std::min(a, b);
 
-			info->cost += (int) (100 * split_cost * (qnty * qnty - 1.0));
+			info->cost += (int) (70 * split_cost * (qnty * qnty - 1.0));
 			continue;
 		}
 
@@ -476,21 +465,22 @@ int EvalPartitionWorker(quadtree_c *tree, seg_t *part,
 
 	/* handle sub-blocks recursively */
 
-	for (num=0 ; num < 2 ; num++)
+	for (int c=0 ; c < 2 ; c++)
 	{
-		if (! tree->subs[num])
-			continue;
-
 		if (info->cost > best_cost)
 			return true;
 
-		if (EvalPartitionWorker(tree->subs[num], part, best_cost, info))
-			return true;
+		if (tree->subs[c] != NULL && ! tree->subs[c]->Empty())
+		{
+			if (EvalPartitionWorker(tree->subs[c], part, best_cost, info))
+				return true;
+		}
 	}
 
 	/* no "bad seg" was found */
 	return false;
 }
+
 
 //
 // -AJA- Evaluate a partition seg & determine the cost, taking into
@@ -505,9 +495,9 @@ int EvalPartition(quadtree_c *tree, seg_t *part, int best_cost)
 	eval_info_t info;
 
 	/* initialise info structure */
-	info.cost   = 0;
-	info.splits = 0;
-	info.iffy   = 0;
+	info.cost       = 0;
+	info.splits     = 0;
+	info.iffy       = 0;
 	info.near_miss  = 0;
 
 	info.real_left  = 0;
@@ -559,13 +549,10 @@ int EvalPartition(quadtree_c *tree, seg_t *part, int best_cost)
 void EvaluateFastWorker(quadtree_c *tree,
 		seg_t **best_H, seg_t **best_V, int mid_x, int mid_y)
 {
-	seg_t *part;
-	int num;
-
-	for (part=tree->list ; part ; part = part->next)
+	for (seg_t *part=tree->list ; part ; part = part->next)
 	{
 		/* ignore minisegs as partition candidates */
-		if (! part->linedef)
+		if (part->linedef == NULL)
 			continue;
 
 		if (part->pdy == 0)
@@ -577,8 +564,8 @@ void EvaluateFastWorker(quadtree_c *tree,
 			}
 			else
 			{
-				int old_dist = abs((int)(*best_H)->psy - mid_y);
-				int new_dist = abs((int)(   part)->psy - mid_y);
+				double old_dist = fabs((*best_H)->psy - mid_y);
+				double new_dist = fabs(   (part)->psy - mid_y);
 
 				if (new_dist < old_dist)
 					*best_H = part;
@@ -593,8 +580,8 @@ void EvaluateFastWorker(quadtree_c *tree,
 			}
 			else
 			{
-				int old_dist = abs((int)(*best_V)->psx - mid_x);
-				int new_dist = abs((int)(   part)->psx - mid_x);
+				double old_dist = fabs((*best_V)->psx - mid_x);
+				double new_dist = fabs(   (part)->psx - mid_x);
 
 				if (new_dist < old_dist)
 					*best_V = part;
@@ -604,9 +591,13 @@ void EvaluateFastWorker(quadtree_c *tree,
 
 	/* handle sub-blocks recursively */
 
-	for (num=0 ; num < 2 ; num++)
-		if (tree->subs[num] != NULL)
-			EvaluateFastWorker(tree->subs[num], best_H, best_V, mid_x, mid_y);
+	for (int c=0 ; c < 2 ; c++)
+	{
+		if (tree->subs[c] != NULL && ! tree->subs[c]->Empty())
+		{
+			EvaluateFastWorker(tree->subs[c], best_H, best_V, mid_x, mid_y);
+		}
+	}
 }
 
 
@@ -624,10 +615,10 @@ seg_t *FindFastSeg(quadtree_c *tree)
 	int V_cost = -1;
 
 	if (best_H)
-		H_cost = EvalPartition(tree, best_H, 99999999);
+		H_cost = EvalPartition(tree, best_H, INT_MAX);
 
 	if (best_V)
-		V_cost = EvalPartition(tree, best_V, 99999999);
+		V_cost = EvalPartition(tree, best_V, INT_MAX);
 
 #if DEBUG_PICKNODE
 	cur_info->Debug("FindFastSeg: best_H=%p (cost %d) | best_V=%p (cost %d)\n",
@@ -648,8 +639,6 @@ seg_t *FindFastSeg(quadtree_c *tree)
 bool PickNodeWorker(quadtree_c *part_list,
 		quadtree_c *tree, seg_t ** best, int *best_cost)
 {
-	int num;
-
 	/* try each Seg as partition */
 	for (seg_t *part = part_list->list ; part ; part = part->next)
 	{
@@ -663,7 +652,7 @@ bool PickNodeWorker(quadtree_c *part_list,
 #endif
 
 		/* ignore minisegs as partition candidates */
-		if (! part->linedef)
+		if (part->linedef == NULL)
 			continue;
 
 		int cost = EvalPartition(tree, part, *best_cost);
@@ -681,9 +670,14 @@ bool PickNodeWorker(quadtree_c *part_list,
 
 	/* recursively handle sub-blocks */
 
-	for (num=0 ; num < 2 ; num++)
-		if (part_list->subs[num] != NULL)
-			PickNodeWorker(part_list->subs[num], tree, best, best_cost);
+	for (int c=0 ; c < 2 ; c++)
+	{
+		if (part_list->subs[c] != NULL && ! part_list->subs[c]->Empty())
+		{
+			if (! PickNodeWorker(part_list->subs[c], tree, best, best_cost))
+				return false;
+		}
+	}
 
 	return true;
 }
@@ -762,10 +756,6 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 		seg_t ** left_list, seg_t ** right_list,
 		intersection_t ** cut_list)
 {
-	seg_t *new_seg;
-
-	double x, y;
-
 	/* get state of lines' relation to each other */
 	double a = part->PerpDist(seg->psx, seg->psy);
 	double b = part->PerpDist(seg->pex, seg->pey);
@@ -785,13 +775,9 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 		// whether it goes in the same direction or the opposite.
 
 		if (seg->pdx*part->pdx + seg->pdy*part->pdy < 0)
-		{
 			ListAddSeg(left_list, seg);
-		}
 		else
-		{
 			ListAddSeg(right_list, seg);
-		}
 
 		return;
 	}
@@ -823,9 +809,10 @@ void DivideOneSeg(seg_t *seg, seg_t *part,
 	// when we reach here, we have a and b non-zero and opposite sign,
 	// hence this seg will be split by the partition line.
 
+	double x, y;
 	ComputeIntersection(seg, part, a, b, &x, &y);
 
-	new_seg = SplitSeg(seg, x, y);
+	seg_t *new_seg = SplitSeg(seg, x, y);
 
 	AddIntersection(cut_list, seg->end, part, self_ref);
 
@@ -846,8 +833,6 @@ void SeparateSegs(quadtree_c *tree, seg_t *part,
 		seg_t ** left_list, seg_t ** right_list,
 		intersection_t ** cut_list)
 {
-	int num;
-
 	while (tree->list != NULL)
 	{
 		seg_t *seg = tree->list;
@@ -858,17 +843,10 @@ void SeparateSegs(quadtree_c *tree, seg_t *part,
 	}
 
 	// recursively handle sub-blocks
-	for (num=0 ; num < 2 ; num++)
+	if (tree->subs[0] != NULL)
 	{
-		quadtree_c *A = tree->subs[num];
-
-		if (A != NULL)
-		{
-			SeparateSegs(A, part, left_list, right_list, cut_list);
-
-			if (A->real_num + A->mini_num > 0)
-				BugError("SeparateSegs: child %d not empty!\n", num);
-		}
+		SeparateSegs(tree->subs[0], part, left_list, right_list, cut_list);
+		SeparateSegs(tree->subs[1], part, left_list, right_list, cut_list);
 	}
 
 	// this quadtree_c is empty now
@@ -913,41 +891,42 @@ void FindLimits2(seg_t *list, bbox_t *bbox)
 void AddMinisegs(intersection_t *cut_list, seg_t *part,
 		seg_t ** left_list, seg_t ** right_list)
 {
-	intersection_t *cur, *next;
-	seg_t *seg, *buddy;
+	intersection_t *cut, *next;
 
 #if DEBUG_CUTLIST
 	cur_info->Debug("CUT LIST:\n");
 	cur_info->Debug("PARTITION: (%1.1f,%1.1f) += (%1.1f,%1.1f)\n",
 			part->psx, part->psy, part->pdx, part->pdy);
 
-	for (cur=cut_list ; cur ; cur=cur->next)
+	for (cut=cut_list ; cut ; cut=cut->next)
 	{
 		cur_info->Debug("  Vertex %8X (%1.1f,%1.1f)  Along %1.2f  [%d/%d]  %s\n",
-				cur->vertex->index, cur->vertex->x, cur->vertex->y,
-				cur->along_dist,
-				cur->open_before ? 1 : 0,
-				cur->open_after  ? 1 : 0,
-				cur->self_ref    ? "SELFREF" : "");
+				cut->vertex->index, cut->vertex->x, cut->vertex->y,
+				cut->along_dist,
+				cut->open_before ? 1 : 0,
+				cut->open_after  ? 1 : 0,
+				cut->self_ref    ? "SELFREF" : "");
 	}
 #endif
 
 	// find open gaps in the intersection list, convert to minisegs
 
-	for (cur = cut_list ; cur && cur->next ; cur = cur->next)
+	for (cut = cut_list ; cut && cut->next ; cut = cut->next)
 	{
-		next = cur->next;
+		next = cut->next;
 
 		// sanity check
-		double len = next->along_dist - cur->along_dist;
-		if (len < -0.01)
+		double len = next->along_dist - cut->along_dist;
+		if (len < -0.001)
+		{
 			BugError("Bad order in intersect list: %1.3f > %1.3f\n",
-					cur->along_dist, next->along_dist);
+					cut->along_dist, next->along_dist);
+		}
 
-		bool A = cur->open_after;
+		bool A =  cut->open_after;
 		bool B = next->open_before;
 
-		// nothing possible is both ends are CLOSED
+		// nothing possible when both ends are CLOSED
 		if (! (A || B))
 			continue;
 
@@ -959,19 +938,19 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 		}
 
 		// righteo, here we have definite open space.
-		// create a miniseg pair...
+		// create a miniseg pair....
 
-		seg = NewSeg();
-		buddy = NewSeg();
+		seg_t *seg   = NewSeg();
+		seg_t *buddy = NewSeg();
 
 		seg->partner = buddy;
 		buddy->partner = seg;
 
-		seg->start = cur->vertex;
+		seg->start = cut->vertex;
 		seg->end   = next->vertex;
 
 		buddy->start = next->vertex;
-		buddy->end   = cur->vertex;
+		buddy->end   = cut->vertex;
 
 		seg->index   = buddy->index   = -1;
 		seg->linedef = buddy->linedef = NULL;
@@ -1039,7 +1018,7 @@ void node_t::SetPartition(const seg_t *part)
 	}
 
 	/* check for really long partition (overflows dx,dy in NODES) */
-	if (part->p_length >= 30000)
+	if (fabs(dx) > 32000 || fabs(dy) > 32000)
 	{
 /* FIXME REVIEW THIS
 		if (dx && dy && ((dx & 1) || (dy & 1)))
@@ -1156,12 +1135,12 @@ void quadtree_c::AddSeg(seg_t *seg)
 }
 
 
-void quadtree_c::AddList(seg_t *_list)
+void quadtree_c::AddList(seg_t *seg_list)
 {
-	while (_list != NULL)
+	while (seg_list != NULL)
 	{
-		seg_t *seg = _list;
-		_list = seg->next;
+		seg_t *seg = seg_list;
+		seg_list = seg->next;
 
 		AddSeg(seg);
    }
@@ -1190,10 +1169,11 @@ void quadtree_c::ConvertToList(seg_t **_list)
 
 int quadtree_c::OnLineSide(const seg_t *part) const
 {
-	double tx1 = (double)x1 - IFFY_LEN;
-	double ty1 = (double)y1 - IFFY_LEN;
-	double tx2 = (double)x2 + IFFY_LEN;
-	double ty2 = (double)y2 + IFFY_LEN;
+	// expand bounds a bit, adds some safety and loses nothing
+	double tx1 = (double)x1 - 0.4;
+	double ty1 = (double)y1 - 0.4;
+	double tx2 = (double)x2 + 0.4;
+	double ty2 = (double)y2 + 0.4;
 
 	int p1, p2;
 
@@ -1246,10 +1226,14 @@ seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
 	seg_t *seg = NewSeg();
 
 	// check for bad sidedef
-	if (! side->sector)
+	if (side->sector == NULL)
 	{
 		Warning("Bad sidedef on linedef #%d (Z_CheckHeap error)\n", line->index);
 	}
+
+	// handle overlapping vertices, pick a nominal one
+	if (start->overlap) start = start->overlap;
+	if (  end->overlap)   end =   end->overlap;
 
 	seg->start   = start;
 	seg->end     = end;
@@ -1276,7 +1260,7 @@ seg_t *CreateSegs()
 
 	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *line = lev_linedefs[i];
+		const linedef_t *line = lev_linedefs[i];
 
 		seg_t *left  = NULL;
 		seg_t *right = NULL;
@@ -1286,16 +1270,16 @@ seg_t *CreateSegs()
 			continue;
 
 		// ignore overlapping lines
-		if (line->overlap)
+		if (line->overlap != NULL)
 			continue;
 
-		// check for Humungously long lines
+		// check for extremely long lines
 		if (hypot(line->start->x - line->end->x, line->start->y - line->end->y) >= 30000)
 		{
 			Warning("Linedef #%d is VERY long, it may cause problems\n", line->index);
 		}
 
-		if (line->right)
+		if (line->right != NULL)
 		{
 			right = CreateOneSeg(line, line->start, line->end, line->right, 0);
 			ListAddSeg(&list, right);
@@ -1305,12 +1289,12 @@ seg_t *CreateSegs()
 			Warning("Linedef #%d has no right sidedef!\n", line->index);
 		}
 
-		if (line->left)
+		if (line->left != NULL)
 		{
 			left = CreateOneSeg(line, line->end, line->start, line->left, 1);
 			ListAddSeg(&list, left);
 
-			if (right)
+			if (right != NULL)
 			{
 				// -AJA- Partner segs.  These always maintain a one-to-one
 				//       correspondence, so if one of the gets split, the
@@ -1346,8 +1330,8 @@ quadtree_c *TreeFromSegList(seg_t *list, const bbox_t *bounds)
 
 void subsec_t::DetermineMiddle()
 {
-	mid_x = 0;
-	mid_y = 0;
+	mid_x = 0.0;
+	mid_y = 0.0;
 
 	int total = 0;
 
