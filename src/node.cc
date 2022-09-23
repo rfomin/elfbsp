@@ -146,13 +146,13 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 	seg_t *new_seg;
 	vertex_t *new_vert;
 
-# if DEBUG_SPLIT
+#if DEBUG_SPLIT
 	if (old_seg->linedef)
 		cur_info->Debug("Splitting Linedef %d (%p) at (%1.1f,%1.1f)\n",
 				old_seg->linedef->index, old_seg, x, y);
 	else
 		cur_info->Debug("Splitting Miniseg %p at (%1.1f,%1.1f)\n", old_seg, x, y);
-# endif
+#endif
 
 	new_vert = NewVertexFromSplitSeg(old_seg, x, y);
 	new_seg  = NewSeg();
@@ -167,18 +167,18 @@ seg_t * SplitSeg(seg_t *old_seg, double x, double y)
 	new_seg->start = new_vert;
 	RecomputeSeg(new_seg);
 
-# if DEBUG_SPLIT
+#if DEBUG_SPLIT
 	cur_info->Debug("Splitting Vertex is %04X at (%1.1f,%1.1f)\n",
 			new_vert->index, new_vert->x, new_vert->y);
-# endif
+#endif
 
 	// handle partners
 
 	if (old_seg->partner)
 	{
-#   if DEBUG_SPLIT
+#if DEBUG_SPLIT
 		cur_info->Debug("Splitting Partner %p\n", old_seg->partner);
-#   endif
+#endif
 
 		new_seg->partner = NewSeg();
 
@@ -530,11 +530,11 @@ int EvalPartition(quadtree_c *tree, seg_t *part, int best_cost)
 	/* make sure there is at least one real seg on each side */
 	if (info.real_left == 0 || info.real_right == 0)
 	{
-#   if DEBUG_PICKNODE
+#if DEBUG_PICKNODE
 		cur_info->Debug("Eval : No real segs on %s%sside\n",
 				info.real_left  ? "" : "left ",
 				info.real_right ? "" : "right ");
-#   endif
+#endif
 
 		return -1;
 	}
@@ -554,12 +554,12 @@ int EvalPartition(quadtree_c *tree, seg_t *part, int best_cost)
 	if (part->pdx != 0 && part->pdy != 0)
 		info.cost += 25;
 
-# if DEBUG_PICKNODE
+#if DEBUG_PICKNODE
 	cur_info->Debug("Eval %p: splits=%d iffy=%d near=%d left=%d+%d right=%d+%d "
 			"cost=%d.%02d\n", part, info.splits, info.iffy, info.near_miss,
 			info.real_left, info.mini_left, info.real_right, info.mini_right,
 			info.cost / 100, info.cost % 100);
-# endif
+#endif
 
 	return info.cost;
 }
@@ -638,10 +638,10 @@ seg_t *FindFastSeg(quadtree_c *tree)
 	if (best_V)
 		V_cost = EvalPartition(tree, best_V, 99999999);
 
-# if DEBUG_PICKNODE
+#if DEBUG_PICKNODE
 	cur_info->Debug("FindFastSeg: best_H=%p (cost %d) | best_V=%p (cost %d)\n",
 			best_H, H_cost, best_V, V_cost);
-# endif
+#endif
 
 	if (H_cost < 0 && V_cost < 0)
 		return NULL;
@@ -925,7 +925,7 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 	intersection_t *cur, *next;
 	seg_t *seg, *buddy;
 
-# if DEBUG_CUTLIST
+#if DEBUG_CUTLIST
 	cur_info->Debug("CUT LIST:\n");
 	cur_info->Debug("PARTITION: (%1.1f,%1.1f) += (%1.1f,%1.1f)\n",
 			part->psx, part->psy, part->pdx, part->pdy);
@@ -939,7 +939,7 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 				cur->open_after  ? 1 : 0,
 				cur->self_ref    ? "SELFREF" : "");
 	}
-# endif
+#endif
 
 	// find open gaps in the intersection list, convert to minisegs
 
@@ -995,13 +995,13 @@ void AddMinisegs(intersection_t *cut_list, seg_t *part,
 		ListAddSeg(right_list, seg);
 		ListAddSeg(left_list, buddy);
 
-#   if DEBUG_CUTLIST
+#if DEBUG_CUTLIST
 		cur_info->Debug("AddMiniseg: %p RIGHT  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 
 		cur_info->Debug("AddMiniseg: %p LEFT   (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
 				buddy->start->x, buddy->start->y, buddy->end->x, buddy->end->y);
-#   endif
+#endif
 	}
 
 	// free intersection structures into quick-alloc list

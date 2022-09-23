@@ -152,9 +152,9 @@ static void BlockAdd(int blk_num, int line_index)
 {
 	u16_t *cur = block_lines[blk_num];
 
-# if DEBUG_BLOCKMAP
+#if DEBUG_BLOCKMAP
 	cur_info->Debug("Block %d has line %d\n", blk_num, line_index);
-# endif
+#endif
 
 	if (blk_num < 0 || blk_num >= block_count)
 		BugError("BlockAdd: bad block number %d\n", blk_num);
@@ -199,10 +199,10 @@ static void BlockAddLine(linedef_t *L)
 	int bx, by;
 	int line_index = L->index;
 
-# if DEBUG_BLOCKMAP
+#if DEBUG_BLOCKMAP
 	cur_info->Debug("BlockAddLine: %d (%d,%d) -> (%d,%d)\n", line_index,
 			x1, y1, x2, y2);
-# endif
+#endif
 
 	// handle truncated blockmaps
 	if (bx1 < 0) bx1 = 0;
@@ -382,10 +382,10 @@ static void CompressBlockmap(void)
 		return;
 	}
 
-# if DEBUG_BLOCKMAP
+#if DEBUG_BLOCKMAP
 	cur_info->Debug("Blockmap: Last ptr = %d  duplicates = %d\n",
 			cur_offset, dup_count);
-# endif
+#endif
 
 	block_compression = (orig_size - new_size) * 100 / orig_size;
 
@@ -540,9 +540,9 @@ static void FindBlockmapLimits(bbox_t *bbox)
 		block_mid_y = (mid_y / num_linedefs) * 16;
 	}
 
-# if DEBUG_BLOCKMAP
+#if DEBUG_BLOCKMAP
 	cur_info->Debug("Blockmap lines centered at (%d,%d)\n", block_mid_x, block_mid_y);
-# endif
+#endif
 }
 
 
@@ -798,9 +798,9 @@ void PutReject()
 	Reject_GroupSectors();
 	Reject_ProcessSectors();
 
-# if DEBUG_REJECT
+#if DEBUG_REJECT
 	Reject_DebugGroups();
-# endif
+#endif
 
 	Reject_WriteLump();
 	Reject_Free();
@@ -1038,9 +1038,9 @@ void GetVertices(void)
 	if (lump)
 		count = lump->Length() / sizeof(raw_vertex_t);
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetVertices: num = %d\n", count);
-# endif
+#endif
 
 	if (!lump || count == 0)
 		return;
@@ -1082,9 +1082,9 @@ void GetSectors(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to sectors.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetSectors: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1126,9 +1126,9 @@ void GetThings(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to things.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetThings: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1163,9 +1163,9 @@ void GetThingsHexen(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to things.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetThingsHexen: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1200,9 +1200,9 @@ void GetSidedefs(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to sidedefs.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetSidedefs: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1243,9 +1243,9 @@ void GetLinedefs(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to linedefs.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetLinedefs: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1318,9 +1318,9 @@ void GetLinedefsHexen(void)
 	if (! lump->Seek())
 		cur_info->FatalError("Error seeking to linedefs.\n");
 
-# if DEBUG_LOAD
+#if DEBUG_LOAD
 	cur_info->Debug("GetLinedefsHexen: num = %d\n", count);
-# endif
+#endif
 
 	for (i = 0 ; i < count ; i++)
 	{
@@ -1559,13 +1559,13 @@ void PutSegs(void)
 
 		count++;
 
-#   if DEBUG_BSP
+#if DEBUG_BSP
 		cur_info->Debug("PUT SEG: %04X  Vert %04X->%04X  Line %04X %s  "
 				"Angle %04X  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index,
 				LE_U16(raw.start), LE_U16(raw.end), LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U16(raw.angle),
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-#   endif
+#endif
 	}
 
 	if (count != num_complete_seg)
@@ -1617,12 +1617,12 @@ void PutGLSegs(void)
 
 		count++;
 
-#   if DEBUG_BSP
+#if DEBUG_BSP
 		cur_info->Debug("PUT GL SEG: %04X  Line %04X %s  Partner %04X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U16(raw.partner),
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-#   endif
+#endif
 	}
 
 	if (count != num_complete_seg)
@@ -1672,12 +1672,12 @@ void PutGLSegs_V5()
 
 		count++;
 
-#   if DEBUG_BSP
+#if DEBUG_BSP
 		cur_info->Debug("PUT V3 SEG: %06X  Line %04X %s  Partner %06X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
 				seg->side ? "L" : "R", LE_U32(raw.partner),
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-#   endif
+#endif
 	}
 
 	if (count != num_complete_seg)
@@ -1705,10 +1705,10 @@ void PutSubsecs(const char *name, int do_gl)
 
 		lump->Write(&raw, sizeof(raw));
 
-#   if DEBUG_BSP
+#if DEBUG_BSP
 		cur_info->Debug("PUT SUBSEC %04X  First %04X  Num %04X\n",
 				sub->index, LE_U16(raw.first), LE_U16(raw.num));
-#   endif
+#endif
 	}
 
 	if (num_subsecs > 32767)
@@ -1738,10 +1738,10 @@ void PutGLSubsecs_V5()
 
 		lump->Write(&raw, sizeof(raw));
 
-#   if DEBUG_BSP
+#if DEBUG_BSP
 		cur_info->Debug("PUT V3 SUBSEC %06X  First %06X  Num %06X\n",
 					sub->index, LE_U32(raw.first), LE_U32(raw.num));
-#   endif
+#endif
 	}
 }
 
@@ -1791,12 +1791,12 @@ static void PutOneNode(node_t *node, Lump_c *lump)
 
 	lump->Write(&raw, sizeof(raw));
 
-# if DEBUG_BSP
+#if DEBUG_BSP
 	cur_info->Debug("PUT NODE %04X  Left %04X  Right %04X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U16(raw.left),
 			LE_U16(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
-# endif
+#endif
 }
 
 
@@ -1843,12 +1843,12 @@ static void PutOneNode_V5(node_t *node, Lump_c *lump)
 
 	lump->Write(&raw, sizeof(raw));
 
-# if DEBUG_BSP
+#if DEBUG_BSP
 	cur_info->Debug("PUT V5 NODE %08X  Left %08X  Right %08X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U32(raw.left),
 			LE_U32(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
-# endif
+#endif
 }
 
 
@@ -2127,12 +2127,12 @@ static void PutOneZNode(node_t *node)
 	ZLibAppendLump(&raw.right, 4);
 	ZLibAppendLump(&raw.left,  4);
 
-# if DEBUG_BSP
+#if DEBUG_BSP
 	cur_info->Debug("PUT Z NODE %08X  Left %08X  Right %08X  "
 			"(%d,%d) -> (%d,%d)\n", node->index, LE_U32(raw.left),
 			LE_U32(raw.right), node->x, node->y,
 			node->x + node->dx, node->y + node->dy);
-# endif
+#endif
 }
 
 
