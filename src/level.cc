@@ -1417,7 +1417,7 @@ void PutVertices(const char *name, int do_gl)
 	{
 		raw_vertex_t raw;
 
-		vertex_t *vert = lev_vertices[i];
+		const vertex_t *vert = lev_vertices[i];
 
 		if ((do_gl ? 1 : 0) != (vert->is_new ? 1 : 0))
 		{
@@ -1462,13 +1462,13 @@ void PutGLVertices(int do_v5)
 	{
 		raw_v2_vertex_t raw;
 
-		vertex_t *vert = lev_vertices[i];
+		const vertex_t *vert = lev_vertices[i];
 
 		if (! vert->is_new)
 			continue;
 
-		raw.x = LE_S32((int)(vert->x * 65536.0));
-		raw.y = LE_S32((int)(vert->y * 65536.0));
+		raw.x = LE_S32(I_ROUND(vert->x * 65536.0));
+		raw.y = LE_S32(I_ROUND(vert->y * 65536.0));
 
 		lump->Write(&raw, sizeof(raw));
 
@@ -1507,7 +1507,7 @@ static inline u32_t VertexIndex_XNOD(const vertex_t *v)
 }
 
 
-void PutSegs(void)
+void PutSegs()
 {
 	int i, count;
 
@@ -1520,7 +1520,7 @@ void PutSegs(void)
 	{
 		raw_seg_t raw;
 
-		seg_t *seg = lev_segs[i];
+		const seg_t *seg = lev_segs[i];
 
 		// ignore minisegs and degenerate segs
 		if (seg->linedef == NULL || seg->is_degenerate)
@@ -1547,8 +1547,7 @@ void PutSegs(void)
 	}
 
 	if (count != num_complete_seg)
-		BugError("PutSegs miscounted (%d != %d)\n", count,
-				num_complete_seg);
+		BugError("PutSegs miscounted (%d != %d)\n", count, num_complete_seg);
 
 	if (count > 65534)
 	{
@@ -1558,7 +1557,7 @@ void PutSegs(void)
 }
 
 
-void PutGLSegs(void)
+void PutGLSegs()
 {
 	int i, count;
 
@@ -1571,7 +1570,7 @@ void PutGLSegs(void)
 	{
 		raw_gl_seg_t raw;
 
-		seg_t *seg = lev_segs[i];
+		const seg_t *seg = lev_segs[i];
 
 		// ignore degenerate segs
 		if (seg->is_degenerate)
@@ -1581,12 +1580,12 @@ void PutGLSegs(void)
 		raw.end   = LE_U16(VertexIndex16Bit(seg->end));
 		raw.side  = LE_U16(seg->side);
 
-		if (seg->linedef)
+		if (seg->linedef != NULL)
 			raw.linedef = LE_U16(seg->linedef->index);
 		else
 			raw.linedef = LE_U16(0xFFFF);
 
-		if (seg->partner)
+		if (seg->partner != NULL)
 			raw.partner = LE_U16(seg->partner->index);
 		else
 			raw.partner = LE_U16(0xFFFF);
@@ -1604,8 +1603,7 @@ void PutGLSegs(void)
 	}
 
 	if (count != num_complete_seg)
-		BugError("PutGLSegs miscounted (%d != %d)\n", count,
-				num_complete_seg);
+		BugError("PutGLSegs miscounted (%d != %d)\n", count, num_complete_seg);
 
 	if (count > 65534)
 		BugError("PutGLSegs with %d (> 65534) segs\n", count);
@@ -1625,7 +1623,7 @@ void PutGLSegs_V5()
 	{
 		raw_v5_seg_t raw;
 
-		seg_t *seg = lev_segs[i];
+		const seg_t *seg = lev_segs[i];
 
 		// ignore degenerate segs
 		if (seg->is_degenerate)
@@ -1636,12 +1634,12 @@ void PutGLSegs_V5()
 
 		raw.side  = LE_U16(seg->side);
 
-		if (seg->linedef)
+		if (seg->linedef != NULL)
 			raw.linedef = LE_U16(seg->linedef->index);
 		else
 			raw.linedef = LE_U16(0xFFFF);
 
-		if (seg->partner)
+		if (seg->partner != NULL)
 			raw.partner = LE_U32(seg->partner->index);
 		else
 			raw.partner = LE_U32(0xFFFFFFFF);
@@ -1659,24 +1657,21 @@ void PutGLSegs_V5()
 	}
 
 	if (count != num_complete_seg)
-		BugError("PutGLSegs miscounted (%d != %d)\n", count,
-				num_complete_seg);
+		BugError("PutGLSegs miscounted (%d != %d)\n", count, num_complete_seg);
 }
 
 
 void PutSubsecs(const char *name, int do_gl)
 {
-	int i;
-
 	int size = num_subsecs * (int)sizeof(raw_subsec_t);
 
 	Lump_c * lump = CreateLevelLump(name, size);
 
-	for (i=0 ; i < num_subsecs ; i++)
+	for (int i=0 ; i < num_subsecs ; i++)
 	{
 		raw_subsec_t raw;
 
-		subsec_t *sub = lev_subsecs[i];
+		const subsec_t *sub = lev_subsecs[i];
 
 		raw.first = LE_U16(sub->seg_list->index);
 		raw.num   = LE_U16(sub->seg_count);
@@ -1699,17 +1694,15 @@ void PutSubsecs(const char *name, int do_gl)
 
 void PutGLSubsecs_V5()
 {
-	int i;
-
 	int size = num_subsecs * (int)sizeof(raw_v5_subsec_t);
 
 	Lump_c *lump = CreateLevelLump("GL_SSECT", size);
 
-	for (i=0 ; i < num_subsecs ; i++)
+	for (int i=0 ; i < num_subsecs ; i++)
 	{
 		raw_v5_subsec_t raw;
 
-		subsec_t *sub = lev_subsecs[i];
+		const subsec_t *sub = lev_subsecs[i];
 
 		raw.first = LE_U32(sub->seg_list->index);
 		raw.num   = LE_U32(sub->seg_count);
@@ -1728,8 +1721,6 @@ static int node_cur_index;
 
 static void PutOneNode(node_t *node, Lump_c *lump)
 {
-	raw_node_t raw;
-
 	if (node->r.node)
 		PutOneNode(node->r.node, lump);
 
@@ -1737,6 +1728,8 @@ static void PutOneNode(node_t *node, Lump_c *lump)
 		PutOneNode(node->l.node, lump);
 
 	node->index = node_cur_index++;
+
+	raw_node_t raw;
 
 	raw.x  = LE_S16(node->x);
 	raw.y  = LE_S16(node->y);
@@ -1780,8 +1773,6 @@ static void PutOneNode(node_t *node, Lump_c *lump)
 
 static void PutOneNode_V5(node_t *node, Lump_c *lump)
 {
-	raw_v5_node_t raw;
-
 	if (node->r.node)
 		PutOneNode_V5(node->r.node, lump);
 
@@ -1789,6 +1780,8 @@ static void PutOneNode_V5(node_t *node, Lump_c *lump)
 		PutOneNode_V5(node->l.node, lump);
 
 	node->index = node_cur_index++;
+
+	raw_v5_node_t raw;
 
 	raw.x  = LE_S16(node->x);
 	raw.y  = LE_S16(node->y);
@@ -1841,7 +1834,7 @@ void PutNodes(const char *name, int do_v5, node_t *root)
 
 	node_cur_index = 0;
 
-	if (root)
+	if (root != NULL)
 	{
 		if (do_v5)
 			PutOneNode_V5(root, lump);
@@ -1850,8 +1843,7 @@ void PutNodes(const char *name, int do_v5, node_t *root)
 	}
 
 	if (node_cur_index != num_nodes)
-		BugError("PutNodes miscounted (%d != %d)\n",
-				node_cur_index, num_nodes);
+		BugError("PutNodes miscounted (%d != %d)\n", node_cur_index, num_nodes);
 
 	if (!do_v5 && node_cur_index > 32767)
 	{
@@ -1919,10 +1911,8 @@ void SortSegs()
 {
 	// do a sanity check
 	for (int i = 0 ; i < num_segs ; i++)
-	{
 		if (lev_segs[i]->index < 0)
 			BugError("Seg %p never reached a subsector!\n", i);
-	}
 
 	// sort segs into ascending index
 	std::sort(lev_segs.begin(), lev_segs.end(), Compare_seg_pred());
@@ -1932,9 +1922,10 @@ void SortSegs()
 /* ----- ZDoom format writing --------------------------- */
 
 static const u8_t *lev_XNOD_magic = (u8_t *) "XNOD";
+static const u8_t *lev_XGL3_magic = (u8_t *) "XGL3";
 static const u8_t *lev_ZNOD_magic = (u8_t *) "ZNOD";
 
-void PutZVertices(void)
+void PutZVertices()
 {
 	int count, i;
 
@@ -1948,13 +1939,13 @@ void PutZVertices(void)
 	{
 		raw_v2_vertex_t raw;
 
-		vertex_t *vert = lev_vertices[i];
+		const vertex_t *vert = lev_vertices[i];
 
 		if (! vert->is_new)
 			continue;
 
-		raw.x = LE_S32((int)(vert->x * 65536.0));
-		raw.y = LE_S32((int)(vert->y * 65536.0));
+		raw.x = LE_S32(I_ROUND(vert->x * 65536.0));
+		raw.y = LE_S32(I_ROUND(vert->y * 65536.0));
 
 		ZLibAppendLump(&raw, sizeof(raw));
 
@@ -1962,33 +1953,27 @@ void PutZVertices(void)
 	}
 
 	if (count != num_new_vert)
-		BugError("PutZVertices miscounted (%d != %d)\n",
-				count, num_new_vert);
+		BugError("PutZVertices miscounted (%d != %d)\n", count, num_new_vert);
 }
 
 
-void PutZSubsecs(void)
+void PutZSubsecs()
 {
-	int i;
-	int count;
 	u32_t raw_num = LE_U32(num_subsecs);
+	ZLibAppendLump(&raw_num, 4);
 
 	int cur_seg_index = 0;
 
-	ZLibAppendLump(&raw_num, 4);
-
-	for (i=0 ; i < num_subsecs ; i++)
+	for (int i=0 ; i < num_subsecs ; i++)
 	{
-		subsec_t *sub = lev_subsecs[i];
-		seg_t *seg;
+		const subsec_t *sub = lev_subsecs[i];
 
 		raw_num = LE_U32(sub->seg_count);
-
 		ZLibAppendLump(&raw_num, 4);
 
 		// sanity check the seg index values
-		count = 0;
-		for (seg = sub->seg_list ; seg ; seg = seg->next, cur_seg_index++)
+		int count = 0;
+		for (const seg_t *seg = sub->seg_list ; seg ; seg = seg->next, cur_seg_index++)
 		{
 			// ignore minisegs and degenerate segs
 			if (seg->linedef == NULL || seg->is_degenerate)
@@ -2012,51 +1997,81 @@ void PutZSubsecs(void)
 }
 
 
-void PutZSegs(void)
+void PutZSegs()
 {
 	int i, count;
-	u32_t raw_num = LE_U32(num_complete_seg);
 
+	u32_t raw_num = LE_U32(num_complete_seg);
 	ZLibAppendLump(&raw_num, 4);
 
 	for (i=0, count=0 ; i < num_segs ; i++)
 	{
-		seg_t *seg = lev_segs[i];
+		const seg_t *seg = lev_segs[i];
 
 		// ignore minisegs and degenerate segs
 		if (seg->linedef == NULL || seg->is_degenerate)
 			continue;
 
 		if (count != seg->index)
-			BugError("PutZSegs: seg index mismatch (%d != %d)\n",
-					count, seg->index);
+			BugError("PutZSegs: seg index mismatch (%d != %d)\n", count, seg->index);
 
-		{
-			u32_t v1 = LE_U32(VertexIndex_XNOD(seg->start));
-			u32_t v2 = LE_U32(VertexIndex_XNOD(seg->end));
+		u32_t v1 = LE_U32(VertexIndex_XNOD(seg->start));
+		u32_t v2 = LE_U32(VertexIndex_XNOD(seg->end));
 
-			u16_t line = LE_U16(seg->linedef->index);
-			u8_t  side = seg->side;
+		u16_t line = LE_U16(seg->linedef->index);
+		u8_t  side = (u8_t) seg->side;
 
-			ZLibAppendLump(&v1,   4);
-			ZLibAppendLump(&v2,   4);
-			ZLibAppendLump(&line, 2);
-			ZLibAppendLump(&side, 1);
-		}
+		ZLibAppendLump(&v1,   4);
+		ZLibAppendLump(&v2,   4);
+		ZLibAppendLump(&line, 2);
+		ZLibAppendLump(&side, 1);
 
 		count++;
 	}
 
 	if (count != num_complete_seg)
-		BugError("PutZSegs miscounted (%d != %d)\n",
-				count, num_complete_seg);
+		BugError("PutZSegs miscounted (%d != %d)\n", count, num_complete_seg);
+}
+
+
+void PutXGL3Segs()
+{
+	int i, count;
+
+	u32_t raw_num = LE_U32(num_segs);
+	ZLibAppendLump(&raw_num, 4);
+
+	for (i=0, count=0 ; i < num_segs ; i++)
+	{
+		const seg_t *seg = lev_segs[i];
+
+		if (count != seg->index)
+			BugError("PutXGL3Segs: seg index mismatch (%d != %d)\n", count, seg->index);
+
+		u32_t v1      = LE_U32(VertexIndex_XNOD(seg->start));
+		u32_t partner = LE_U32(seg->partner ? seg->partner->index : -1);
+		u32_t line    = LE_U32(seg->linedef);
+		u8_t  side    = (u8_t) seg->side;
+
+		ZLibAppendLump(&v1,      4);
+		ZLibAppendLump(&partner, 4);
+		ZLibAppendLump(&line,    4);
+		ZLibAppendLump(&side,    1);
+
+#if DEBUG_BSP
+		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
+#endif
+
+		count++;
+	}
+
+	if (count != num_segs)
+		BugError("PutXGL3Segs miscounted (%d != %d)\n", count, num_segs);
 }
 
 
 static void PutOneZNode(node_t *node)
 {
-	raw_v5_node_t raw;
-
 	if (node->r.node)
 		PutOneZNode(node->r.node);
 
@@ -2064,6 +2079,8 @@ static void PutOneZNode(node_t *node)
 		PutOneZNode(node->l.node);
 
 	node->index = node_cur_index++;
+
+	raw_v5_node_t raw;
 
 	raw.x  = LE_S16(node->x);
 	raw.y  = LE_S16(node->y);
@@ -2117,7 +2134,6 @@ static void PutOneZNode(node_t *node)
 void PutZNodes(node_t *root)
 {
 	u32_t raw_num = LE_U32(num_nodes);
-
 	ZLibAppendLump(&raw_num, 4);
 
 	node_cur_index = 0;
@@ -2126,8 +2142,7 @@ void PutZNodes(node_t *root)
 		PutOneZNode(root);
 
 	if (node_cur_index != num_nodes)
-		BugError("PutZNodes miscounted (%d != %d)\n",
-				node_cur_index, num_nodes);
+		BugError("PutZNodes miscounted (%d != %d)\n", node_cur_index, num_nodes);
 }
 
 
