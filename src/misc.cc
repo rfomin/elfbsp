@@ -92,11 +92,9 @@ void MinorIssue(const char *fmt, ...)
 
 /* ----- polyobj handling ----------------------------- */
 
-static void MarkPolyobjSector(sector_t *sector)
+void MarkPolyobjSector(sector_t *sector)
 {
-	int i;
-
-	if (! sector)
+	if (sector == NULL)
 		return;
 
 #if DEBUG_POLYOBJ
@@ -107,33 +105,31 @@ static void MarkPolyobjSector(sector_t *sector)
 	if (sector->has_polyobj)
 		return;
 
-	// mark all lines of this sector as precious, to prevent the sector
-	// from being split.
+	// mark all lines of this sector as precious, to prevent (ideally)
+	// the sector from being split.
 	sector->has_polyobj = true;
 
-	for (i = 0 ; i < num_linedefs ; i++)
+	for (int i = 0 ; i < num_linedefs ; i++)
 	{
 		linedef_t *L = lev_linedefs[i];
 
-		if ((L->right && L->right->sector == sector) ||
-			(L->left  && L->left ->sector == sector))
+		if ((L->right != NULL && L->right->sector == sector) ||
+			(L->left  != NULL && L->left ->sector == sector))
 		{
 			L->is_precious = true;
 		}
 	}
 }
 
-static void MarkPolyobjPoint(double x, double y)
+
+void MarkPolyobjPoint(double x, double y)
 {
 	int i;
 	int inside_count = 0;
 
 	double best_dist = 999999;
-	linedef_t *best_match = NULL;
+	const linedef_t *best_match = NULL;
 	sector_t *sector = NULL;
-
-	double x1, y1;
-	double x2, y2;
 
 	// -AJA- First we handle the "awkward" cases where the polyobj sits
 	//       directly on a linedef or even a vertex.  We check all lines
@@ -146,20 +142,20 @@ static void MarkPolyobjPoint(double x, double y)
 
 	for (i = 0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = lev_linedefs[i];
+		const linedef_t *L = lev_linedefs[i];
 
 		if (CheckLinedefInsideBox(bminx, bminy, bmaxx, bmaxy,
 					(int) L->start->x, (int) L->start->y,
-					(int) L->end->x, (int) L->end->y))
+					(int) L->end->x,   (int) L->end->y))
 		{
 #if DEBUG_POLYOBJ
 			cur_info->Debug("  Touching line was %d\n", L->index);
 #endif
 
-			if (L->left)
+			if (L->left != NULL)
 				MarkPolyobjSector(L->left->sector);
 
-			if (L->right)
+			if (L->right != NULL)
 				MarkPolyobjSector(L->right->sector);
 
 			inside_count++;
@@ -177,22 +173,22 @@ static void MarkPolyobjPoint(double x, double y)
 
 	for (i = 0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = lev_linedefs[i];
+		const linedef_t *L = lev_linedefs[i];
 
-		double x_cut;
-
-		x1 = L->start->x;  y1 = L->start->y;
-		x2 = L->end->x;    y2 = L->end->y;
+		double x1 = L->start->x;
+		double y1 = L->start->y;
+		double x2 = L->end->x;
+		double y2 = L->end->y;
 
 		/* check vertical range */
 		if (fabs(y2 - y1) < DIST_EPSILON)
 			continue;
 
 		if ((y > (y1 + DIST_EPSILON) && y > (y2 + DIST_EPSILON)) ||
-				(y < (y1 - DIST_EPSILON) && y < (y2 - DIST_EPSILON)))
+			(y < (y1 - DIST_EPSILON) && y < (y2 - DIST_EPSILON)))
 			continue;
 
-		x_cut = x1 + (x2 - x1) * (y - y1) / (y2 - y1) - x;
+		double x_cut = x1 + (x2 - x1) * (y - y1) / (y2 - y1) - x;
 
 		if (fabs(x_cut) < fabs(best_dist))
 		{
@@ -203,14 +199,14 @@ static void MarkPolyobjPoint(double x, double y)
 		}
 	}
 
-	if (! best_match)
+	if (best_match == NULL)
 	{
 		Warning("Bad polyobj thing at (%1.0f,%1.0f).\n", x, y);
 		return;
 	}
 
-	y1 = best_match->start->y;
-	y2 = best_match->end->y;
+	double y1 = best_match->start->y;
+	double y2 = best_match->end->y;
 
 #if DEBUG_POLYOBJ
 	cur_info->Debug("  Closest line was %d Y=%1.0f..%1.0f (dist=%1.1f)\n",
@@ -235,11 +231,10 @@ static void MarkPolyobjPoint(double x, double y)
 		sector = best_match->left ? best_match->left->sector : NULL;
 
 #if DEBUG_POLYOBJ
-	cur_info->Debug("  Sector %d contains the polyobj.\n",
-			sector ? sector->index : -1);
+	cur_info->Debug("  Sector %d contains the polyobj.\n", sector ? sector->index : -1);
 #endif
 
-	if (! sector)
+	if (sector == NULL)
 	{
 		Warning("Invalid Polyobj thing at (%1.0f,%1.0f).\n", x, y);
 		return;
@@ -296,8 +291,7 @@ void DetectPolyobjSectors(void)
 	}
 
 #if DEBUG_POLYOBJ
-	cur_info->Debug("Using %s style polyobj things\n",
-			hexen_style ? "HEXEN" : "ZDOOM");
+	cur_info->Debug("Using %s style polyobj things\n", hexen_style ? "HEXEN" : "ZDOOM");
 #endif
 
 	for (i = 0 ; i < num_things ; i++)
@@ -533,13 +527,11 @@ void vertex_t::AddWallTip(double dx, double dy, bool open_left, bool open_right)
 }
 
 
-void CalculateWallTips(void)
+void CalculateWallTips()
 {
-	int i;
-
-	for (i=0 ; i < num_linedefs ; i++)
+	for (int i=0 ; i < num_linedefs ; i++)
 	{
-		linedef_t *L = lev_linedefs[i];
+		const linedef_t *L = lev_linedefs[i];
 
 		if (L->overlap || L->zero_len)
 			continue;
@@ -557,11 +549,11 @@ void CalculateWallTips(void)
 	}
 
 #if DEBUG_WALLTIPS
-	for (i=0 ; i < num_vertices ; i++)
+	for (int k=0 ; k < num_vertices ; k++)
 	{
-		vertex_t *V = lev_vertices[i];
+		vertex_t *V = lev_vertices[k];
 
-		cur_info->Debug("WallTips for vertex %d:\n", i);
+		cur_info->Debug("WallTips for vertex %d:\n", k);
 
 		for (walltip_t *tip = V->tip_set ; tip ; tip = tip->next)
 		{
@@ -652,7 +644,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
 
 bool vertex_t::CheckOpen(double dx, double dy) const
 {
-	walltip_t *tip;
+	const walltip_t *tip;
 
 	double angle = ComputeAngle(dx, dy);
 
