@@ -35,6 +35,7 @@ OBJS = \
 	$(OBJ_DIR)/level.o    \
 	$(OBJ_DIR)/node.o     \
 	$(OBJ_DIR)/misc.o     \
+	$(OBJ_DIR)/parse.o    \
 	$(OBJ_DIR)/utility.o  \
 	$(OBJ_DIR)/wad.o
 
