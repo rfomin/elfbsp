@@ -1074,16 +1074,6 @@ void GetSectors()
 
 		sector_t *sector = NewSector();
 
-		sector->floor_h = LE_S16(raw.floorh);
-		sector->ceil_h  = LE_S16(raw.ceilh);
-
-		memcpy(sector->floor_tex, raw.floor_tex, sizeof(sector->floor_tex));
-		memcpy(sector->ceil_tex,  raw.ceil_tex,  sizeof(sector->ceil_tex));
-
-		sector->light = LE_U16(raw.light);
-		sector->special = LE_U16(raw.type);
-		sector->tag = LE_S16(raw.tag);
-
 		// sector indices never change
 		sector->index = i;
 	}
@@ -1194,13 +1184,6 @@ void GetSidedefs()
 
 		side->sector = SafeLookupSector(LE_S16(raw.sector));
 
-		side->x_offset = LE_S16(raw.x_offset);
-		side->y_offset = LE_S16(raw.y_offset);
-
-		memcpy(side->upper_tex, raw.upper_tex, sizeof(side->upper_tex));
-		memcpy(side->lower_tex, raw.lower_tex, sizeof(side->lower_tex));
-		memcpy(side->mid_tex,   raw.mid_tex,   sizeof(side->mid_tex));
-
 		// sidedef indices never change
 		side->index = i;
 	}
@@ -1251,25 +1234,15 @@ void GetLinedefs()
 			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
-		line->flags = LE_U16(raw.flags);
 		line->type  = LE_U16(raw.type);
-		line->tag   = LE_S16(raw.tag);
+		u16_t flags = LE_U16(raw.flags);
+		s16_t tag   = LE_S16(raw.tag);
 
-		line->two_sided = (line->flags & MLF_TwoSided) != 0;
-		line->is_precious = (line->tag >= 900 && line->tag < 1000);
+		line->two_sided   = (flags & MLF_TwoSided) != 0;
+		line->is_precious = (tag >= 900 && tag < 1000);
 
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
-
-		if (line->right)
-		{
-			line->right->on_special |= (line->type > 0) ? 1 : 0;
-		}
-
-		if (line->left)
-		{
-			line->left->on_special |= (line->type > 0) ? 1 : 0;
-		}
 
 		if (line->right || line->left)
 			num_real_lines++;
@@ -1326,30 +1299,14 @@ void GetLinedefsHexen()
 			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
-		line->flags = LE_U16(raw.flags);
 		line->type  = (u8_t) raw.type;
-		line->tag   = 0;
-
-		// read specials
-		for (int k=0 ; k < 5 ; k++)
-			line->specials[k] = (u8_t) raw.args[k];
+		u16_t flags = LE_U16(raw.flags);
 
 		// -JL- Added missing twosided flag handling that caused a broken reject
-		line->two_sided = (line->flags & MLF_TwoSided) != 0;
+		line->two_sided = (flags & MLF_TwoSided) != 0;
 
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
-
-		// -JL- Added missing sidedef handling that caused all sidedefs to be pruned
-		if (line->right)
-		{
-			line->right->on_special |= (line->type > 0) ? 1 : 0;
-		}
-
-		if (line->left)
-		{
-			line->left->on_special |= (line->type > 0) ? 1 : 0;
-		}
 
 		if (line->right || line->left)
 			num_real_lines++;

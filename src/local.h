@@ -158,20 +158,11 @@ public:
 	// sector index.  Always valid after loading & pruning.
 	int index;
 
+	// most info (floor_h, floor_tex, etc) omitted.  We don't need to
+	// write the SECTORS lump, only read it.
+
 	// -JL- non-zero if this sector contains a polyobj.
 	bool has_polyobj;
-
-	// heights
-	int floor_h, ceil_h;
-
-	// textures
-	char floor_tex[8];
-	char ceil_tex[8];
-
-	// attributes
-	int light;
-	int special;
-	int tag;
 
 	// used when building REJECT table.  Each set of sectors that are
 	// isolated from other sectors will have a different group number.
@@ -191,21 +182,8 @@ public:
 	// adjacent sector.  Can be NULL (invalid sidedef)
 	sector_t *sector;
 
-	// offset values
-	int x_offset, y_offset;
-
-	// texture names
-	char upper_tex[8];
-	char lower_tex[8];
-	char mid_tex[8];
-
 	// sidedef index.  Always valid after loading & pruning.
 	int index;
-
-	// this is true if the sidedef is on a special line.  We don't merge
-	// these sidedefs together, as they might scroll, or change texture
-	// when a switch is pressed.
-	int on_special;
 };
 
 
@@ -221,6 +199,8 @@ public:
 	sidedef_t *right;   // right sidedef
 	sidedef_t *left;    // left sidede, or NULL if none
 
+	int type;
+
 	// line is marked two-sided
 	bool two_sided;
 
@@ -232,13 +212,6 @@ public:
 
 	// sector is the same on both sides
 	bool self_ref;
-
-	int flags;
-	int type;
-	int tag;
-
-	// Hexen support
-	int specials[5];
 
 	// normally NULL, except when this linedef directly overlaps an earlier
 	// one (a rarely-used trick to create higher mid-masked textures).
@@ -264,7 +237,7 @@ public:
 	int type;
 
 	// other info (angle, and hexen stuff) omitted.  We don't need to
-	// write the THING lump, only read it.
+	// write the THINGS lump, only read it.
 
 	// Always valid (thing indices never change).
 	int index;

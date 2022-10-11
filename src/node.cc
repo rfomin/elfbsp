@@ -1271,7 +1271,7 @@ seg_t *CreateSegs()
 			continue;
 
 		// check for extremely long lines
-		if (hypot(line->start->x - line->end->x, line->start->y - line->end->y) >= 30000)
+		if (hypot(line->start->x - line->end->x, line->start->y - line->end->y) >= 32000)
 		{
 			Warning("Linedef #%d is VERY long, it may cause problems\n", line->index);
 		}
