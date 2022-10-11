@@ -1350,39 +1350,98 @@ static inline int VanillaSegAngle(const seg_t *seg)
 
 /* ----- UDMF reading routines ------------------------- */
 
-void ParseUDMF_Thing(lexer_c& lex)
+#define UDMF_THING    1
+#define UDMF_VERTEX   2
+#define UDMF_SECTOR   3
+#define UDMF_SIDEDEF  4
+#define UDMF_LINEDEF  5
+
+void ParseThingField(thing_t *thing, const std::string& key, token_kind_e kind, const std::string& value)
 {
 	// TODO
 }
 
 
-void ParseUDMF_Vertex(lexer_c& lex)
+void ParseVertexField(vertex_t *vertex, const std::string& key, token_kind_e kind, const std::string& value)
 {
 	// TODO
 }
 
 
-void ParseUDMF_Sector(lexer_c& lex)
+void ParseSectorField(sector_t *sector, const std::string& key, token_kind_e kind, const std::string& value)
 {
 	// TODO
 }
 
 
-void ParseUDMF_Sidedef(lexer_c& lex)
+void ParseSidedefField(sidedef_t *side, const std::string& key, token_kind_e kind, const std::string& value)
 {
 	// TODO
 }
 
 
-void ParseUDMF_Linedef(lexer_c& lex)
+void ParseLinedefField(linedef_t *line, const std::string& key, token_kind_e kind, const std::string& value)
 {
 	// TODO
 }
 
 
-void ParseUDMF_SkipBlock(lexer_c& lex)
+void ParseUDMF_Block(lexer_c& lex, int cur_type)
 {
-	// TODO
+	vertex_t  * vertex = NULL;
+	thing_t   * thing  = NULL;
+	sector_t  * sector = NULL;
+	sidedef_t * side   = NULL;
+	linedef_t * line   = NULL;
+
+	switch (cur_type)
+	{
+		case UDMF_VERTEX:  vertex = NewVertex();  break;
+		case UDMF_THING:   thing  = NewThing();   break;
+		case UDMF_SECTOR:  sector = NewSector();  break;
+		case UDMF_SIDEDEF: side   = NewSidedef(); break;
+		case UDMF_LINEDEF: line   = NewLinedef(); break;
+		default: break;
+	}
+
+	for (;;)
+	{
+		if (lex.Match("}"))
+			return;
+
+		std::string key;
+		std::string value;
+
+		token_kind_e tok = lex.Next(key);
+
+		if (tok == TOK_EOF)
+			cur_info->FatalError("Malformed TEXTMAP lump: unclosed block\n");
+
+		if (tok != TOK_Ident)
+			cur_info->FatalError("Malformed TEXTMAP lump: missing key\n");
+
+		if (! lex.Match("="))
+			cur_info->FatalError("Malformed TEXTMAP lump: missing '='\n");
+
+		tok = lex.Next(value);
+
+		if (tok == TOK_EOF || tok == TOK_ERROR || value == "}")
+			cur_info->FatalError("Malformed TEXTMAP lump: missing value\n");
+
+		if (! lex.Match(";"))
+			cur_info->FatalError("Malformed TEXTMAP lump: missing ';'\n");
+
+		switch (cur_type)
+		{
+			case UDMF_VERTEX:  ParseVertexField (vertex, key, tok, value); break;
+			case UDMF_THING:   ParseThingField  (thing,  key, tok, value); break;
+			case UDMF_SECTOR:  ParseSectorField (sector, key, tok, value); break;
+			case UDMF_SIDEDEF: ParseSidedefField(side,   key, tok, value); break;
+			case UDMF_LINEDEF: ParseLinedefField(line,   key, tok, value); break;
+
+			default: /* just skip it */ break;
+		}
+	}
 }
 
 
@@ -1396,8 +1455,8 @@ void ParseUDMF_Pass(const std::string& data, int pass)
 
 	for (;;)
 	{
-		std::string what;
-		token_kind_e tok = lex.Next(what);
+		std::string section;
+		token_kind_e tok = lex.Next(section);
 
 		if (tok == TOK_EOF)
 			return;
@@ -1411,52 +1470,45 @@ void ParseUDMF_Pass(const std::string& data, int pass)
 		// ignore top-level assignments
 		if (lex.Match("="))
 		{
-			lex.Next(what);
+			lex.Next(section);
 			if (! lex.Match(";"))
 				cur_info->FatalError("Malformed TEXTMAP lump: missing ';'\n");
 			continue;
 		}
 
-		if (what == "thing")
+		if (! lex.Match("{"))
+			cur_info->FatalError("Malformed TEXTMAP lump: missing '{'\n");
+
+		int cur_type = 0;
+
+		if (section == "thing")
 		{
 			if (pass == 1)
-				ParseUDMF_Thing(lex);
-			else
-				ParseUDMF_SkipBlock(lex);
+				cur_type = UDMF_THING;
 		}
-		else if (what == "vertex")
+		else if (section == "vertex")
 		{
 			if (pass == 1)
-				ParseUDMF_Vertex(lex);
-			else
-				ParseUDMF_SkipBlock(lex);
+				cur_type = UDMF_VERTEX;
 		}
-		else if (what == "sector")
+		else if (section == "sector")
 		{
 			if (pass == 1)
-				ParseUDMF_Sector(lex);
-			else
-				ParseUDMF_SkipBlock(lex);
+				cur_type = UDMF_SECTOR;
 		}
-		else if (what == "sidedef")
+		else if (section == "sidedef")
 		{
 			if (pass == 2)
-				ParseUDMF_Sidedef(lex);
-			else
-				ParseUDMF_SkipBlock(lex);
+				cur_type = UDMF_SIDEDEF;
 		}
-		else if (what == "linedef")
+		else if (section == "linedef")
 		{
 			if (pass == 3)
-				ParseUDMF_Linedef(lex);
-			else
-				ParseUDMF_SkipBlock(lex);
+				cur_type = UDMF_LINEDEF;
 		}
-		else
-		{
-			// ignore unknown blocks
-			ParseUDMF_SkipBlock(lex);
-		}
+
+		// process the block
+		ParseUDMF_Block(lex, cur_type);
 	}
 }
 
