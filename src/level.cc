@@ -2237,6 +2237,26 @@ void SaveZDFormat(node_t *root_node)
 }
 
 
+void SaveXGL3Format(node_t *root_node)
+{
+	// WISH : compute a max_size
+
+	Lump_c *lump = CreateLevelLump("ZNODES", -1);
+
+	lump->Write(lev_XGL3_magic, 4);
+
+	// the ZLibXXX functions do no compression for XNOD format
+	ZLibBeginLump(lump);
+
+	PutZVertices();
+	PutZSubsecs();
+	PutZSegs();
+	PutZNodes(root_node);
+
+	ZLibFinishLump();
+}
+
+
 /* ----- whole-level routines --------------------------- */
 
 void LoadLevel()
@@ -2499,6 +2519,35 @@ build_result_e SaveLevel(node_t *root_node)
 		// [ in verbose mode, each overflow already printed a message ]
 		// [ in normal mode, we don't want any messages at all ]
 
+		return BUILD_LumpOverflow;
+	}
+
+	return BUILD_OK;
+}
+
+
+build_result_e SaveLevel_UDMF(node_t *root_node)
+{
+	if (num_real_lines == 0)
+		return BUILD_OK;
+
+	cur_wad->BeginWrite();
+
+	// remove any existing ZNODES lump
+	// FIXME cur_wad->RemoveGLNodes(lev_current_idx);
+
+	// FIXME review these
+	lev_force_v5   = true;
+	lev_force_xnod = true;
+
+	SortSegs();
+
+	SaveXGL3Format(root_node);
+
+	cur_wad->EndWrite();
+
+	if (lev_overflows > 0)
+	{
 		return BUILD_LumpOverflow;
 	}
 
