@@ -1350,6 +1350,117 @@ static inline int VanillaSegAngle(const seg_t *seg)
 
 /* ----- UDMF reading routines ------------------------- */
 
+void ParseUDMF_Thing(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_Vertex(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_Sector(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_Sidedef(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_Linedef(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_SkipBlock(lexer_c& lex)
+{
+	// TODO
+}
+
+
+void ParseUDMF_Pass(const std::string& data, int pass)
+{
+	// pass = 1 : vertices, sectors, things
+	// pass = 2 : sidedefs
+	// pass = 3 : linedefs
+
+	lexer_c lex(data);
+
+	for (;;)
+	{
+		std::string what;
+		token_kind_e tok = lex.Next(what);
+
+		if (tok == TOK_EOF)
+			return;
+
+		if (tok != TOK_Ident)
+		{
+			cur_info->FatalError("Malformed TEXTMAP lump.\n");
+			return;
+		}
+
+		// ignore top-level assignments
+		if (lex.Match("="))
+		{
+			lex.Next(what);
+			if (! lex.Match(";"))
+				cur_info->FatalError("Malformed TEXTMAP lump: missing ';'\n");
+			continue;
+		}
+
+		if (what == "thing")
+		{
+			if (pass == 1)
+				ParseUDMF_Thing(lex);
+			else
+				ParseUDMF_SkipBlock(lex);
+		}
+		else if (what == "vertex")
+		{
+			if (pass == 1)
+				ParseUDMF_Vertex(lex);
+			else
+				ParseUDMF_SkipBlock(lex);
+		}
+		else if (what == "sector")
+		{
+			if (pass == 1)
+				ParseUDMF_Sector(lex);
+			else
+				ParseUDMF_SkipBlock(lex);
+		}
+		else if (what == "sidedef")
+		{
+			if (pass == 2)
+				ParseUDMF_Sidedef(lex);
+			else
+				ParseUDMF_SkipBlock(lex);
+		}
+		else if (what == "linedef")
+		{
+			if (pass == 3)
+				ParseUDMF_Linedef(lex);
+			else
+				ParseUDMF_SkipBlock(lex);
+		}
+		else
+		{
+			// ignore unknown blocks
+			ParseUDMF_SkipBlock(lex);
+		}
+	}
+}
+
+
 void ParseUDMF()
 {
 	Lump_c *lump = FindLevelLump("TEXTMAP");
@@ -1378,9 +1489,13 @@ void ParseUDMF()
 
 	// now parse it...
 
-	lexer_c lex(data);
+	// the UDMF spec does not require objects to be in a dependency order.
+	// for example: sidedefs may occur *after* the linedefs which refer to
+	// them.  hence we perform multiple passes over the TEXTMAP data.
 
-	// TODO
+	ParseUDMF_Pass(data, 1);
+	ParseUDMF_Pass(data, 2);
+	ParseUDMF_Pass(data, 3);
 }
 
 
