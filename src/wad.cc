@@ -437,12 +437,30 @@ int Wad_file::LevelLastLump(int lev_num)
 	int start = LevelHeader(lev_num);
 	int count = 1;
 
-	while (count < MAX_LUMPS_IN_A_LEVEL &&
-		   start+count < NumLumps() &&
-		   (IsLevelLump(directory[start+count]->name) ||
-		    IsGLNodeLump(directory[start+count]->name)) )
+	// UDMF level?
+	if (LevelFormat(lev_num) == MAPF_UDMF)
 	{
-		count++;
+		while (count < MAX_LUMPS_IN_A_LEVEL &&
+			   start+count < NumLumps())
+		{
+			if (StringCaseCmp(directory[start+count]->name, "ENDMAP") == 0)
+			{
+				count++;
+				break;
+			}
+
+			count++;
+		}
+	}
+	else  // standard DOOM or HEXEN format
+	{
+		while (count < MAX_LUMPS_IN_A_LEVEL &&
+			   start+count < NumLumps() &&
+			   (IsLevelLump (directory[start+count]->name) ||
+				IsGLNodeLump(directory[start+count]->name)) )
+		{
+			count++;
+		}
 	}
 
 	return start + count - 1;
@@ -496,6 +514,14 @@ int Wad_file::LevelHeader(int lev_num)
 map_format_e Wad_file::LevelFormat(int lev_num)
 {
 	int start = LevelHeader(lev_num);
+
+	if (start + 2 < (int)NumLumps())
+	{
+		const char *name = GetLump(start + 1)->Name();
+
+		if (StringCaseCmp(name, "TEXTMAP") == 0)
+			return MAPF_UDMF;
+	}
 
 	if (start + LL_BEHAVIOR < (int)NumLumps())
 	{
@@ -583,19 +609,32 @@ void Wad_file::ReadDirectory()
 
 void Wad_file::DetectLevels()
 {
-	// Determine what lumps in the wad are level markers, based on
-	// the lumps which follow it.  Store the result in the 'levels'
-	// vector.  The test here is rather lax, as I'm told certain
-	// wads exist with a non-standard ordering of level lumps.
+	// Determine what lumps in the wad are level markers, based on the
+	// lumps which follow it.  Store the result in the 'levels' vector.
+	// The test here is rather lax, since wads exist with a non-standard
+	// ordering of level lumps.
 
-	for (int k = 0 ; k+5 < NumLumps() ; k++)
+	for (int k = 0 ; k+1 < NumLumps() ; k++)
 	{
 		int part_mask  = 0;
 		int part_count = 0;
 
+		// check for UDMF levels
+		if (StringCaseCmp(directory[k+1]->name, "TEXTMAP") == 0)
+		{
+			levels.push_back(k);
+#if DEBUG_WAD
+			cur_info->Debug("Detected level : %s (UDMF)\n", directory[k]->name);
+#endif
+			continue;
+		}
+
 		// check whether the next four lumps are level lumps
 		for (int i = 1 ; i <= 4 ; i++)
 		{
+			if (k+i >= NumLumps())
+				break;
+
 			int part = WhatLevelPart(directory[k+i]->name);
 
 			if (part == 0)
@@ -620,8 +659,6 @@ void Wad_file::DetectLevels()
 	}
 
 	// sort levels into alphabetical order
-	// (mainly for the 'N' next map and 'P' prev map commands)
-
 	SortLevels();
 }
 

@@ -30,7 +30,8 @@ typedef enum
 	MAPF_INVALID = 0,
 
 	MAPF_Doom,
-	MAPF_Hexen
+	MAPF_Hexen,
+	MAPF_UDMF
 
 } map_format_e;
 

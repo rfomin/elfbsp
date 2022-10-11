@@ -806,8 +806,7 @@ const char *lev_current_name;
 int lev_current_idx;
 int lev_current_start;
 
-bool lev_doing_hexen;
-bool lev_doing_udmf;
+map_format_e lev_format;
 
 bool lev_force_v5;
 bool lev_force_xnod;
@@ -2288,17 +2287,13 @@ void LoadLevel()
 	lev_long_name = false;
 	lev_overflows = false;
 
-	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
-	lev_doing_udmf  = (FindLevelLump("TEXTMAP")  != NULL);
-	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL) && !lev_doing_udmf;
-
 	cur_info->ShowMap(lev_current_name);
 
 	num_new_vert = 0;
 	num_complete_seg = 0;
 	num_real_lines = 0;
 
-	if (lev_doing_udmf)
+	if (lev_format == MAPF_UDMF)
 	{
 		ParseUDMF();
 	}
@@ -2308,7 +2303,7 @@ void LoadLevel()
 		GetSectors();
 		GetSidedefs();
 
-		if (lev_doing_hexen)
+		if (lev_format == MAPF_Hexen)
 		{
 			GetLinedefsHexen();
 			GetThingsHexen();
@@ -2332,7 +2327,7 @@ void LoadLevel()
 
 	CalculateWallTips();
 
-	if (lev_doing_hexen || lev_doing_udmf)
+	if (lev_format == MAPF_Hexen || lev_format == MAPF_UDMF)
 	{
 		// -JL- Find sectors containing polyobjs
 		DetectPolyobjSectors();
@@ -2717,7 +2712,7 @@ Lump_c * CreateLevelLump(const char *name, int max_size)
 
 		// in UDMF maps, insert before the ENDMAP lump, otherwise insert
 		// after the last known lump of the level.
-		if (! lev_doing_udmf)
+		if (lev_format != MAPF_UDMF)
 			last_idx += 1;
 
 		cur_wad->InsertPoint(last_idx);
@@ -2778,6 +2773,7 @@ build_result_e BuildLevel(int lev_idx)
 
 	lev_current_idx   = lev_idx;
 	lev_current_start = cur_wad->LevelHeader(lev_idx);
+	lev_format        = cur_wad->LevelFormat(lev_idx);
 
 	LoadLevel();
 
@@ -2810,7 +2806,7 @@ build_result_e BuildLevel(int lev_idx)
 
 		ClockwiseBspTree();
 
-		if (lev_doing_udmf)
+		if (lev_format == MAPF_UDMF)
 			ret = SaveUDMF(root_node);
 		else
 			ret = SaveLevel(root_node);
