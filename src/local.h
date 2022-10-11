@@ -398,8 +398,12 @@ public:
 class node_t
 {
 public:
-	int x, y;     // starting point
-	int dx, dy;   // offset to ending point
+	// these coordinates are high precision to support UDMF.
+	// in non-UDMF maps, they will actually be integral since a
+	// partition line *always* comes from a normal linedef.
+
+	double x, y;     // starting point
+	double dx, dy;   // offset to ending point
 
 	// right & left children
 	child_t r;
@@ -408,10 +412,6 @@ public:
 	// node index.  Only valid once the NODES or GL_NODES lump has been
 	// created.
 	int index;
-
-	// the node is too long, and the (dx,dy) values should be halved
-	// when writing into the NODES lump.
-	bool too_long;
 
 public:
 	void SetPartition(const seg_t *part);
