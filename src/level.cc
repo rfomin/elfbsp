@@ -2554,10 +2554,10 @@ build_result_e SaveUDMF(node_t *root_node)
 	// remove any existing ZNODES lump
 	cur_wad->RemoveZNodes(lev_current_idx);
 
-	SortSegs();
-
 	if (num_real_lines >= 0)
 	{
+		SortSegs();
+
 		SaveXGL3Format(root_node);
 	}
 
