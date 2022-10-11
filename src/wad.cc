@@ -883,22 +883,39 @@ void Wad_file::RemoveGLNodes(int lev_num)
 
 	start++;
 
-	while (start <= finish &&
-		   IsLevelLump(directory[start]->name))
+	while (start <= finish && IsLevelLump(directory[start]->name))
 	{
 		start++;
 	}
 
 	int count = 0;
 
-	while (start+count <= finish &&
-		   IsGLNodeLump(directory[start+count]->name))
+	while (start+count <= finish && IsGLNodeLump(directory[start+count]->name))
 	{
 		count++;
 	}
 
 	if (count > 0)
 		RemoveLumps(start, count);
+}
+
+
+void Wad_file::RemoveZNodes(int lev_num)
+{
+	SYS_ASSERT(begun_write);
+	SYS_ASSERT(0 <= lev_num && lev_num < LevelCount());
+
+	short start  = LevelHeader(lev_num);
+	short finish = LevelLastLump(lev_num);
+
+	for ( ; start <= finish ; start++)
+	{
+		if (StringCaseCmp(directory[start]->name, "ZNODES") == 0)
+		{
+			RemoveLumps(start, 1);
+			break;
+		}
+	}
 }
 
 

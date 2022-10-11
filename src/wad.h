@@ -217,9 +217,11 @@ public:
 	// which follow it.
 	void RemoveLevel(int lev_num);
 
-	// removes any GL-Nodes lumps that are associated with the given
-	// level.
+	// removes any GL-Nodes lumps that are associated with the given level.
 	void RemoveGLNodes(int lev_num);
+
+	// removes any ZNODES lump from a UDMF level.
+	void RemoveZNodes(int lev_num);
 
 	// insert a new lump.
 	// The second form is for a level marker.
