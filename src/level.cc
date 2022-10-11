@@ -20,6 +20,7 @@
 
 #include "system.h"
 #include "local.h"
+#include "parse.h"
 #include "raw_def.h"
 #include "utility.h"
 #include "wad.h"
@@ -806,6 +807,7 @@ int lev_current_idx;
 int lev_current_start;
 
 bool lev_doing_hexen;
+bool lev_doing_udmf;
 
 bool lev_force_v5;
 bool lev_force_xnod;
@@ -1023,7 +1025,7 @@ void GetVertices()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to vertices.\n");
 
 	for (int i = 0 ; i < count ; i++)
@@ -1057,7 +1059,7 @@ void GetSectors()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to sectors.\n");
 
 #if DEBUG_LOAD
@@ -1101,7 +1103,7 @@ void GetThings()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to things.\n");
 
 #if DEBUG_LOAD
@@ -1138,7 +1140,7 @@ void GetThingsHexen()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to things.\n");
 
 #if DEBUG_LOAD
@@ -1175,7 +1177,7 @@ void GetSidedefs()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to sidedefs.\n");
 
 #if DEBUG_LOAD
@@ -1218,7 +1220,7 @@ void GetLinedefs()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to linedefs.\n");
 
 #if DEBUG_LOAD
@@ -1293,7 +1295,7 @@ void GetLinedefsHexen()
 	if (lump == NULL || count == 0)
 		return;
 
-	if (! lump->Seek())
+	if (! lump->Seek(0))
 		cur_info->FatalError("Error seeking to linedefs.\n");
 
 #if DEBUG_LOAD
@@ -1387,6 +1389,42 @@ static inline int VanillaSegAngle(const seg_t *seg)
 	int result = (int) floor(angle * 65536.0 / 360.0 + 0.5);
 
 	return (result & 0xFFFF);
+}
+
+
+/* ----- UDMF reading routines ------------------------- */
+
+void ParseUDMF()
+{
+	Lump_c *lump = FindLevelLump("TEXTMAP");
+
+	if (lump == NULL || ! lump->Seek(0))
+		cur_info->FatalError("Error finding TEXTMAP lump.\n");
+
+	int remain = lump->Length();
+
+	// load the lump into this string
+	std::string data;
+
+	while (remain > 0)
+	{
+		char buffer[4096];
+
+		int want = std::min(remain, (int)sizeof(buffer));
+
+		if (! lump->Read(buffer, want))
+			cur_info->FatalError("Error reading TEXTMAP lump.\n");
+
+		data.append(buffer, want);
+
+		remain -= want;
+	}
+
+	// now parse it...
+
+	lexer_c lex(data);
+
+	// TODO
 }
 
 
@@ -2210,7 +2248,8 @@ void LoadLevel()
 	lev_overflows = false;
 
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
-	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
+	lev_doing_udmf  = (FindLevelLump("TEXTMAP")  != NULL);
+	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL) && !lev_doing_udmf;
 
 	cur_info->ShowMap(lev_current_name);
 
@@ -2218,34 +2257,41 @@ void LoadLevel()
 	num_complete_seg = 0;
 	num_real_lines = 0;
 
-	GetVertices();
-	GetSectors();
-	GetSidedefs();
-
-	if (lev_doing_hexen)
+	if (lev_doing_udmf)
 	{
-		GetLinedefsHexen();
-		GetThingsHexen();
+		ParseUDMF();
 	}
 	else
 	{
-		GetLinedefs();
-		GetThings();
+		GetVertices();
+		GetSectors();
+		GetSidedefs();
+
+		if (lev_doing_hexen)
+		{
+			GetLinedefsHexen();
+			GetThingsHexen();
+		}
+		else
+		{
+			GetLinedefs();
+			GetThings();
+		}
+
+		// always prune vertices at end of lump, otherwise all the
+		// unused vertices from seg splits would keep accumulating.
+		PruneVerticesAtEnd();
 	}
 
 	cur_info->Print(2, "    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
 				num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
-
-	// always prune vertices at end of lump, otherwise all the
-	// unused vertices from seg splits would keep accumulating.
-	PruneVerticesAtEnd();
 
 	DetectOverlappingVertices();
 	DetectOverlappingLines();
 
 	CalculateWallTips();
 
-	if (lev_doing_hexen)
+	if (lev_doing_hexen || lev_doing_udmf)
 	{
 		// -JL- Find sectors containing polyobjs
 		DetectPolyobjSectors();
@@ -2279,7 +2325,7 @@ static u32_t CalcGLChecksum(void)
 	{
 		u8_t *data = new u8_t[lump->Length()];
 
-		if (! lump->Seek() ||
+		if (! lump->Seek(0) ||
 		    ! lump->Read(data, lump->Length()))
 			cur_info->FatalError("Error reading vertices (for checksum).\n");
 
@@ -2293,7 +2339,7 @@ static u32_t CalcGLChecksum(void)
 	{
 		u8_t *data = new u8_t[lump->Length()];
 
-		if (! lump->Seek() ||
+		if (! lump->Seek(0) ||
 		    ! lump->Read(data, lump->Length()))
 			cur_info->FatalError("Error reading linedefs (for checksum).\n");
 

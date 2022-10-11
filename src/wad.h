@@ -64,7 +64,7 @@ public:
 
 	// attempt to seek to a position within the lump (default is
 	// the beginning).  Returns true if OK, false on error.
-	bool Seek(int offset = 0);
+	bool Seek(int offset);
 
 	// read some data from the lump, returning true if OK.
 	bool Read(void *data, int len);
