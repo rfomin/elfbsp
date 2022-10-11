@@ -21,7 +21,7 @@
 #ifndef __AJBSP_BSP_H__
 #define __AJBSP_BSP_H__
 
-#define AJBSP_VERSION  "1.02"
+#define AJBSP_VERSION  "1.03"
 
 //
 // Node Build Information Structure
