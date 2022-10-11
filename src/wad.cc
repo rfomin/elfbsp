@@ -391,21 +391,12 @@ int Wad_file::FindLumpNum(const char *name)
 
 int Wad_file::LevelLookupLump(int lev_num, const char *name)
 {
-	int start = LevelHeader(lev_num);
+	int start  = LevelHeader(lev_num);
+	int finish = LevelLastLump(lev_num);
 
-	// determine how far past the level marker (MAP01 etc) to search
-	int last = start + MAX_LUMPS_IN_A_LEVEL;
-
-	if (last >= NumLumps())
-		last = NumLumps() - 1;
-
-	for (int k = start+1 ; k <= last ; k++)
+	for (int k = start+1 ; k <= finish ; k++)
 	{
 		SYS_ASSERT(0 <= k && k < NumLumps());
-
-		if (! IsLevelLump(directory[k]->name) &&
-			! IsGLNodeLump(directory[k]->name))
-			break;
 
 		if (StringCaseCmp(directory[k]->name, name) == 0)
 			return k;
@@ -888,22 +879,12 @@ void Wad_file::RemoveLevel(int lev_num)
 	SYS_ASSERT(begun_write);
 	SYS_ASSERT(0 <= lev_num && lev_num < LevelCount());
 
-	int start = LevelHeader(lev_num);
-	int count = 1;
-
-	// collect associated lumps (THINGS, VERTEXES etc)
-	// this will stop when it hits a non-level lump
-	while (count < MAX_LUMPS_IN_A_LEVEL &&
-		   start + count < NumLumps() &&
-		   (IsLevelLump(directory[start+count]->name) ||
-		    IsGLNodeLump(directory[start+count]->name)) )
-	{
-		count++;
-	}
+	int start  = LevelHeader(lev_num);
+	int finish = LevelLastLump(lev_num);
 
 	// NOTE: FixGroup() will remove the entry in levels[]
 
-	RemoveLumps(start, count);
+	RemoveLumps(start, finish - start + 1);
 }
 
 
@@ -913,10 +894,7 @@ void Wad_file::RemoveGLNodes(int lev_num)
 	SYS_ASSERT(0 <= lev_num && lev_num < LevelCount());
 
 	int start  = LevelHeader(lev_num);
-	int finish = start + MAX_LUMPS_IN_A_LEVEL - 1;
-
-	if (finish >= NumLumps())
-		finish = NumLumps() - 1;
+	int finish = LevelLastLump(lev_num);
 
 	start++;
 
