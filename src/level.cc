@@ -2284,10 +2284,12 @@ void LoadLevel()
 
 	CalculateWallTips();
 
-	if (lev_format == MAPF_Hexen || lev_format == MAPF_UDMF)
+	// -JL- Find sectors containing polyobjs
+	switch (lev_format)
 	{
-		// -JL- Find sectors containing polyobjs
-		DetectPolyobjSectors();
+		case MAPF_Hexen: DetectPolyobjSectors(false); break;
+		case MAPF_UDMF:  DetectPolyobjSectors(true);  break;
+		default:         break;
 	}
 }
 

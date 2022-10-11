@@ -247,7 +247,7 @@ void MarkPolyobjPoint(double x, double y)
 //
 // Based on code courtesy of Janis Legzdinsh.
 //
-void DetectPolyobjSectors(void)
+void DetectPolyobjSectors(bool is_udmf)
 {
 	int i;
 
@@ -259,6 +259,14 @@ void DetectPolyobjSectors(void)
 	//      are going through all things searching for ZDoom polyobj thing
 	//      types. If any found, we assume that ZDoom polyobj thing types are
 	//      used, otherwise Hexen polyobj thing types are used.
+
+	// -AJA- With UDMF there is an additional ambiguity, as line type 1 is a
+	//       very common door in Doom and Heretic namespaces, but it is also
+	//       the HEXTYPE_POLY_EXPLICIT special in Hexen and ZDoom namespaces.
+	//
+	//       Since the plain "Hexen" namespace is rare for UDMF maps, and ZDoom
+	//       ports prefer their own polyobj things, we disable the Hexen polyobj
+	//       things in UDMF maps.
 
 	// -JL- First go through all lines to see if level contains any polyobjs
 	for (i = 0 ; i < num_linedefs ; i++)
@@ -277,6 +285,9 @@ void DetectPolyobjSectors(void)
 
 	// -JL- Detect what polyobj thing types are used - Hexen ones or ZDoom ones
 	bool hexen_style = true;
+
+	if (is_udmf)
+		hexen_style = false;
 
 	for (i = 0 ; i < num_things ; i++)
 	{

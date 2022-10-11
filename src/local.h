@@ -511,7 +511,7 @@ void ZLibFinishLump(void);
 // detection routines
 void DetectOverlappingVertices(void);
 void DetectOverlappingLines(void);
-void DetectPolyobjSectors(void);
+void DetectPolyobjSectors(bool is_udmf);
 
 // pruning routines
 void PruneVerticesAtEnd(void);
