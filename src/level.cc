@@ -2109,27 +2109,42 @@ void PutXGL3Segs()
 }
 
 
-static void PutOneZNode(node_t *node)
+static void PutOneZNode(node_t *node, bool do_xgl3)
 {
+	raw_v5_node_t raw;
+
 	if (node->r.node)
-		PutOneZNode(node->r.node);
+		PutOneZNode(node->r.node, do_xgl3);
 
 	if (node->l.node)
-		PutOneZNode(node->l.node);
+		PutOneZNode(node->l.node, do_xgl3);
 
 	node->index = node_cur_index++;
 
-	raw_v5_node_t raw;
+	if (do_xgl3)
+	{
+		u32_t x  = LE_S32(I_ROUND(node->x  * 65536.0));
+		u32_t y  = LE_S32(I_ROUND(node->y  * 65536.0));
+		u32_t dx = LE_S32(I_ROUND(node->dx * 65536.0));
+		u32_t dy = LE_S32(I_ROUND(node->dy * 65536.0));
 
-	raw.x  = LE_S16(I_ROUND(node->x));
-	raw.y  = LE_S16(I_ROUND(node->y));
-	raw.dx = LE_S16(I_ROUND(node->dx));
-	raw.dy = LE_S16(I_ROUND(node->dy));
+		ZLibAppendLump(&x,  4);
+		ZLibAppendLump(&y,  4);
+		ZLibAppendLump(&dx, 4);
+		ZLibAppendLump(&dy, 4);
+	}
+	else
+	{
+		raw.x  = LE_S16(I_ROUND(node->x));
+		raw.y  = LE_S16(I_ROUND(node->y));
+		raw.dx = LE_S16(I_ROUND(node->dx));
+		raw.dy = LE_S16(I_ROUND(node->dy));
 
-	ZLibAppendLump(&raw.x,  2);
-	ZLibAppendLump(&raw.y,  2);
-	ZLibAppendLump(&raw.dx, 2);
-	ZLibAppendLump(&raw.dy, 2);
+		ZLibAppendLump(&raw.x,  2);
+		ZLibAppendLump(&raw.y,  2);
+		ZLibAppendLump(&raw.dx, 2);
+		ZLibAppendLump(&raw.dy, 2);
+	}
 
 	raw.b1.minx = LE_S16(node->r.bounds.minx);
 	raw.b1.miny = LE_S16(node->r.bounds.miny);
@@ -2170,7 +2185,7 @@ static void PutOneZNode(node_t *node)
 }
 
 
-void PutZNodes(node_t *root)
+void PutZNodes(node_t *root, bool do_xgl3)
 {
 	u32_t raw_num = LE_U32(num_nodes);
 	ZLibAppendLump(&raw_num, 4);
@@ -2178,7 +2193,7 @@ void PutZNodes(node_t *root)
 	node_cur_index = 0;
 
 	if (root)
-		PutOneZNode(root);
+		PutOneZNode(root, do_xgl3);
 
 	if (node_cur_index != num_nodes)
 		BugError("PutZNodes miscounted (%d != %d)\n", node_cur_index, num_nodes);
@@ -2232,7 +2247,7 @@ void SaveZDFormat(node_t *root_node)
 	PutZVertices();
 	PutZSubsecs();
 	PutZSegs();
-	PutZNodes(root_node);
+	PutZNodes(root_node, false);
 
 	ZLibFinishLump();
 }
@@ -2246,15 +2261,20 @@ void SaveXGL3Format(node_t *root_node)
 
 	lump->Write(lev_XGL3_magic, 4);
 
-	// the ZLibXXX functions do no compression for XNOD format
+	// disable compression
+	bool force_compress = cur_info->force_compress;
+	cur_info->force_compress = false;
+
 	ZLibBeginLump(lump);
 
 	PutZVertices();
 	PutZSubsecs();
-	PutZSegs();
-	PutZNodes(root_node);
+	PutXGL3Segs();
+	PutZNodes(root_node, true /* do_xgl3 */);
 
 	ZLibFinishLump();
+
+	cur_info->force_compress = force_compress;
 }
 
 
@@ -2695,7 +2715,12 @@ Lump_c * CreateLevelLump(const char *name, int max_size)
 	{
 		int last_idx = cur_wad->LevelLastLump(lev_current_idx);
 
-		cur_wad->InsertPoint(last_idx + 1);
+		// in UDMF maps, insert before the ENDMAP lump, otherwise insert
+		// after the last known lump of the level.
+		if (! lev_doing_udmf)
+			last_idx += 1;
+
+		cur_wad->InsertPoint(last_idx);
 
 		lump = cur_wad->AddLump(name, max_size);
 	}
