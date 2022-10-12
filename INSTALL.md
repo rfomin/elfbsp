@@ -53,7 +53,7 @@ inside of /ajbsp, and generate the solution for your intended target
 machine and version of Visual Studio.  Upon a successful build,
 MSVC will generate `ajbsp.exe` in your build directory of choice.
 
-For detailed information, see [CMake-Windows.md](CMake-Windows.md)
+For detailed information, see [INSTALL-Win.md](INSTALL-Win.md)
 
 
 Cross Compiling
