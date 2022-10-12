@@ -1489,6 +1489,12 @@ void ParseUDMF_Block(lexer_c& lex, int cur_type)
 	{
 		if (line->start == NULL || line->end == NULL)
 			cur_info->FatalError("Linedef #%d is missing a vertex!\n", line->index);
+
+		if (line->right || line->left)
+			num_real_lines++;
+
+		line->self_ref = (line->left && line->right &&
+				(line->left->sector == line->right->sector));
 	}
 }
 
@@ -1596,6 +1602,8 @@ void ParseUDMF()
 	ParseUDMF_Pass(data, 1);
 	ParseUDMF_Pass(data, 2);
 	ParseUDMF_Pass(data, 3);
+
+	num_old_vert = num_vertices;
 }
 
 
