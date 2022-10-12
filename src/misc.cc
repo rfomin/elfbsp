@@ -503,6 +503,8 @@ void DetectOverlappingLines(void)
 
 void vertex_t::AddWallTip(double dx, double dy, bool open_left, bool open_right)
 {
+	SYS_ASSERT(overlap == NULL);
+
 	walltip_t *tip = NewWallTip();
 	walltip_t *after;
 
@@ -554,6 +556,9 @@ void CalculateWallTips()
 
 		bool left  = (L->left  != NULL) && (L->left ->sector != NULL);
 		bool right = (L->right != NULL) && (L->right->sector != NULL);
+
+		// note that start->overlap and end->overlap should be NULL
+		// due to logic in DetectOverlappingVertices.
 
 		L->start->AddWallTip(x2-x1, y2-y1, left, right);
 		L->end  ->AddWallTip(x1-x2, y1-y2, right, left);
