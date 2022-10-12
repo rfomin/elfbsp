@@ -838,6 +838,7 @@ int num_real_lines = 0;
 vertex_t *NewVertex()
 {
 	vertex_t *V = (vertex_t *) UtilCalloc(sizeof(vertex_t));
+	V->index = (int)lev_vertices.size();
 	lev_vertices.push_back(V);
 	return V;
 }
@@ -845,6 +846,7 @@ vertex_t *NewVertex()
 linedef_t *NewLinedef()
 {
 	linedef_t *L = (linedef_t *) UtilCalloc(sizeof(linedef_t));
+	L->index = (int)lev_linedefs.size();
 	lev_linedefs.push_back(L);
 	return L;
 }
@@ -852,6 +854,7 @@ linedef_t *NewLinedef()
 sidedef_t *NewSidedef()
 {
 	sidedef_t *S = (sidedef_t *) UtilCalloc(sizeof(sidedef_t));
+	S->index = (int)lev_sidedefs.size();
 	lev_sidedefs.push_back(S);
 	return S;
 }
@@ -859,6 +862,7 @@ sidedef_t *NewSidedef()
 sector_t *NewSector()
 {
 	sector_t *S = (sector_t *) UtilCalloc(sizeof(sector_t));
+	S->index = (int)lev_sectors.size();
 	lev_sectors.push_back(S);
 	return S;
 }
@@ -866,6 +870,7 @@ sector_t *NewSector()
 thing_t *NewThing()
 {
 	thing_t *T = (thing_t *) UtilCalloc(sizeof(thing_t));
+	T->index = (int)lev_things.size();
 	lev_things.push_back(T);
 	return T;
 }
@@ -1038,8 +1043,6 @@ void GetVertices()
 
 		vert->x = (double) LE_S16(raw.x);
 		vert->y = (double) LE_S16(raw.y);
-
-		vert->index = i;
 	}
 
 	num_old_vert = num_vertices;
@@ -1074,8 +1077,7 @@ void GetSectors()
 
 		sector_t *sector = NewSector();
 
-		// sector indices never change
-		sector->index = i;
+		(void) sector;
 	}
 }
 
@@ -1108,11 +1110,9 @@ void GetThings()
 
 		thing_t *thing = NewThing();
 
-		thing->x = LE_S16(raw.x);
-		thing->y = LE_S16(raw.y);
-
-		thing->type  = LE_U16(raw.type);
-		thing->index = i;
+		thing->x    = LE_S16(raw.x);
+		thing->y    = LE_S16(raw.y);
+		thing->type = LE_U16(raw.type);
 	}
 }
 
@@ -1145,11 +1145,9 @@ void GetThingsHexen()
 
 		thing_t *thing = NewThing();
 
-		thing->x = LE_S16(raw.x);
-		thing->y = LE_S16(raw.y);
-
-		thing->type  = LE_U16(raw.type);
-		thing->index = i;
+		thing->x    = LE_S16(raw.x);
+		thing->y    = LE_S16(raw.y);
+		thing->type = LE_U16(raw.type);
 	}
 }
 
@@ -1183,9 +1181,6 @@ void GetSidedefs()
 		sidedef_t *side = NewSidedef();
 
 		side->sector = SafeLookupSector(LE_S16(raw.sector));
-
-		// sidedef indices never change
-		side->index = i;
 	}
 }
 
@@ -1249,8 +1244,6 @@ void GetLinedefs()
 
 		line->self_ref = (line->left && line->right &&
 				(line->left->sector == line->right->sector));
-
-		line->index = i;
 	}
 }
 
@@ -1313,8 +1306,6 @@ void GetLinedefsHexen()
 
 		line->self_ref = (line->left && line->right &&
 				(line->left->sector == line->right->sector));
-
-		line->index = i;
 	}
 }
 
@@ -1407,7 +1398,7 @@ void ParseUDMF_Block(lexer_c& lex, int cur_type)
 	for (;;)
 	{
 		if (lex.Match("}"))
-			return;
+			break;
 
 		std::string key;
 		std::string value;
@@ -1441,6 +1432,14 @@ void ParseUDMF_Block(lexer_c& lex, int cur_type)
 
 			default: /* just skip it */ break;
 		}
+	}
+
+	// validate stuff
+
+	if (line != NULL)
+	{
+		if (line->start == NULL || line->end == NULL)
+			cur_info->FatalError("Linedef #%d is missing a vertex!\n", line->index);
 	}
 }
 
