@@ -183,6 +183,9 @@ bool CheckMapInMaplist(int lev_idx)
 
 build_result_e BuildFile()
 {
+	config.total_warnings = 0;
+	config.total_minor_issues = 0;
+
 	int num_levels = ajbsp::cur_wad->LevelCount();
 
 	if (num_levels == 0)

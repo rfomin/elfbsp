@@ -2660,8 +2660,6 @@ build_result_e SaveLevel(node_t *root_node)
 
 	if (lev_overflows)
 	{
-		cur_info->total_failed_maps++;
-
 		// no message here
 		// [ in verbose mode, each overflow already printed a message ]
 		// [ in normal mode, we don't want any messages at all ]

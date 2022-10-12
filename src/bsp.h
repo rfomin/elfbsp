@@ -56,7 +56,6 @@ public:
 	int verbosity;
 
 	// from here on, various bits of internal state
-	int total_failed_maps;
 	int total_warnings;
 	int total_minor_issues;
 
@@ -78,7 +77,6 @@ public:
 		split_cost(SPLIT_COST_DEFAULT),
 		verbosity(0),
 
-		total_failed_maps(0),
 		total_warnings(0),
 		total_minor_issues(0)
 	{ }
