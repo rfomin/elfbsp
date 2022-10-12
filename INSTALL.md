@@ -2,8 +2,8 @@ Compiling AJBSP
 ===============
 
 The AJBSP code is fairly portable C++, and does not depend
-on any third-party libraries.  Both GNU g++ and clang++
-have been tested and are known to work.
+on any third-party libraries.  It requires at least C++11.
+Both GNU g++ and clang++ are known to work.
 
 Building should be fairly straight-forward on any Unix-like
 system, such as Linux, the BSDs, and even MacOS X.  Fairly
