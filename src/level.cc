@@ -2222,7 +2222,7 @@ void PutXGL3Segs()
 
 		u32_t v1      = LE_U32(VertexIndex_XNOD(seg->start));
 		u32_t partner = LE_U32(seg->partner ? seg->partner->index : -1);
-		u32_t line    = LE_U32(seg->linedef->index);
+		u32_t line    = LE_U32(seg->linedef ? seg->linedef->index : -1);
 		u8_t  side    = (u8_t) seg->side;
 
 		ZLibAppendLump(&v1,      4);
