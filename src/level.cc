@@ -981,10 +981,10 @@ void FreeWallTips()
 
 /* ----- reading routines ------------------------------ */
 
-static vertex_t *SafeLookupVertex(u16_t num)
+static vertex_t *SafeLookupVertex(int num)
 {
-	if ((int)num >= num_vertices)
-		cur_info->FatalError("illegal vertex number #%d\n", (int)num);
+	if (num >= num_vertices)
+		cur_info->FatalError("illegal vertex number #%d\n", num);
 
 	return lev_vertices[num];
 }
@@ -1349,31 +1349,80 @@ static inline int VanillaSegAngle(const seg_t *seg)
 
 void ParseThingField(thing_t *thing, const std::string& key, token_kind_e kind, const std::string& value)
 {
-	// TODO
+	if (key == "x")
+		thing->x = LEX_Double(value);
+
+	if (key == "y")
+		thing->y = LEX_Double(value);
+
+	if (key == "type")
+		thing->type = LEX_Double(value);
 }
 
 
 void ParseVertexField(vertex_t *vertex, const std::string& key, token_kind_e kind, const std::string& value)
 {
-	// TODO
+	if (key == "x")
+		vertex->x = LEX_Double(value);
+
+	if (key == "y")
+		vertex->y = LEX_Double(value);
 }
 
 
 void ParseSectorField(sector_t *sector, const std::string& key, token_kind_e kind, const std::string& value)
 {
-	// TODO
+	// nothing actually needed
 }
 
 
 void ParseSidedefField(sidedef_t *side, const std::string& key, token_kind_e kind, const std::string& value)
 {
-	// TODO
+	if (key == "sector")
+	{
+		int num = LEX_Int(value);
+
+		if (num < 0 || num >= num_sectors)
+			cur_info->FatalError("illegal sector number #%d\n", (int)num);
+
+		side->sector = lev_sectors[num];
+	}
 }
 
 
 void ParseLinedefField(linedef_t *line, const std::string& key, token_kind_e kind, const std::string& value)
 {
-	// TODO
+	if (key == "v1")
+		line->start = SafeLookupVertex(LEX_Int(value));
+
+	if (key == "v2")
+		line->end = SafeLookupVertex(LEX_Int(value));
+
+	if (key == "special")
+		line->type = LEX_Int(value);
+
+	if (key == "twosided")
+		line->two_sided = LEX_Boolean(value);
+
+	if (key == "sidefront")
+	{
+		int num = LEX_Int(value);
+
+		if (num < 0 || num >= (int)num_sidedefs)
+			line->right = NULL;
+		else
+			line->right = lev_sidedefs[num];
+	}
+
+	if (key == "sideback")
+	{
+		int num = LEX_Int(value);
+
+		if (num < 0 || num >= (int)num_sidedefs)
+			line->left = NULL;
+		else
+			line->left = lev_sidedefs[num];
+	}
 }
 
 
