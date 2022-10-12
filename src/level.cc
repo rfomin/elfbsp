@@ -829,7 +829,6 @@ std::vector<walltip_t *> lev_walltips;
 
 int num_old_vert = 0;
 int num_new_vert = 0;
-int num_complete_seg = 0;
 int num_real_lines = 0;
 
 
@@ -1726,22 +1725,16 @@ static inline u32_t VertexIndex_XNOD(const vertex_t *v)
 
 void PutSegs()
 {
-	int i, count;
-
 	// this size is worst-case scenario
 	int size = num_segs * (int)sizeof(raw_seg_t);
 
 	Lump_c *lump = CreateLevelLump("SEGS", size);
 
-	for (i=0, count=0 ; i < num_segs ; i++)
+	for (int i=0 ; i < num_segs ; i++)
 	{
 		raw_seg_t raw;
 
 		const seg_t *seg = lev_segs[i];
-
-		// ignore minisegs and degenerate segs
-		if (seg->linedef == NULL || seg->is_degenerate)
-			continue;
 
 		raw.start   = LE_U16(VertexIndex16Bit(seg->start));
 		raw.end     = LE_U16(VertexIndex16Bit(seg->end));
@@ -1752,8 +1745,6 @@ void PutSegs()
 
 		lump->Write(&raw, sizeof(raw));
 
-		count++;
-
 #if DEBUG_BSP
 		cur_info->Debug("PUT SEG: %04X  Vert %04X->%04X  Line %04X %s  "
 				"Angle %04X  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index,
@@ -1763,10 +1754,7 @@ void PutSegs()
 #endif
 	}
 
-	if (count != num_complete_seg)
-		BugError("PutSegs miscounted (%d != %d)\n", count, num_complete_seg);
-
-	if (count > 65534)
+	if (num_segs > 65534)
 	{
 		Failure("Number of segs has overflowed.\n");
 		MarkOverflow(LIMIT_SEGS);
@@ -1774,24 +1762,21 @@ void PutSegs()
 }
 
 
-void PutGLSegs()
+void PutGLSegs_V2()
 {
-	int i, count;
+	// should not happen (we should have upgraded to V5)
+	SYS_ASSERT(num_segs <= 65534);
 
 	// this size is worst-case scenario
 	int size = num_segs * (int)sizeof(raw_gl_seg_t);
 
 	Lump_c *lump = CreateLevelLump("GL_SEGS", size);
 
-	for (i=0, count=0 ; i < num_segs ; i++)
+	for (int i=0 ; i < num_segs ; i++)
 	{
 		raw_gl_seg_t raw;
 
 		const seg_t *seg = lev_segs[i];
-
-		// ignore degenerate segs
-		if (seg->is_degenerate)
-			continue;
 
 		raw.start = LE_U16(VertexIndex16Bit(seg->start));
 		raw.end   = LE_U16(VertexIndex16Bit(seg->end));
@@ -1809,8 +1794,6 @@ void PutGLSegs()
 
 		lump->Write(&raw, sizeof(raw));
 
-		count++;
-
 #if DEBUG_BSP
 		cur_info->Debug("PUT GL SEG: %04X  Line %04X %s  Partner %04X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
@@ -1818,37 +1801,24 @@ void PutGLSegs()
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 #endif
 	}
-
-	if (count != num_complete_seg)
-		BugError("PutGLSegs miscounted (%d != %d)\n", count, num_complete_seg);
-
-	if (count > 65534)
-		BugError("PutGLSegs with %d (> 65534) segs\n", count);
 }
 
 
 void PutGLSegs_V5()
 {
-	int i, count;
-
 	// this size is worst-case scenario
 	int size = num_segs * (int)sizeof(raw_v5_seg_t);
 
 	Lump_c *lump = CreateLevelLump("GL_SEGS", size);
 
-	for (i=0, count=0 ; i < num_segs ; i++)
+	for (int i=0 ; i < num_segs ; i++)
 	{
 		raw_v5_seg_t raw;
 
 		const seg_t *seg = lev_segs[i];
 
-		// ignore degenerate segs
-		if (seg->is_degenerate)
-			continue;
-
 		raw.start = LE_U32(VertexIndex_V5(seg->start));
 		raw.end   = LE_U32(VertexIndex_V5(seg->end));
-
 		raw.side  = LE_U16(seg->side);
 
 		if (seg->linedef != NULL)
@@ -1863,8 +1833,6 @@ void PutGLSegs_V5()
 
 		lump->Write(&raw, sizeof(raw));
 
-		count++;
-
 #if DEBUG_BSP
 		cur_info->Debug("PUT V3 SEG: %06X  Line %04X %s  Partner %06X  "
 				"(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, LE_U16(raw.linedef),
@@ -1872,9 +1840,6 @@ void PutGLSegs_V5()
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 #endif
 	}
-
-	if (count != num_complete_seg)
-		BugError("PutGLSegs miscounted (%d != %d)\n", count, num_complete_seg);
 }
 
 
@@ -2095,8 +2060,8 @@ void CheckLimits()
 	{
 		if (num_old_vert > 32767 ||
 			num_new_vert > 32767 ||
-			num_segs > 65534 ||
-			num_nodes > 32767)
+			num_segs     > 65534 ||
+			num_nodes    > 32767)
 		{
 			Warning("Forcing V5 of GL-Nodes due to overflows.\n");
 			lev_force_v5 = true;
@@ -2107,8 +2072,8 @@ void CheckLimits()
 	{
 		if (num_old_vert > 32767 ||
 			num_new_vert > 32767 ||
-			num_segs > 32767 ||
-			num_nodes > 32767)
+			num_segs     > 32767 ||
+			num_nodes    > 32767)
 		{
 			Warning("Forcing XNOD format nodes due to overflows.\n");
 			lev_force_xnod = true;
@@ -2134,6 +2099,13 @@ void SortSegs()
 
 	// sort segs into ascending index
 	std::sort(lev_segs.begin(), lev_segs.end(), Compare_seg_pred());
+
+	// remove unwanted segs
+	while (lev_segs.size() > 0 && lev_segs.back()->index == SEG_IS_GARBAGE)
+	{
+		UtilFree((void *) lev_segs.back());
+		lev_segs.pop_back();
+	}
 }
 
 
@@ -2193,10 +2165,6 @@ void PutZSubsecs()
 		int count = 0;
 		for (const seg_t *seg = sub->seg_list ; seg ; seg = seg->next, cur_seg_index++)
 		{
-			// ignore minisegs and degenerate segs
-			if (seg->linedef == NULL || seg->is_degenerate)
-				continue;
-
 			if (cur_seg_index != seg->index)
 				BugError("PutZSubsecs: seg index mismatch in sub %d (%d != %d)\n",
 						i, cur_seg_index, seg->index);
@@ -2209,29 +2177,22 @@ void PutZSubsecs()
 					i, count, sub->seg_count);
 	}
 
-	if (cur_seg_index != num_complete_seg)
-		BugError("PutZSubsecs miscounted segs (%d != %d)\n",
-				cur_seg_index, num_complete_seg);
+	if (cur_seg_index != num_segs)
+		BugError("PutZSubsecs miscounted segs (%d != %d)\n", cur_seg_index, num_segs);
 }
 
 
 void PutZSegs()
 {
-	int i, count;
-
-	u32_t raw_num = LE_U32(num_complete_seg);
+	u32_t raw_num = LE_U32(num_segs);
 	ZLibAppendLump(&raw_num, 4);
 
-	for (i=0, count=0 ; i < num_segs ; i++)
+	for (int i=0 ; i < num_segs ; i++)
 	{
 		const seg_t *seg = lev_segs[i];
 
-		// ignore minisegs and degenerate segs
-		if (seg->linedef == NULL || seg->is_degenerate)
-			continue;
-
-		if (count != seg->index)
-			BugError("PutZSegs: seg index mismatch (%d != %d)\n", count, seg->index);
+		if (seg->index != i)
+			BugError("PutZSegs: seg index mismatch (%d != %d)\n", seg->index, i);
 
 		u32_t v1 = LE_U32(VertexIndex_XNOD(seg->start));
 		u32_t v2 = LE_U32(VertexIndex_XNOD(seg->end));
@@ -2243,28 +2204,21 @@ void PutZSegs()
 		ZLibAppendLump(&v2,   4);
 		ZLibAppendLump(&line, 2);
 		ZLibAppendLump(&side, 1);
-
-		count++;
 	}
-
-	if (count != num_complete_seg)
-		BugError("PutZSegs miscounted (%d != %d)\n", count, num_complete_seg);
 }
 
 
 void PutXGL3Segs()
 {
-	int i, count;
-
 	u32_t raw_num = LE_U32(num_segs);
 	ZLibAppendLump(&raw_num, 4);
 
-	for (i=0, count=0 ; i < num_segs ; i++)
+	for (int i=0 ; i < num_segs ; i++)
 	{
 		const seg_t *seg = lev_segs[i];
 
-		if (count != seg->index)
-			BugError("PutXGL3Segs: seg index mismatch (%d != %d)\n", count, seg->index);
+		if (seg->index != i)
+			BugError("PutXGL3Segs: seg index mismatch (%d != %d)\n", seg->index, i);
 
 		u32_t v1      = LE_U32(VertexIndex_XNOD(seg->start));
 		u32_t partner = LE_U32(seg->partner ? seg->partner->index : -1);
@@ -2279,12 +2233,7 @@ void PutXGL3Segs()
 #if DEBUG_BSP
 		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
 #endif
-
-		count++;
 	}
-
-	if (count != num_segs)
-		BugError("PutXGL3Segs miscounted (%d != %d)\n", count, num_segs);
 }
 
 
@@ -2389,7 +2338,7 @@ static int CalcZDoomNodesSize()
 
 	size += 8 + num_vertices * 8;
 	size += 4 + num_subsecs  * 4;
-	size += 4 + num_complete_seg * 11;
+	size += 4 + num_segs     * 11;
 	size += 4 + num_nodes    * sizeof(raw_v5_node_t);
 
 	if (cur_info->force_compress)
@@ -2469,8 +2418,7 @@ void LoadLevel()
 
 	cur_info->ShowMap(lev_current_name);
 
-	num_new_vert = 0;
-	num_complete_seg = 0;
+	num_new_vert   = 0;
 	num_real_lines = 0;
 
 	if (lev_format == MAPF_UDMF)
@@ -2646,6 +2594,7 @@ build_result_e SaveLevel(node_t *root_node)
 
 	if (cur_info->gl_nodes && num_real_lines > 0)
 	{
+		// this also removes minisegs and degenerate segs
 		SortSegs();
 
 		// create empty marker now, flesh it out later
@@ -2656,7 +2605,7 @@ build_result_e SaveLevel(node_t *root_node)
 		if (lev_force_v5)
 			PutGLSegs_V5();
 		else
-			PutGLSegs();
+			PutGLSegs_V2();
 
 		if (lev_force_v5)
 			PutGLSubsecs_V5();

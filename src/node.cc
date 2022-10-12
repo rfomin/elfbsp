@@ -1502,7 +1502,7 @@ void subsec_t::SanityCheckHasRealSeg() const
 }
 
 
-void subsec_t::RenumberSegs()
+void subsec_t::RenumberSegs(int& cur_seg_index)
 {
 #if DEBUG_SUBSEC
 	cur_info->Debug("Subsec: Renumbering %d\n", index);
@@ -1512,8 +1512,8 @@ void subsec_t::RenumberSegs()
 
 	for (seg_t *seg=seg_list ; seg ; seg=seg->next)
 	{
-		seg->index = num_complete_seg;
-		num_complete_seg++;
+		seg->index = cur_seg_index;
+		cur_seg_index += 1;
 
 		seg_count++;
 
@@ -1673,14 +1673,14 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 
 void ClockwiseBspTree()
 {
-	num_complete_seg = 0;
+	int cur_seg_index = 0;
 
 	for (int i=0 ; i < num_subsecs ; i++)
 	{
 		subsec_t *sub = lev_subsecs[i];
 
 		sub->ClockwiseOrder();
-		sub->RenumberSegs();
+		sub->RenumberSegs(cur_seg_index);
 
 		// do some sanity checks
 		sub->SanityCheckClosed();
@@ -1711,10 +1711,8 @@ void subsec_t::Normalise()
 #if DEBUG_SUBSEC
 			cur_info->Debug("Subsec: Removing miniseg %p\n", seg);
 #endif
-
-			// set index to a really high value, so that SortSegs() will
-			// move all the minisegs to the top of the seg array.
-			seg->index = 1<<24;  // FIXME SEG_IS_GARBAGE
+			// this causes SortSegs() to remove the seg
+			seg->index = SEG_IS_GARBAGE;
 			continue;
 		}
 
@@ -1743,14 +1741,14 @@ void NormaliseBspTree()
 {
 	// unlinks all minisegs from each subsector
 
-	num_complete_seg = 0;
+	int cur_seg_index = 0;
 
 	for (int i=0 ; i < num_subsecs ; i++)
 	{
 		subsec_t *sub = lev_subsecs[i];
 
 		sub->Normalise();
-		sub->RenumberSegs();
+		sub->RenumberSegs(cur_seg_index);
 	}
 }
 
@@ -1852,13 +1850,12 @@ void subsec_t::RoundOff()
 #if DEBUG_SUBSEC
 			cur_info->Debug("Subsec: Removing degenerate %p\n", seg);
 #endif
-
-			// set index to a really high value, so that SortSegs() will
-			// move all the minisegs to the top of the seg array.
-			seg->index = 1<<24;  // FIXME SEG_IS_GARBAGE
+			// this causes SortSegs() to remove the seg
+			seg->index = SEG_IS_GARBAGE;
 			continue;
 		}
 
+		// add it to new list
 		seg->next = NULL;
 
 		if (new_tail)
@@ -1881,7 +1878,7 @@ void subsec_t::RoundOff()
 
 void RoundOffBspTree()
 {
-	num_complete_seg = 0;
+	int cur_seg_index = 0;
 
 	RoundOffVertices();
 
@@ -1890,7 +1887,7 @@ void RoundOffBspTree()
 		subsec_t *sub = lev_subsecs[i];
 
 		sub->RoundOff();
-		sub->RenumberSegs();
+		sub->RenumberSegs(cur_seg_index);
 	}
 }
 

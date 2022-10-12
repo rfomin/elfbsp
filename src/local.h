@@ -315,6 +315,10 @@ public:
 	}
 };
 
+// a seg with this index is removed by SortSegs().
+// it must be a very high value.
+#define SEG_IS_GARBAGE  (1 << 29)
+
 
 class subsec_t
 {
@@ -338,7 +342,7 @@ public:
 
 	void DetermineMiddle();
 	void ClockwiseOrder();
-	void RenumberSegs();
+	void RenumberSegs(int& cur_seg_index);
 
 	void RoundOff();
 	void Normalise();
@@ -461,7 +465,6 @@ extern std::vector<walltip_t *> lev_walltips;
 
 extern int num_old_vert;
 extern int num_new_vert;
-extern int num_complete_seg;
 
 
 /* ----- function prototypes ----------------------- */
