@@ -569,7 +569,7 @@ void Wad_file::ReadDirectory()
 	if (fread(&header, sizeof(header), 1, fp) != 1)
 		cur_info->FatalError("Error reading WAD header.\n");
 
-	// TODO: check ident for PWAD or IWAD
+	// WISH: check ident for PWAD or IWAD
 
 	kind = header.ident[0];
 
@@ -591,7 +591,7 @@ void Wad_file::ReadDirectory()
 
 		Lump_c *lump = new Lump_c(this, &entry);
 
-		// TODO: check if entry is valid
+		// WISH: check if entry is valid
 
 		directory.push_back(lump);
 	}
