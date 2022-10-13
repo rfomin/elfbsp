@@ -757,7 +757,6 @@ static void Reject_WriteLump()
 	Lump_c *lump = CreateLevelLump("REJECT", rej_total_size);
 
 	lump->Write(rej_matrix, rej_total_size);
-
 	lump->Finish();
 }
 
@@ -1648,6 +1647,8 @@ void PutVertices(const char *name, int do_gl)
 		count++;
 	}
 
+	lump->Finish();
+
 	if (count != (do_gl ? num_new_vert : num_old_vert))
 		BugError("PutVertices miscounted (%d != %d)\n", count,
 				do_gl ? num_new_vert : num_old_vert);
@@ -1690,6 +1691,8 @@ void PutGLVertices(int do_v5)
 
 		count++;
 	}
+
+	lump->Finish();
 
 	if (count != num_new_vert)
 		BugError("PutGLVertices miscounted (%d != %d)\n", count, num_new_vert);
@@ -1754,6 +1757,8 @@ void PutSegs()
 #endif
 	}
 
+	lump->Finish();
+
 	if (num_segs > 65534)
 	{
 		Failure("Number of segs has overflowed.\n");
@@ -1801,6 +1806,8 @@ void PutGLSegs_V2()
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 #endif
 	}
+
+	lump->Finish();
 }
 
 
@@ -1840,6 +1847,8 @@ void PutGLSegs_V5()
 				seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 #endif
 	}
+
+	lump->Finish();
 }
 
 
@@ -1871,6 +1880,8 @@ void PutSubsecs(const char *name, int do_gl)
 		Failure("Number of %s has overflowed.\n", do_gl ? "GL subsectors" : "subsectors");
 		MarkOverflow(do_gl ? LIMIT_GL_SSECT : LIMIT_SSECTORS);
 	}
+
+	lump->Finish();
 }
 
 
@@ -1896,6 +1907,8 @@ void PutGLSubsecs_V5()
 					sub->index, LE_U32(raw.first), LE_U32(raw.num));
 #endif
 	}
+
+	lump->Finish();
 }
 
 
@@ -2024,6 +2037,8 @@ void PutNodes(const char *name, int do_v5, node_t *root)
 		else
 			PutOneNode(root, lump);
 	}
+
+	lump->Finish();
 
 	if (node_cur_index != num_nodes)
 		BugError("PutNodes miscounted (%d != %d)\n", node_cur_index, num_nodes);
@@ -2769,6 +2784,7 @@ void ZLibFinishLump(void)
 {
 	if (! cur_info->force_compress)
 	{
+		zout_lump->Finish();
 		zout_lump = NULL;
 		return;
 	}
@@ -2808,6 +2824,8 @@ void ZLibFinishLump(void)
 		zout_lump->Write(zout_buffer, left_over);
 
 	deflateEnd(&zout_stream);
+
+	zout_lump->Finish();
 	zout_lump = NULL;
 #endif
 }
@@ -2997,7 +3015,6 @@ build_result_e BuildLevel(int lev_idx)
 
 	return ret;
 }
-
 
 
 }  // namespace ajbsp
