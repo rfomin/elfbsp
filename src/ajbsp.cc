@@ -133,6 +133,8 @@ public:
 
 		buffer[MSG_BUF_LEN-1] = 0;
 
+		ajbsp::CloseWad();
+
 		StopHanging();
 
 		fprintf(stderr, "\nFATAL ERROR: %s", buffer);
