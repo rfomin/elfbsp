@@ -120,6 +120,10 @@ void OpenWad(const char *filename);
 // close a previously opened wad.
 void CloseWad();
 
+// create/finish an XWA file
+void CreateXWA(const char *filename);
+void FinishXWA();
+
 // give the number of levels detected in the wad.
 int LevelsInWad();
 

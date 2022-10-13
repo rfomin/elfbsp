@@ -40,6 +40,7 @@ namespace ajbsp
 {
 
 Wad_file * cur_wad;
+Wad_file * xwa_wad;
 
 
 static int block_x, block_y;
@@ -2396,11 +2397,9 @@ void SaveZDFormat(node_t *root_node)
 }
 
 
-void SaveXGL3Format(node_t *root_node)
+void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 {
 	// WISH : compute a max_size
-
-	Lump_c *lump = CreateLevelLump("ZNODES", -1);
 
 	lump->Write(lev_XGL3_magic, 4);
 
@@ -2642,7 +2641,6 @@ build_result_e SaveLevel(node_t *root_node)
 	if (lev_force_xnod && num_real_lines > 0)
 	{
 		SortSegs();
-
 		SaveZDFormat(root_node);
 	}
 	else
@@ -2693,19 +2691,42 @@ build_result_e SaveUDMF(node_t *root_node)
 	// remove any existing ZNODES lump
 	cur_wad->RemoveZNodes(lev_current_idx);
 
-	if (num_real_lines >= 0)
+	Lump_c *lump = CreateLevelLump("ZNODES", -1);
+
+	if (num_real_lines == 0)
+	{
+		lump->Finish();
+	}
+	else
 	{
 		SortSegs();
-
-		SaveXGL3Format(root_node);
+		SaveXGL3Format(lump, root_node);
 	}
 
 	cur_wad->EndWrite();
 
-	if (lev_overflows > 0)
+	return BUILD_OK;
+}
+
+
+build_result_e SaveXWA(node_t *root_node)
+{
+	xwa_wad->BeginWrite();
+
+	const char *lev_name = GetLevelName(lev_current_idx);
+	Lump_c *lump = xwa_wad->AddLump(lev_name);
+
+	if (num_real_lines == 0)
 	{
-		return BUILD_LumpOverflow;
+		lump->Finish();
 	}
+	else
+	{
+		SortSegs();
+		SaveXGL3Format(lump, root_node);
+	}
+
+	xwa_wad->EndWrite();
 
 	return BUILD_OK;
 }
@@ -2929,11 +2950,40 @@ void OpenWad(const char *filename)
 }
 
 
+void CreateXWA(const char *filename)
+{
+	xwa_wad = Wad_file::Open(filename, 'w');
+	if (xwa_wad == NULL)
+		cur_info->FatalError("Cannot create file: %s\n", filename);
+
+	xwa_wad->BeginWrite();
+	xwa_wad->AddLump("XG_START")->Finish();
+	xwa_wad->EndWrite();
+}
+
+
+void FinishXWA()
+{
+	xwa_wad->BeginWrite();
+	xwa_wad->AddLump("XG_END")->Finish();
+	xwa_wad->EndWrite();
+}
+
+
 void CloseWad()
 {
-	// this closes the file
-	delete cur_wad;
-	cur_wad = NULL;
+	if (cur_wad != NULL)
+	{
+		// this closes the file
+		delete cur_wad;
+		cur_wad = NULL;
+	}
+
+	if (xwa_wad != NULL)
+	{
+		delete xwa_wad;
+		xwa_wad = NULL;
+	}
 }
 
 
@@ -3001,7 +3051,9 @@ build_result_e BuildLevel(int lev_idx)
 
 		ClockwiseBspTree();
 
-		if (lev_format == MAPF_UDMF)
+		if (xwa_wad != NULL)
+			ret = SaveXWA(root_node);
+		else if (lev_format == MAPF_UDMF)
 			ret = SaveUDMF(root_node);
 		else
 			ret = SaveLevel(root_node);
