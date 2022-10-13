@@ -2889,6 +2889,54 @@ Lump_c * CreateGLMarker()
 
 buildinfo_t * cur_info = NULL;
 
+void SetInfo(buildinfo_t *info)
+{
+	cur_info = info;
+}
+
+
+void OpenWad(const char *filename)
+{
+	cur_wad = Wad_file::Open(filename, 'a');
+	if (cur_wad == NULL)
+		cur_info->FatalError("Cannot open file: %s\n", filename);
+
+	if (cur_wad->IsReadOnly())
+	{
+		delete cur_wad;
+		cur_wad = NULL;
+
+		cur_info->FatalError("file is read only: %s\n", filename);
+	}
+}
+
+
+void CloseWad()
+{
+	// this closes the file
+	delete cur_wad;
+	cur_wad = NULL;
+}
+
+
+int LevelsInWad()
+{
+	if (cur_wad == NULL)
+		return 0;
+
+	return cur_wad->LevelCount();
+}
+
+
+const char * GetLevelName(int lev_idx)
+{
+	SYS_ASSERT(cur_wad != NULL);
+
+	int lump_idx = cur_wad->LevelHeader(lev_idx);
+
+	return cur_wad->GetLump(lump_idx)->Name();
+}
+
 
 /* ----- build nodes for a single level ----- */
 
@@ -2950,11 +2998,6 @@ build_result_e BuildLevel(int lev_idx)
 	return ret;
 }
 
-
-void SetInfo(buildinfo_t *info)
-{
-	cur_info = info;
-}
 
 
 }  // namespace ajbsp

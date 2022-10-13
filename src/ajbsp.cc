@@ -18,10 +18,11 @@
 
 #include "system.h"
 #include "bsp.h"
-#include "local.h"
-#include "raw_def.h"
 #include "utility.h"
 #include "wad.h"
+
+// this is only needed for CheckTypeSizes
+#include "raw_def.h"
 
 bool opt_backup   = false;
 bool opt_help     = false;
@@ -169,9 +170,7 @@ bool CheckMapInMaplist(int lev_idx)
 	if (map_list.empty())
 		return true;
 
-	int lump_idx = ajbsp::cur_wad->LevelHeader(lev_idx);
-
-	const char *name = ajbsp::cur_wad->GetLump(lump_idx)->Name();
+	const char *name = ajbsp::GetLevelName(lev_idx);
 
 	for (unsigned int i = 0 ; i < map_list.size() ; i++)
 		if (CheckMapInRange(&map_list[i], name))
@@ -186,7 +185,7 @@ build_result_e BuildFile()
 	config.total_warnings = 0;
 	config.total_minor_issues = 0;
 
-	int num_levels = ajbsp::cur_wad->LevelCount();
+	int num_levels = ajbsp::LevelsInWad();
 
 	if (num_levels == 0)
 	{
@@ -242,15 +241,6 @@ build_result_e BuildFile()
 	config.Print(0, "\n");
 
 	total_failed_maps += failures;
-
-	if (res == BUILD_BadFile)
-	{
-		config.Print(0, "  Corrupted wad or level detected.\n");
-
-		// allow building other files
-		total_failed_files += 1;
-		return BUILD_OK;
-	}
 
 	if (failures > 0)
 	{
@@ -352,23 +342,12 @@ void VisitFile(unsigned int idx, const char *filename)
 	config.Print(0, "\n");
 	config.Print(0, "Building %s\n", filename);
 
-	ajbsp::cur_wad = ajbsp::Wad_file::Open(filename, 'a');
-	if (ajbsp::cur_wad == NULL)
-		config.FatalError("Cannot open file: %s\n", filename);
-
-	if (ajbsp::cur_wad->IsReadOnly())
-	{
-		delete ajbsp::cur_wad;
-		ajbsp::cur_wad = NULL;
-
-		config.FatalError("file is read only: %s\n", filename);
-	}
+	// this will fatal error if it fails
+	ajbsp::OpenWad(filename);
 
 	build_result_e res = BuildFile();
 
-	// this closes the file
-	delete ajbsp::cur_wad;
-	ajbsp::cur_wad = NULL;
+	ajbsp::CloseWad();
 
 	if (res == BUILD_Cancelled)
 		config.FatalError("CANCELLED\n");

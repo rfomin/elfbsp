@@ -37,6 +37,7 @@ public:
 	// use a faster method to pick nodes
 	bool fast;
 
+	// create GL Nodes?
 	bool gl_nodes;
 
 	// when these two are false, they create an empty lump
@@ -100,9 +101,6 @@ typedef enum
 	// building was cancelled
 	BUILD_Cancelled,
 
-	// the WAD file was corrupt / empty / bad filename
-	BUILD_BadFile,
-
 	// when saving the map, one or more lumps overflowed
 	BUILD_LumpOverflow
 }
@@ -112,8 +110,26 @@ build_result_e;
 namespace ajbsp
 {
 
+// set the build information.  must be done before anything else.
 void SetInfo(buildinfo_t *info);
 
+// attempt to open a wad.  on failure, the FatalError method in the
+// buildinfo_t interface is called.
+void OpenWad(const char *filename);
+
+// close a previously opened wad.
+void CloseWad();
+
+// give the number of levels detected in the wad.
+int LevelsInWad();
+
+// retrieve the name of a particular level.
+const char *GetLevelName(int lev_idx);
+
+// build the nodes of a particular level.  if cancelled, returns the
+// BUILD_Cancelled result and the wad is unchanged.  otherwise the wad
+// is updated to store the new lumps and returns either BUILD_OK or
+// BUILD_LumpOverflow if some limits were exceeded.
 build_result_e BuildLevel(int lev_idx);
 
 
