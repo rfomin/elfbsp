@@ -1,17 +1,18 @@
 
-AJBSP 1.01
+AJBSP 1.05
 ==========
 
-by Andrew Apted, 2018.
+by Andrew Apted, 2022.
 
 
 About
 -----
 
 AJBSP is a simple nodes builder for modern DOOM source ports.
-It can build standard DOOM nodes, GL-Nodes, and XNOD format nodes.
-The code is based on the BSP code in Eureka DOOM Editor, which
-was based on the code from glBSP but with significant changes.
+It can build standard DOOM nodes, GL-Nodes, and XNOD format nodes,
+and since version 1.05 supports the UDMF map format.  The code is
+based on the BSP code in Eureka DOOM Editor, which was based on the
+code from glBSP but with significant changes.
 
 AJBSP is a command-line tool.  It can handle multiple wad files,
 and modifies each file in-place.  There is an option to backup each
@@ -35,7 +36,7 @@ https://gitlab.com/andwj/ajbsp/tags/v1.01
 Legalese
 --------
 
-AJBSP is Copyright &copy; 2018 Andrew Apted, Colin Reed, and
+AJBSP is Copyright &copy; 2022 Andrew Apted, Colin Reed, and
 Lee Killough, et al.
 
 AJBSP is Free Software, under the terms of the GNU General Public
