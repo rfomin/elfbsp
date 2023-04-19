@@ -46,7 +46,10 @@ public:
 
 	bool force_v5;
 	bool force_xnod;
-	bool force_compress;	// NOTE: only supported when HAVE_ZLIB is defined
+	bool ssect_xgl3;
+
+	// NOTE: this only supported when HAVE_ZLIB is defined
+	bool force_compress;
 
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;

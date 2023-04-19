@@ -369,11 +369,12 @@ void ShowHelp()
 			"    -b --backup        Backup input files (.bak extension)\n"
 			"    -f --fast          Faster partition selection\n"
 			"    -m --map   XXXX    Control which map(s) are built\n"
+			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
 			"\n"
 			"    -n --nogl          Disable creation of GL-Nodes\n"
 			"    -g --gl5           Use V5 format for GL-nodes\n"
-			"    -x --xnod          Use XNOD format for normal nodes\n"
-			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
+			"    -x --xnod          Use XNOD format in NODES lump\n"
+			"    -s --ssect         Use XGL3 format in SSECTORS lump\n"
 			"\n"
 			"Short options may be mixed, for example: -fbv\n"
 			"Long options must always begin with a double hyphen\n"
@@ -522,6 +523,7 @@ void ParseShortArgument(const char *arg)
 			case 'n': config.gl_nodes = false; continue;
 			case 'g': config.force_v5 = true; continue;
 			case 'x': config.force_xnod = true; continue;
+			case 's': config.ssect_xgl3 = true; continue;
 
 			case 'm':
 			case 'o':
@@ -604,13 +606,17 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	{
 		config.gl_nodes = false;
 	}
+	else if (strcmp(name, "--gl5") == 0)
+	{
+		config.force_v5 = true;
+	}
 	else if (strcmp(name, "--xnod") == 0)
 	{
 		config.force_xnod = true;
 	}
-	else if (strcmp(name, "--gl5") == 0)
+	else if (strcmp(name, "--ssect") == 0)
 	{
-		config.force_v5 = true;
+		config.ssect_xgl3 = true;
 	}
 	else if (strcmp(name, "--cost") == 0)
 	{
