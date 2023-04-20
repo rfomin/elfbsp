@@ -2084,7 +2084,7 @@ void CheckLimits()
 		}
 	}
 
-	if (! (cur_info->force_xnod || cur_info->ssect_xgl3))
+	if (! cur_info->force_xnod)
 	{
 		if (num_old_vert > 32767 ||
 			num_new_vert > 32767 ||
@@ -2372,7 +2372,9 @@ static int CalcZDoomNodesSize()
 
 void SaveZDFormat(node_t *root_node)
 {
-	SortSegs();
+	// leave SEGS and SSECTORS empty
+	CreateLevelLump("SEGS")->Finish();
+	CreateLevelLump("SSECTORS")->Finish();
 
 	int max_size = CalcZDoomNodesSize();
 
@@ -2397,8 +2399,6 @@ void SaveZDFormat(node_t *root_node)
 
 void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 {
-	SortSegs();
-
 	// WISH : compute a max_size
 
 	lump->Write(lev_XGL3_magic, 4);
@@ -2635,38 +2635,16 @@ build_result_e SaveLevel(node_t *root_node)
 
 	/* --- Normal nodes --- */
 
-	if ((lev_force_xnod || cur_info->ssect_xgl3) && num_real_lines > 0)
+	// remove all the mini-segs from subsectors
+	NormaliseBspTree();
+
+	if (lev_force_xnod && num_real_lines > 0)
 	{
-		// leave SEGS empty
-		CreateLevelLump("SEGS")->Finish();
-
-		if (cur_info->ssect_xgl3)
-		{
-			Lump_c *lump = CreateLevelLump("SSECTORS");
-			SaveXGL3Format(lump, root_node);
-		}
-		else
-		{
-			CreateLevelLump("SSECTORS")->Finish();
-		}
-
-		if (lev_force_xnod)
-		{
-			// remove all the mini-segs from subsectors
-			NormaliseBspTree();
-
-			SaveZDFormat(root_node);
-		}
-		else
-		{
-			CreateLevelLump("NODES")->Finish();
-		}
+		SortSegs();
+		SaveZDFormat(root_node);
 	}
 	else
 	{
-		// remove all the mini-segs from subsectors
-		NormaliseBspTree();
-
 		// reduce vertex precision for classic DOOM nodes.
 		// some segs can become "degenerate" after this, and these
 		// are removed from subsectors.
@@ -2721,6 +2699,7 @@ build_result_e SaveUDMF(node_t *root_node)
 	}
 	else
 	{
+		SortSegs();
 		SaveXGL3Format(lump, root_node);
 	}
 
@@ -2743,6 +2722,7 @@ build_result_e SaveXWA(node_t *root_node)
 	}
 	else
 	{
+		SortSegs();
 		SaveXGL3Format(lump, root_node);
 	}
 

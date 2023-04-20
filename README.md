@@ -151,13 +151,6 @@ support it, since it provides higher accuracy for seg
 splits.  However, it cannot be used with the original
 DOOM.EXE or with Chocolate-Doom.
 
-`-s --ssect`  
-Build XGL3 (extended GL-Nodes) format in the SSECTORS lump.
-This option will disable the building of normal nodes, leaving
-the NODES and SEGS lumps empty.  Although it can be used with
-the `-x` option to store XNOD format nodes in the NODES lump
-as well.
-
 `-c --cost  ##`  
 Sets the cost for making seg splits.
 The value is a number between 1 and 32.
