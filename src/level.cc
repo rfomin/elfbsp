@@ -2490,6 +2490,7 @@ void FreeLevel()
 	FreeSubsecs();
 	FreeNodes();
 	FreeWallTips();
+	FreeIntersections();
 }
 
 
