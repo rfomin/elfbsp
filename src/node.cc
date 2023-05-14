@@ -105,6 +105,14 @@ intersection_t *NewIntersection()
 	return alloc_cuts[used_intersections++];
 }
 
+void FreeIntersections(void)
+{
+	for (unsigned int i = 0 ; i < alloc_cuts.size() ; i++)
+		delete alloc_cuts[i];
+
+	alloc_cuts.clear();
+}
+
 
 //
 // Fill in the fields 'angle', 'len', 'pdx', 'pdy', etc...
