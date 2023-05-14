@@ -93,21 +93,18 @@ public:
 
 std::vector<intersection_t *> alloc_cuts;
 
-size_t used_intersections = 0;
-
 intersection_t *NewIntersection()
 {
-	SYS_ASSERT(used_intersections <= alloc_cuts.size());
+	intersection_t *cut = new intersection_t;
 
-	if (used_intersections == alloc_cuts.size())
-		alloc_cuts.push_back(new intersection_t);
+	alloc_cuts.push_back(cut);
 
-	return alloc_cuts[used_intersections++];
+	return cut;
 }
 
 void FreeIntersections(void)
 {
-	for (unsigned int i = 0 ; i < alloc_cuts.size() ; i++)
+	for (size_t i = 0 ; i < alloc_cuts.size() ; i++)
 		delete alloc_cuts[i];
 
 	alloc_cuts.clear();
@@ -1625,9 +1622,6 @@ build_result_e BuildNodes(seg_t *list, int depth, bbox_t *bounds /* output */,
 
 	node_t *node = NewNode();
 	*N = node;
-
-	// re-use any previous intersections
-	used_intersections = 0;
 
 	/* divide the segs into two lists: left & right */
 	seg_t *lefts  = NULL;
