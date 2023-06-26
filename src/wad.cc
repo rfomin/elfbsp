@@ -191,18 +191,18 @@ bool Lump_c::Finish()
 //------------------------------------------------------------------------
 
 Wad_file::Wad_file(const char *_name, char _mode, FILE * _fp) :
-	mode(_mode), fp(_fp), kind('P'),
+	filename(_name), mode(_mode), fp(_fp), kind('P'),
 	total_size(0), directory(),
 	dir_start(0), dir_count(0),
 	levels(), patches(), sprites(), flats(), tx_tex(),
 	begun_write(false), insert_point(-1)
 {
-	filename = StringDup(_name);
+	// nothing needed
 }
 
 Wad_file::~Wad_file()
 {
-	FileMessage("Closing WAD file: %s\n", filename);
+	FileMessage("Closing WAD file: %s\n", filename.c_str());
 
 	fclose(fp);
 
@@ -211,8 +211,6 @@ Wad_file::~Wad_file()
 		delete directory[k];
 
 	directory.clear();
-
-	StringFree(filename);
 }
 
 
