@@ -28,7 +28,7 @@ bool opt_backup   = false;
 bool opt_help     = false;
 bool opt_version  = false;
 
-const char *opt_output = NULL;
+std::string opt_output;
 
 std::vector< const char * > wad_list;
 
@@ -328,14 +328,15 @@ void BackupFile(const char *filename)
 
 void VisitFile(unsigned int idx, const char *filename)
 {
-	if (opt_output != NULL)
+	// handle the -o option
+	if (opt_output.size() > 0)
 	{
-		if (! ajbsp::FileCopy(filename, opt_output))
-			config.FatalError("failed to create output file: %s\n", opt_output);
+		if (! ajbsp::FileCopy(filename, opt_output.c_str()))
+			config.FatalError("failed to create output file: %s\n", opt_output.c_str());
 
 		config.Print(0, "\nCopied input file: %s\n", filename);
 
-		filename = opt_output;
+		filename = opt_output.c_str();
 	}
 
 	if (opt_backup)
@@ -632,10 +633,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 		if (argc < 1 || argv[0][0] == '-')
 			config.FatalError("missing value for '--output' option\n");
 
-		if (opt_output != NULL)
+		if (opt_output.size() > 0)
 			config.FatalError("cannot use '--output' option twice\n");
 
-		opt_output = ajbsp::StringDup(argv[0]);
+		opt_output = argv[0];
 		used = 1;
 	}
 	else
@@ -765,7 +766,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if (opt_output != NULL)
+	if (opt_output.size() > 0)
 	{
 		if (opt_backup)
 			config.FatalError("cannot use --backup with --output\n");
@@ -773,7 +774,7 @@ int main(int argc, char *argv[])
 		if (total_files > 1)
 			config.FatalError("cannot use multiple input files with --output\n");
 
-		if (ajbsp::StringCaseCmp(wad_list[0], opt_output) == 0)
+		if (ajbsp::StringCaseCmp(wad_list[0], opt_output.c_str()) == 0)
 			config.FatalError("input and output files are the same\n");
 	}
 
