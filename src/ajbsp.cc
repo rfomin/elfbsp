@@ -39,8 +39,8 @@ int total_failed_maps  = 0;
 
 struct map_range_t
 {
-	const char *low;
-	const char *high;
+	std::string low;
+	std::string high;
 };
 
 std::vector< map_range_t > map_list;
@@ -153,13 +153,13 @@ class mybuildinfo_t config;
 
 bool CheckMapInRange(const map_range_t *range, const char *name)
 {
-	if (strlen(name) != strlen(range->low))
+	if (strlen(name) != range->low.size())
 		return false;
 
-	if (strcmp(name, range->low) < 0)
+	if (strcmp(name, range->low.c_str()) < 0)
 		return false;
 
-	if (strcmp(name, range->high) > 0)
+	if (strcmp(name, range->high.c_str()) > 0)
 		return false;
 
 	return true;
@@ -473,32 +473,31 @@ void ParseMapRange(char *tok)
 }
 
 
-void ParseMapList(const char *from_arg)
+void ParseMapList(const char *arg)
 {
-	// create a mutable copy of the string
-	// [ we will keep long-term pointers into this buffer ]
-	char *buf = ajbsp::StringDup(from_arg);
-
-	char *arg = buf;
-
-	while (*arg)
+	while (*arg != 0)
 	{
 		if (*arg == ',')
 			config.FatalError("bad map list (empty element)\n");
 
-		// find next comma
-		char *tok = arg;
-		arg++;
+		// copy characters up to next comma / end
+		char buffer[64];
+		size_t len = 0;
 
-		while (*arg && *arg != ',')
-			arg++;
-
-		if (*arg == ',')
+		while (! (*arg == 0 || *arg == ','))
 		{
-			*arg++ = 0;
+			if (len > sizeof(buffer)-4)
+				config.FatalError("bad map list (very long element)\n");
+
+			buffer[len++] = *arg++;
 		}
 
-		ParseMapRange(tok);
+		buffer[len] = 0;
+
+		ParseMapRange(buffer);
+
+		if (*arg == ',')
+			arg++;
 	}
 }
 
