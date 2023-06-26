@@ -143,29 +143,6 @@ char *ReplaceExtension(const char *filename, const char *ext)
 }
 
 
-const char *FindBaseName(const char *filename)
-{
-	// Find the base name of the file (i.e. without any path).
-	// The result always points within the given string.
-	//
-	// Example:  "C:\Foo\Bar.wad"  ->  "Bar.wad"
-
-	const char *pos = filename + strlen(filename) - 1;
-
-	for (; pos >= filename ; pos--)
-	{
-		if (*pos == '/')
-			return pos + 1;
-
-#ifdef WIN32
-		if (*pos == '\\' || *pos == ':')
-			return pos + 1;
-#endif
-	}
-
-	return filename;
-}
-
 //------------------------------------------------------------------------
 // FILE MANAGEMENT
 //------------------------------------------------------------------------
@@ -322,50 +299,6 @@ char *StringDup(const char *orig, int limit)
 	s[limit] = 0;
 
 	return s;
-}
-
-
-char *StringUpper(const char *name)
-{
-	char *copy = StringDup(name);
-
-	for (char *p = copy; *p; p++)
-		*p = toupper(*p);
-
-	return copy;
-}
-
-
-char *StringPrintf(const char *str, ...)
-{
-	// Algorithm: keep doubling the allocated buffer size
-	// until the output fits. Based on code by Darren Salt.
-
-	char *buf = NULL;
-	int buf_size = 128;
-
-	for (;;)
-	{
-		va_list args;
-		int out_len;
-
-		buf_size *= 2;
-
-		buf = (char*)realloc(buf, buf_size);
-		if (!buf)
-			cur_info->FatalError("Out of memory (formatting string)\n");
-
-		va_start(args, str);
-		out_len = vsnprintf(buf, buf_size, str, args);
-		va_end(args);
-
-		// old versions of vsnprintf() simply return -1 when
-		// the output doesn't fit.
-		if (out_len < 0 || out_len >= buf_size)
-			continue;
-
-		return buf;
-	}
 }
 
 

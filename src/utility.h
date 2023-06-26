@@ -35,7 +35,6 @@ namespace ajbsp
 bool HasExtension(const char *filename);
 bool MatchExtension(const char *filename, const char *ext);
 char *ReplaceExtension(const char *filename, const char *ext);
-const char *FindBaseName(const char *filename);
 
 // file utilities
 bool FileExists(const char *filename);
@@ -58,8 +57,6 @@ int StringCaseCmpMax(const char *s1, const char *s2, size_t len);
 
 char *StringNew(int length);
 char *StringDup(const char *orig, int limit = -1);
-char *StringUpper(const char *name);
-char *StringPrintf(const char *str, ...);
 void  StringFree(const char *str);
 
 // checksum functions
