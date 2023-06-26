@@ -48,35 +48,36 @@ void LumpWarning(const char *fmt, ...)
 //------------------------------------------------------------------------
 
 Lump_c::Lump_c(Wad_file *_par, const char *_name, int _start, int _len) :
-	parent(_par), l_start(_start), l_length(_len)
+	parent(_par), lumpname(), l_start(_start), l_length(_len)
 {
 	// ensure lump name is uppercase
-	name = StringUpper(_name);
+	Rename(_name);
 }
 
 
 Lump_c::Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry) :
-	parent(_par)
+	parent(_par), lumpname()
 {
 	// handle the entry name, which can lack a terminating NUL
 	char buffer[10];
 	strncpy(buffer, entry->name, 8);
 	buffer[8] = 0;
 
-	name = StringDup(buffer);
+	// ensure lump name is uppercase
+	Rename(buffer);
 
 	l_start  = LE_U32(entry->pos);
 	l_length = LE_U32(entry->size);
 
 #if DEBUG_WAD
-	cur_info->Debug("new lump '%s' @ %d len:%d\n", name, l_start, l_length);
+	cur_info->Debug("new lump '%s' @ %d len:%d\n", Name(), l_start, l_length);
 #endif
 }
 
 
 Lump_c::~Lump_c()
 {
-	StringFree(name);
+	// nothing needed
 }
 
 
@@ -84,19 +85,27 @@ void Lump_c::MakeEntry(struct raw_wad_entry_s *entry)
 {
 	// do a dance to avoid a compiler warning from strncpy(), *sigh*
 	memset(entry->name, 0, 8);
-	memcpy(entry->name, name, strlen(name));
+	memcpy(entry->name, lumpname.c_str(), lumpname.size());
 
 	entry->pos  = LE_U32(l_start);
 	entry->size = LE_U32(l_length);
 }
 
 
+bool Lump_c::Match(const char *s) const
+{
+	return (0 == StringCaseCmp(lumpname.c_str(), s));
+}
+
+
 void Lump_c::Rename(const char *new_name)
 {
-	StringFree(name);
-
 	// ensure lump name is uppercase
-	name = StringUpper(new_name);
+	lumpname.clear();
+
+	const char * s;
+	for (s = new_name ; *s != 0 ; s++)
+		lumpname.push_back(toupper(*s));
 }
 
 
@@ -369,7 +378,7 @@ Lump_c * Wad_file::GetLump(int index)
 Lump_c * Wad_file::FindLump(const char *name)
 {
 	for (int k = 0 ; k < NumLumps() ; k++)
-		if (StringCaseCmp(directory[k]->name, name) == 0)
+		if (directory[k]->Match(name))
 			return directory[k];
 
 	return NULL;  // not found
@@ -378,7 +387,7 @@ Lump_c * Wad_file::FindLump(const char *name)
 int Wad_file::FindLumpNum(const char *name)
 {
 	for (int k = 0 ; k < NumLumps() ; k++)
-		if (StringCaseCmp(directory[k]->name, name) == 0)
+		if (directory[k]->Match(name))
 			return k;
 
 	return -1;  // not found
@@ -396,7 +405,7 @@ int Wad_file::LevelLookupLump(int lev_num, const char *name)
 	{
 		SYS_ASSERT(0 <= k && k < NumLumps());
 
-		if (StringCaseCmp(directory[k]->name, name) == 0)
+		if (directory[k]->Match(name))
 			return k;
 	}
 
@@ -413,7 +422,7 @@ int Wad_file::LevelFind(const char *name)
 		SYS_ASSERT(0 <= index && index < NumLumps());
 		SYS_ASSERT(directory[index]);
 
-		if (StringCaseCmp(directory[index]->name, name) == 0)
+		if (directory[index]->Match(name))
 			return k;
 	}
 
@@ -432,7 +441,7 @@ int Wad_file::LevelLastLump(int lev_num)
 		while (count < MAX_LUMPS_IN_A_LEVEL &&
 			   start+count < NumLumps())
 		{
-			if (StringCaseCmp(directory[start+count]->name, "ENDMAP") == 0)
+			if (directory[start+count]->Match("ENDMAP"))
 			{
 				count++;
 				break;
@@ -445,8 +454,8 @@ int Wad_file::LevelLastLump(int lev_num)
 	{
 		while (count < MAX_LUMPS_IN_A_LEVEL &&
 			   start+count < NumLumps() &&
-			   (IsLevelLump (directory[start+count]->name) ||
-				IsGLNodeLump(directory[start+count]->name)) )
+			   (IsLevelLump (directory[start+count]->Name()) ||
+				IsGLNodeLump(directory[start+count]->Name())) )
 		{
 			count++;
 		}
@@ -532,19 +541,19 @@ Lump_c * Wad_file::FindLumpInNamespace(const char *name, char group)
 	{
 		case 'P':
 			for (k = 0 ; k < (int)patches.size() ; k++)
-				if (StringCaseCmp(directory[patches[k]]->name, name) == 0)
+				if (directory[patches[k]]->Match(name))
 					return directory[patches[k]];
 			break;
 
 		case 'S':
 			for (k = 0 ; k < (int)sprites.size() ; k++)
-				if (StringCaseCmp(directory[sprites[k]]->name, name) == 0)
+				if (directory[sprites[k]]->Match(name))
 					return directory[sprites[k]];
 			break;
 
 		case 'F':
 			for (k = 0 ; k < (int)flats.size() ; k++)
-				if (StringCaseCmp(directory[flats[k]]->name, name) == 0)
+				if (directory[flats[k]]->Match(name))
 					return directory[flats[k]];
 			break;
 
@@ -609,11 +618,11 @@ void Wad_file::DetectLevels()
 		int part_count = 0;
 
 		// check for UDMF levels
-		if (StringCaseCmp(directory[k+1]->name, "TEXTMAP") == 0)
+		if (directory[k+1]->Match("TEXTMAP"))
 		{
 			levels.push_back(k);
 #if DEBUG_WAD
-			cur_info->Debug("Detected level : %s (UDMF)\n", directory[k]->name);
+			cur_info->Debug("Detected level : %s (UDMF)\n", directory[k]->Name());
 #endif
 			continue;
 		}
@@ -624,7 +633,7 @@ void Wad_file::DetectLevels()
 			if (k+i >= NumLumps())
 				break;
 
-			int part = WhatLevelPart(directory[k+i]->name);
+			int part = WhatLevelPart(directory[k+i]->Name());
 
 			if (part == 0)
 				break;
@@ -642,7 +651,7 @@ void Wad_file::DetectLevels()
 			levels.push_back(k);
 
 #if DEBUG_WAD
-			cur_info->Debug("Detected level : %s\n", directory[k]->name);
+			cur_info->Debug("Detected level : %s\n", directory[k]->Name());
 #endif
 		}
 	}
@@ -685,7 +694,7 @@ void Wad_file::ProcessNamespaces()
 
 	for (int k = 0 ; k < NumLumps() ; k++)
 	{
-		const char *name = directory[k]->name;
+		const char *name = directory[k]->Name();
 
 		// skip the sub-namespace markers
 		if (IsDummyMarker(name))
@@ -896,14 +905,14 @@ void Wad_file::RemoveGLNodes(int lev_num)
 
 	start++;
 
-	while (start <= finish && IsLevelLump(directory[start]->name))
+	while (start <= finish && IsLevelLump(directory[start]->Name()))
 	{
 		start++;
 	}
 
 	int count = 0;
 
-	while (start+count <= finish && IsGLNodeLump(directory[start+count]->name))
+	while (start+count <= finish && IsGLNodeLump(directory[start+count]->Name()))
 	{
 		count++;
 	}
@@ -923,7 +932,7 @@ void Wad_file::RemoveZNodes(int lev_num)
 
 	for ( ; start <= finish ; start++)
 	{
-		if (StringCaseCmp(directory[start]->name, "ZNODES") == 0)
+		if (StringCaseCmp(directory[start]->Name(), "ZNODES") == 0)
 		{
 			RemoveLumps(start, 1);
 			break;

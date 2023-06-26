@@ -43,7 +43,7 @@ friend class Wad_file;
 private:
 	Wad_file *parent;
 
-	const char *name;
+	std::string lumpname;
 
 	int l_start;
 	int l_length;
@@ -57,8 +57,11 @@ private:
 public:
 	~Lump_c();
 
-	const char *Name() const { return name; }
+	const char *Name() const { return lumpname.c_str(); }
 	int Length() const { return l_length; }
+
+	// case insensitive match on the lump name
+	bool Match(const char *s) const;
 
 	// do not call this directly, use Wad_file::RenameLump()
 	void Rename(const char *new_name);
