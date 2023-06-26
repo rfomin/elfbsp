@@ -315,14 +315,20 @@ void ValidateInputFilename(const char *filename)
 
 void BackupFile(const char *filename)
 {
-	const char *dest_name = ajbsp::ReplaceExtension(filename, "bak");
+	std::string dest_name = filename;
 
-	if (! ajbsp::FileCopy(filename, dest_name))
-		config.FatalError("failed to create backup: %s\n", dest_name);
+	// replace file extension (if any) with .bak
 
-	config.Print(1, "\nCreated backup: %s\n", dest_name);
+	int ext_pos = ajbsp::FindExtension(filename);
+	if (ext_pos > 0)
+		dest_name.resize(ext_pos);
 
-	ajbsp::StringFree(dest_name);
+	dest_name += ".bak";
+
+	if (! ajbsp::FileCopy(filename, dest_name.c_str()))
+		config.FatalError("failed to create backup: %s\n", dest_name.c_str());
+
+	config.Print(0, "\nCreated backup: %s\n", dest_name.c_str());
 }
 
 

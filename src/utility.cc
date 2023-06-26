@@ -92,54 +92,37 @@ bool MatchExtension(const char *filename, const char *ext)
 
 
 //
-// ReplaceExtension
+// FindExtension
 //
-// When ext is NULL, any existing extension is removed.
+// Return offset of the '.', or -1 when no extension was found.
 //
-// Returned string is a COPY.
-//
-char *ReplaceExtension(const char *filename, const char *ext)
+int FindExtension(const char *filename)
 {
-	SYS_ASSERT(filename[0] != 0);
+	if (filename[0] == 0)
+		return -1;
 
-	size_t total_len = strlen(filename) + (ext ? strlen(ext) : 0);
+	int pos = (int)strlen(filename) - 1;
 
-	char *buffer = StringNew((int)total_len + 10);
-
-	strcpy(buffer, filename);
-
-	char *dot_pos = buffer + strlen(buffer) - 1;
-
-	for (; dot_pos >= buffer && *dot_pos != '.' ; dot_pos--)
+	for (; pos >= 0 && filename[pos] != '.' ; pos--)
 	{
-		if (*dot_pos == '/')
+		char ch = filename[pos];
+
+		if (ch == '/')
 			break;
 
 #ifdef WIN32
-		if (*dot_pos == '\\' || *dot_pos == ':')
+		if (ch == '\\' || ch == ':')
 			break;
 #endif
 	}
 
-	if (dot_pos < buffer || *dot_pos != '.')
-		dot_pos = NULL;
+	if (pos < 0)
+		return -1;
 
-	if (! ext)
-	{
-		if (dot_pos)
-			dot_pos[0] = 0;
+	if (filename[pos] != '.')
+		return -1;
 
-		return buffer;
-	}
-
-	if (dot_pos)
-		dot_pos[1] = 0;
-	else
-		strcat(buffer, ".");
-
-	strcat(buffer, ext);
-
-	return buffer;
+	return pos;
 }
 
 
