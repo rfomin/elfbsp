@@ -55,10 +55,6 @@ double ComputeAngle(double dx, double dy);
 int StringCaseCmp   (const char *s1, const char *s2);
 int StringCaseCmpMax(const char *s1, const char *s2, size_t len);
 
-char *StringNew(int length);
-char *StringDup(const char *orig, int limit = -1);
-void  StringFree(const char *str);
-
 // checksum functions
 void Adler32_Begin(u32_t *crc);
 void Adler32_AddBlock(u32_t *crc, const u8_t *data, int length);

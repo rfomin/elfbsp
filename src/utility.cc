@@ -249,51 +249,6 @@ int StringCaseCmpMax(const char *s1, const char *s2, size_t len)
 }
 
 
-char *StringNew(int length)
-{
-	// length does not include the trailing NUL.
-
-	char *s = (char *) calloc(length + 1, 1);
-
-	if (! s)
-		cur_info->FatalError("Out of memory (%d bytes for string)\n", length);
-
-	return s;
-}
-
-
-char *StringDup(const char *orig, int limit)
-{
-	if (! orig)
-		return NULL;
-
-	if (limit < 0)
-	{
-		char *s = strdup(orig);
-
-		if (! s)
-			cur_info->FatalError("Out of memory (copy string)\n");
-
-		return s;
-	}
-
-	char * s = StringNew(limit+1);
-	strncpy(s, orig, limit);
-	s[limit] = 0;
-
-	return s;
-}
-
-
-void StringFree(const char *str)
-{
-	if (str)
-	{
-		free((void*) str);
-	}
-}
-
-
 //------------------------------------------------------------------------
 // MEMORY ALLOCATION
 //------------------------------------------------------------------------
