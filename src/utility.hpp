@@ -2,8 +2,9 @@
 //  UTILITIES
 //------------------------------------------------------------------------
 //
+//  Copyright (C) 2025      Guilherme Miranda
 //  Copyright (C) 2001-2013 Andrew Apted
-//  Copyright (C) 1997-2003 André Majorel et al
+//  Copyright (C) 1997-2003 AndrÃ© Majorel et al
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,10 +18,12 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_UTILITY_H__
-#define __AJBSP_UTILITY_H__
+#ifndef __ELFBSP_UTILITY_H__
+#define __ELFBSP_UTILITY_H__
 
-namespace ajbsp
+#include <cstdint>
+
+namespace elfbsp
 {
 
 #ifdef WIN32
@@ -53,16 +56,16 @@ double ComputeAngle(double dx, double dy);
 
 // string utilities
 int StringCaseCmp   (const char *s1, const char *s2);
-int StringCaseCmpMax(const char *s1, const char *s2, size_t len);
+int StringCaseCmpMax(const char *s1, const char *s2, std::size_t len);
 
 // checksum functions
 void Adler32_Begin(uint32_t *crc);
 void Adler32_AddBlock(uint32_t *crc, const uint8_t *data, int length);
 void Adler32_Finish(uint32_t *crc);
 
-} // namespace ajbsp
+} // namespace elfbsp
 
-#endif  /* __AJBSP_UTILITY_H__ */
+#endif  /* __ELFBSP_UTILITY_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

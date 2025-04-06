@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -18,9 +19,9 @@
 //
 //------------------------------------------------------------------------
 
-#include "system.h"
-#include "local.h"
-#include "utility.h"
+#include "local.hpp"
+#include "system.hpp"
+#include "utility.hpp"
 
 
 #define DEBUG_PICKNODE  0
@@ -50,7 +51,7 @@
 // Rewritten again by Andrew Apted (-AJA-), 1999-2000.
 //
 
-namespace ajbsp
+namespace elfbsp
 {
 
 #define PRECIOUS_MULTIPLY  100
@@ -1896,7 +1897,7 @@ void RoundOffBspTree()
 }
 
 
-}  // namespace ajbsp
+}  // namespace elfbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

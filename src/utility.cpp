@@ -2,8 +2,9 @@
 //  UTILITIES
 //------------------------------------------------------------------------
 //
+//  Copyright (C) 2025      Guilherme Miranda
 //  Copyright (C) 2001-2018 Andrew Apted
-//  Copyright (C) 1997-2003 Andr� Majorel et al
+//  Copyright (C) 1997-2003 AndrÃ© Majorel et al
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,24 +18,26 @@
 //
 //------------------------------------------------------------------------
 
-#include "system.h"
-#include "local.h"
-#include "utility.h"
+#include <cctype>
+
+#include "local.hpp"
+#include "system.hpp"
+#include "utility.hpp"
 
 #ifdef WIN32
 #include <io.h>
 #else  // UNIX or MACOSX
 #include <dirent.h>
-#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #ifdef __APPLE__
 #include <sys/param.h>
 #endif
 
-namespace ajbsp
+namespace elfbsp
 {
 
 //------------------------------------------------------------------------
@@ -362,7 +365,7 @@ void Adler32_Finish(uint32_t *crc)
 	/* nothing to do */
 }
 
-} // namespace ajbsp
+} // namespace elfbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

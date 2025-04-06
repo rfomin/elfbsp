@@ -1,0 +1,4 @@
+#cmakedefine PROJECT_NAME "@PROJECT_NAME@"
+#cmakedefine PROJECT_VERSION "@PROJECT_VERSION@"
+#cmakedefine PROJECT_STRING "@PROJECT_STRING@"
+#cmakedefine HAVE_ZLIB

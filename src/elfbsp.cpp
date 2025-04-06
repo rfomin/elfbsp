@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2001-2022  Andrew Apted
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2001-2022  Andrew Apted
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -16,12 +17,13 @@
 //
 //------------------------------------------------------------------------
 
-#include "system.h"
-#include "bsp.h"
-#include "utility.h"
+#include <string>
+#include <vector>
 
-// this is only needed for CheckTypeSizes
-#include "raw_def.h"
+#include "elfbsp.hpp"
+#include "raw_def.hpp"
+#include "system.hpp"
+#include "utility.hpp"
 
 bool opt_backup   = false;
 bool opt_help     = false;
@@ -132,7 +134,7 @@ public:
 
 		buffer[MSG_BUF_LEN-1] = 0;
 
-		ajbsp::CloseWad();
+		elfbsp::CloseWad();
 
 		StopHanging();
 
@@ -171,7 +173,7 @@ bool CheckMapInMaplist(int lev_idx)
 	if (map_list.empty())
 		return true;
 
-	const char *name = ajbsp::GetLevelName(lev_idx);
+	const char *name = elfbsp::GetLevelName(lev_idx);
 
 	for (unsigned int i = 0 ; i < map_list.size() ; i++)
 		if (CheckMapInRange(&map_list[i], name))
@@ -186,7 +188,7 @@ build_result_e BuildFile()
 	config.total_warnings = 0;
 	config.total_minor_issues = 0;
 
-	int num_levels = ajbsp::LevelsInWad();
+	int num_levels = elfbsp::LevelsInWad();
 
 	if (num_levels == 0)
 	{
@@ -211,7 +213,7 @@ build_result_e BuildFile()
 		if (n > 0 && config.verbosity >= 2)
 			config.Print(0, "\n");
 
-		res = ajbsp::BuildLevel(n);
+		res = elfbsp::BuildLevel(n);
 
 		// handle a failed map (due to lump overflow)
 		if (res == BUILD_LumpOverflow)
@@ -270,42 +272,38 @@ void ValidateInputFilename(const char *filename)
 	// NOTE: these checks are case-insensitive
 
 	// files with ".bak" extension cannot be backed up, so refuse them
-	if (ajbsp::MatchExtension(filename, "bak"))
+	if (elfbsp::MatchExtension(filename, "bak"))
 		config.FatalError("cannot process a backup file: %s\n", filename);
 
-	// GWA files only contain GL-nodes, never any maps
-	if (ajbsp::MatchExtension(filename, "gwa"))
-		config.FatalError("cannot process a GWA file: %s\n", filename);
-
 	// we do not support packages
-	if (ajbsp::MatchExtension(filename, "pak") ||
-		ajbsp::MatchExtension(filename, "pk2") ||
-		ajbsp::MatchExtension(filename, "pk3") ||
-		ajbsp::MatchExtension(filename, "pk4") ||
-		ajbsp::MatchExtension(filename, "pk7") ||
-		ajbsp::MatchExtension(filename, "epk") ||
-		ajbsp::MatchExtension(filename, "pack") ||
-		ajbsp::MatchExtension(filename, "zip") ||
-		ajbsp::MatchExtension(filename, "rar"))
+	if (elfbsp::MatchExtension(filename, "pak") ||
+		elfbsp::MatchExtension(filename, "pk2") ||
+		elfbsp::MatchExtension(filename, "pk3") ||
+		elfbsp::MatchExtension(filename, "pk4") ||
+		elfbsp::MatchExtension(filename, "pk7") ||
+		elfbsp::MatchExtension(filename, "epk") ||
+		elfbsp::MatchExtension(filename, "pack") ||
+		elfbsp::MatchExtension(filename, "zip") ||
+		elfbsp::MatchExtension(filename, "rar"))
 	{
 		config.FatalError("package files (like PK3) are not supported: %s\n", filename);
 	}
 
 	// reject some very common formats
-	if (ajbsp::MatchExtension(filename, "exe") ||
-		ajbsp::MatchExtension(filename, "dll") ||
-		ajbsp::MatchExtension(filename, "com") ||
-		ajbsp::MatchExtension(filename, "bat") ||
-		ajbsp::MatchExtension(filename, "txt") ||
-		ajbsp::MatchExtension(filename, "doc") ||
-		ajbsp::MatchExtension(filename, "deh") ||
-		ajbsp::MatchExtension(filename, "bex") ||
-		ajbsp::MatchExtension(filename, "lmp") ||
-		ajbsp::MatchExtension(filename, "cfg") ||
-		ajbsp::MatchExtension(filename, "gif") ||
-		ajbsp::MatchExtension(filename, "png") ||
-		ajbsp::MatchExtension(filename, "jpg") ||
-		ajbsp::MatchExtension(filename, "jpeg"))
+	if (elfbsp::MatchExtension(filename, "exe") ||
+		elfbsp::MatchExtension(filename, "dll") ||
+		elfbsp::MatchExtension(filename, "com") ||
+		elfbsp::MatchExtension(filename, "bat") ||
+		elfbsp::MatchExtension(filename, "txt") ||
+		elfbsp::MatchExtension(filename, "doc") ||
+		elfbsp::MatchExtension(filename, "deh") ||
+		elfbsp::MatchExtension(filename, "bex") ||
+		elfbsp::MatchExtension(filename, "lmp") ||
+		elfbsp::MatchExtension(filename, "cfg") ||
+		elfbsp::MatchExtension(filename, "gif") ||
+		elfbsp::MatchExtension(filename, "png") ||
+		elfbsp::MatchExtension(filename, "jpg") ||
+		elfbsp::MatchExtension(filename, "jpeg"))
 	{
 		config.FatalError("not a wad file: %s\n", filename);
 	}
@@ -318,13 +316,13 @@ void BackupFile(const char *filename)
 
 	// replace file extension (if any) with .bak
 
-	int ext_pos = ajbsp::FindExtension(filename);
+	int ext_pos = elfbsp::FindExtension(filename);
 	if (ext_pos > 0)
 		dest_name.resize(ext_pos);
 
 	dest_name += ".bak";
 
-	if (! ajbsp::FileCopy(filename, dest_name.c_str()))
+	if (! elfbsp::FileCopy(filename, dest_name.c_str()))
 		config.FatalError("failed to create backup: %s\n", dest_name.c_str());
 
 	config.Print(0, "\nCreated backup: %s\n", dest_name.c_str());
@@ -336,7 +334,7 @@ void VisitFile(unsigned int idx, const char *filename)
 	// handle the -o option
 	if (opt_output.size() > 0)
 	{
-		if (! ajbsp::FileCopy(filename, opt_output.c_str()))
+		if (! elfbsp::FileCopy(filename, opt_output.c_str()))
 			config.FatalError("failed to create output file: %s\n", opt_output.c_str());
 
 		config.Print(0, "\nCopied input file: %s\n", filename);
@@ -351,11 +349,11 @@ void VisitFile(unsigned int idx, const char *filename)
 	config.Print(0, "Building %s\n", filename);
 
 	// this will fatal error if it fails
-	ajbsp::OpenWad(filename);
+	elfbsp::OpenWad(filename);
 
 	build_result_e res = BuildFile();
 
-	ajbsp::CloseWad();
+	elfbsp::CloseWad();
 
 	if (res == BUILD_Cancelled)
 		config.FatalError("CANCELLED\n");
@@ -368,19 +366,18 @@ void ShowHelp()
 {
 	printf("\n");
 
-	printf( "Usage: ajbsp [options...] FILE...\n"
+	printf( "Usage: elfbsp [options...] FILE...\n"
 			"\n"
 			"Available options are:\n"
 			"    -v --verbose       Verbose output, show all warnings\n"
 			"    -b --backup        Backup input files (.bak extension)\n"
-			"    -f --fast          Faster partition selection\n"
 			"    -m --map   XXXX    Control which map(s) are built\n"
 			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
 			"\n"
-			"    -n --nogl          Disable creation of GL-Nodes\n"
-			"    -g --gl5           Use V5 format for GL-nodes\n"
-			"    -x --xnod          Use XNOD format in NODES lump\n"
-			"    -s --ssect         Use XGL3 format in SSECTORS lump\n"
+			"    -t --type  ##      Force a specific node format, automatic otherwise\n"
+			"                         0 = Doom\n"
+			"                         2 = XNOD\n"
+			"                         5 = XGL3\n"
 			"\n"
 			"Short options may be mixed, for example: -fbv\n"
 			"Long options must always begin with a double hyphen\n"
@@ -395,7 +392,7 @@ void ShowHelp()
 
 void ShowVersion()
 {
-	printf("ajbsp " AJBSP_VERSION "  (" __DATE__ ")\n");
+	printf("%s - [%s]\n", PROJECT_STRING, ISO_8601_DATE);
 
 	fflush(stdout);
 }
@@ -403,9 +400,9 @@ void ShowVersion()
 
 void ShowBanner()
 {
-	printf("+-----------------------------------------------+\n");
-	printf("|   AJBSP " AJBSP_VERSION "   (C) 2023 Andrew Apted, et al   |\n");
-	printf("+-----------------------------------------------+\n");
+	printf("+---------------------------------------------------+\n");
+	printf("|   ELFBSP %s (C) 2025 Guilherme Miranda, et al   |\n", PROJECT_VERSION);
+	printf("+---------------------------------------------------+\n");
 
 	fflush(stdout);
 }
@@ -524,14 +521,10 @@ void ParseShortArgument(const char *arg)
 			case 'b': opt_backup = true; continue;
 
 			case 'v': config.verbosity += 1; continue;
-			case 'f': config.fast = true; continue;
-			case 'n': config.gl_nodes = false; continue;
-			case 'g': config.force_v5 = true; continue;
-			case 'x': config.force_xnod = true; continue;
-			case 's': config.ssect_xgl3 = true; continue;
 
 			case 'm':
 			case 'o':
+			case 't':
 				config.FatalError("cannot use option '-%c' like that\n", c);
 				return;
 
@@ -594,10 +587,6 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	{
 		opt_backup = true;
 	}
-	else if (strcmp(name, "--fast") == 0)
-	{
-		config.fast = true;
-	}
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
 		if (argc < 1 || argv[0][0] == '-')
@@ -607,21 +596,19 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 
 		used = 1;
 	}
-	else if (strcmp(name, "--nogl") == 0 || strcmp(name, "--no-gl") == 0)
+	else if (strcmp(name, "--type") == 0)
 	{
-		config.gl_nodes = false;
-	}
-	else if (strcmp(name, "--gl5") == 0)
-	{
-		config.force_v5 = true;
-	}
-	else if (strcmp(name, "--xnod") == 0)
-	{
-		config.force_xnod = true;
-	}
-	else if (strcmp(name, "--ssect") == 0)
-	{
-		config.ssect_xgl3 = true;
+		if (argc < 1 || ! isdigit(argv[0][0]))
+			config.FatalError("missing value for '--type' option\n");
+
+		int val = atoi(argv[0]);
+
+		if (val < Node_Minimum || val > Node_Maximum)
+			config.FatalError("illegal value for '--type' option\n");
+
+		config.node_type = (node_type_t)(val);
+
+		used = 1;
 	}
 	else if (strcmp(name, "--cost") == 0)
 	{
@@ -700,6 +687,7 @@ void ParseCommandLine(int argc, char *argv[])
 		if (strcmp(arg, "-c") == 0) arg = "--cost";
 		if (strcmp(arg, "-m") == 0) arg = "--map";
 		if (strcmp(arg, "-o") == 0) arg = "--output";
+		if (strcmp(arg, "-t") == 0) arg = "--type";
 
 		if (arg[1] != '-')
 		{
@@ -750,7 +738,7 @@ void CheckTypeSizes()
 int main(int argc, char *argv[])
 {
 	// need this early, especially for fatal errors in utility/wad code
-	ajbsp::SetInfo(&config);
+	elfbsp::SetInfo(&config);
 
 	// sanity check on type sizes (useful when porting)
 	CheckTypeSizes();
@@ -786,7 +774,7 @@ int main(int argc, char *argv[])
 		if (total_files > 1)
 			config.FatalError("cannot use multiple input files with --output\n");
 
-		if (ajbsp::StringCaseCmp(wad_list[0], opt_output.c_str()) == 0)
+		if (elfbsp::StringCaseCmp(wad_list[0], opt_output.c_str()) == 0)
 			config.FatalError("input and output files are the same\n");
 	}
 
@@ -799,7 +787,7 @@ int main(int argc, char *argv[])
 
 		ValidateInputFilename(filename);
 
-		if (! ajbsp::FileExists(filename))
+		if (! elfbsp::FileExists(filename))
 			config.FatalError("no such file: %s\n", filename);
 	}
 

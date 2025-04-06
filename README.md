@@ -1,20 +1,21 @@
 
-AJBSP 1.05
+ELFBSP 1.7
 ==========
 
-by Andrew Apted, 2022.
+by Guilherme Miranda, 2025.
+AJBSP by Andrew Apted, 2022.
 
 
 About
 -----
 
-AJBSP is a simple nodes builder for modern DOOM source ports.
-It can build standard DOOM nodes, GL-Nodes, and XNOD format nodes,
-and since version 1.05 supports the UDMF map format.  The code is
+ELFBSP is a simple nodes builder for modern DOOM source ports.
+It can build standard DOOM nodes and Extended ZDoom format nodes,
+and since version 1.5 supports the UDMF map format.  The code is
 based on the BSP code in Eureka DOOM Editor, which was based on the
 code from glBSP but with significant changes.
 
-AJBSP is a command-line tool.  It can handle multiple wad files,
+ELFBSP is a command-line tool.  It can handle multiple wad files,
 and modifies each file in-place.  There is an option to backup each
 file first.  The output to the terminal is fairly terse, but greater
 verbosity can be enabled.  Generally all the maps in a wad will
@@ -24,26 +25,26 @@ processed, but this can be limited to a specific set.
 Main Site
 ---------
 
-https://gitlab.com/andwj/ajbsp
+https://github.com/elf-alchemist/elfbsp
 
 
 Binary Packages
 ---------------
 
-https://gitlab.com/andwj/ajbsp/tags/v1.05
+https://github.com/elf-alchemist/elfbsp/tags
 
 
 Legalese
 --------
 
-AJBSP is Copyright &copy; 2022 Andrew Apted, Colin Reed, and
-Lee Killough, et al.
+ELFBSP is Copyright &copy; 2025 Guilherme Miranda, Andrew Apted,
+Colin Reed, and Lee Killough, et al.
 
-AJBSP is Free Software, under the terms of the GNU General Public
+ELFBSP is Free Software, under the terms of the GNU General Public
 License, version 2 or (at your option) any later version.
 See the [LICENSE.txt](LICENSE.txt) file for the complete text.
 
-AJBSP comes with NO WARRANTY of any kind, express or implied.
+ELFBSP comes with NO WARRANTY of any kind, express or implied.
 Please read the license for full details.
 
 
@@ -56,7 +57,7 @@ Please see the [INSTALL.md](INSTALL.md) document.
 Usage
 -----
 
-AJBSP must be run from a terminal (Linux) or the command shell
+ELFBSP must be run from a terminal (Linux) or the command shell
 (cmd.exe in Win32).  The command-line arguments are either files
 to process or options.  Where options are placed does not matter,
 the set of given options is applied to every given file.
@@ -75,14 +76,14 @@ The special option '--' causes all following arguments to be
 interpreted as filenames.  This allows specifying a file which
 begins with a hyphen.
 
-Once invoked, AJBSP will process each wad file.  All the maps in the
+Once invoked, ELFBSP will process each wad file.  All the maps in the
 file have their nodes rebuilt, unless the --map option is used to
 limit which maps are visited.  The normal behavior is to keep the
 output to the terminal fairly terse, only showing the name of each
 map as it being processed, and a simple summary of each file.
 More verbose output can be enabled by the --verbose option.
 
-Running AJBSP with no options, or the --help option, will show
+Running ELFBSP with no options, or the --help option, will show
 some help text, including a summary of all available options.
 
 
@@ -108,11 +109,6 @@ The backup files will have the ".bak" extension
 (replacing the ".wad" extension).  If the backup
 file already exists, it will be silently overwritten.
 
-`-f --fast`  
-Enables a faster method for selecting partition lines.
-On large maps this can be significantly faster,
-however the BSP tree may not be as good.
-
 `-m --map  NAME(s)`  
 Specifies one or more maps to process.
 All other maps will be skipped (not touched at all).
@@ -127,36 +123,19 @@ commas to separate them, such as "MAP01,MAP03,MAP05".
 
 NOTE: spaces cannot be used to separate map names.
 
-`-n --nogl`  
-Disables building of GL-Nodes, only the normal nodes
-are built.  Any existing GL-Nodes in a visited map
-will be removed.
+`-t --type  ##`  
+Forces a specific Node format version. Choices include:
+ - 0 => plain Doom format nodes
+ - 1 => DeepBSPv4
+ - 2 => XNOD
+ - 3 => XGLN
+ - 4 => XGL2
+ - 5 => XGL3
 
-`-g --gl5`  
-Forces V5 format of GL-Nodes.  The normal behavior
-is to build V2 format, and only switch to V5 format
-when the level is too large (e.g. has too many segs).
-
-Unless you are testing a source port, there is almost
-no need to use this option.
-
-`-x --xnod`  
-Forces XNOD (ZDoom extended) format of normal nodes.
-Without this option, normal nodes will be built using
-the standard DOOM format, and only switch to XNOD format
-when the level is too large (e.g. has too many segs).
-
-Using XNOD format can be better for source ports which
-support it, since it provides higher accuracy for seg
-splits.  However, it cannot be used with the original
-DOOM.EXE or with Chocolate-Doom.
-
-`-s --ssect`  
-Build XGL3 (extended GL-Nodes) format in the SSECTORS lump.
-This option will disable the building of normal nodes, leaving
-the NODES and SEGS lumps empty.  Although it can be used with
-the `-x` option to store XNOD format nodes in the NODES lump
-as well.
+ELFBSP will automatically choose the minimum format needed when certain
+limits are reached, raising from Doom to XNOD and XGL3, as is needed.
+DeepBSPv4, XGLN and XGL2 are considered deprecated and are only made
+available for source port testing purposes.
 
 `-c --cost  ##`  
 Sets the cost for making seg splits.
@@ -164,9 +143,6 @@ The value is a number between 1 and 32.
 Larger values try to reduce the number of seg splits,
 whereas smaller values produce more balanced BSP trees.
 The default value is 11.
-
-NOTE: this option has little effect when the --fast
-option is enabled.
 
 `-o --output  FILE`  
 This option is provided *only* for compatibility with
@@ -179,7 +155,7 @@ input files, or with the --backup option.
 Displays a brief help screen, then exits.
 
 `--version`  
-Displays the version of AJBSP, then exits.
+Displays the version of ELFBSP, then exits.
 
 
 Exit Codes

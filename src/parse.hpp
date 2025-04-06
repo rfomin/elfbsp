@@ -2,6 +2,7 @@
 //  Lexer (tokenizer)
 //----------------------------------------------------------------------------
 //
+//  Copyright (C) 2025  Guilherme Miranda
 //  Copyright (c) 2022  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
@@ -16,12 +17,12 @@
 //
 //----------------------------------------------------------------------------
 
-#ifndef __AJBSP_PARSE_H__
-#define __AJBSP_PARSE_H__
+#ifndef __ELFBSP_PARSE_H__
+#define __ELFBSP_PARSE_H__
 
 #include <string>
 
-namespace ajbsp
+namespace elfbsp
 {
 
 enum token_kind_e
@@ -84,9 +85,9 @@ int    LEX_Int    (const std::string& s);
 double LEX_Double (const std::string& s);
 bool   LEX_Boolean(const std::string& s);
 
-} // namespace ajbsp
+} // namespace elfbsp
 
-#endif /* __AJBSP_PARSE_H__ */
+#endif /* __ELFBSP_PARSE_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

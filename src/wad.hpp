@@ -2,7 +2,8 @@
 //  WAD Reading / Writing
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2001-2018  Andrew Apted
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2001-2018  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,10 +17,15 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_WAD_H__
-#define __AJBSP_WAD_H__
+#ifndef __ELFBSP_WAD_H__
+#define __ELFBSP_WAD_H__
 
-namespace ajbsp
+#include <string>
+#include <vector>
+
+#include "raw_def.hpp"
+
+namespace elfbsp
 {
 
 class Wad_file;
@@ -50,9 +56,9 @@ private:
 
 	// constructor is private
 	Lump_c(Wad_file *_par, const char *_name, int _start, int _len);
-	Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry);
+	Lump_c(Wad_file *_par, const raw_wad_entry_t *entry);
 
-	void MakeEntry(struct raw_wad_entry_s *entry);
+	void MakeEntry(raw_wad_entry_t *entry);
 
 public:
 	~Lump_c();
@@ -221,9 +227,6 @@ public:
 	// which follow it.
 	void RemoveLevel(int lev_num);
 
-	// removes any GL-Nodes lumps that are associated with the given level.
-	void RemoveGLNodes(int lev_num);
-
 	// removes any ZNODES lump from a UDMF level.
 	void RemoveZNodes(int lev_num);
 
@@ -310,9 +313,9 @@ private:
 };
 
 
-} // namespace ajbsp
+} // namespace elfbsp
 
-#endif  /* __AJBSP_WAD_H__ */
+#endif  /* __ELFBSP_WAD_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

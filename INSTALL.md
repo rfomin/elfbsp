@@ -1,7 +1,7 @@
-Compiling AJBSP
+Compiling ELFBSP
 ===============
 
-The AJBSP code is fairly portable C++, and does not depend
+The ELFBSP code is fairly portable C++, and does not depend
 on any third-party libraries.  It requires at least C++11.
 Both GNU g++ and clang++ are known to work.
 
@@ -32,7 +32,7 @@ To build the program, type:
 
     make
 
-To install AJBSP, become root and type:
+To install ELFBSP, become root and type:
 
     make install
 
@@ -49,9 +49,9 @@ Windows
 
 Using CMake or CMake-GUI, you can generate a Microsoft Visual Studio
 solution for Windows.  Simply point CMake to the root CMakeLists.txt
-inside of /ajbsp, and generate the solution for your intended target
+inside of /ELFbsp, and generate the solution for your intended target
 machine and version of Visual Studio.  Upon a successful build,
-MSVC will generate `ajbsp.exe` in your build directory of choice.
+MSVC will generate `elfbsp.exe` in your build directory of choice.
 
 For detailed information, see [INSTALL-Win.md](INSTALL-Win.md)
 

@@ -2,6 +2,7 @@
 //  Lexer (tokenizer)
 //----------------------------------------------------------------------------
 //
+//  Copyright (C) 2025  Guilherme Miranda
 //  Copyright (c) 2022  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
@@ -16,13 +17,13 @@
 //
 //----------------------------------------------------------------------------
 
-#include "parse.h"
-
-#include <cstdlib>
-#include <cctype>
 #include <cassert>
+#include <cctype>
+#include <cstdlib>
 
-namespace ajbsp
+#include "parse.hpp"
+
+namespace elfbsp
 {
 
 token_kind_e lexer_c::Next(std::string& s)
@@ -364,7 +365,7 @@ void lexer_c::ParseEscape(std::string& s)
 }
 
 
-} // namespace ajbsp
+} // namespace elfbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -18,10 +19,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_BSP_H__
-#define __AJBSP_BSP_H__
-
-#define AJBSP_VERSION  "1.07"
+#ifndef __ELFBSP_BSP_H__
+#define __ELFBSP_BSP_H__
 
 //
 // Node Build Information Structure
@@ -31,22 +30,31 @@
 #define SPLIT_COST_DEFAULT  11
 #define SPLIT_COST_MAX      32
 
+typedef enum node_type_e
+{
+	Node_DOOM,
+	Node_DEEP,
+
+	Node_XNOD, // also ZNOD
+	Node_XGLN, // also ZGLN
+	Node_XGL2, // also ZGL2
+	Node_XGL3, // also ZGL3
+
+	Node_Minimum = Node_DOOM,
+	Node_Maximum = Node_XGL3,
+
+} node_type_t;
+
 class buildinfo_t
 {
 public:
 	// use a faster method to pick nodes
 	bool fast;
-
-	// create GL Nodes?
-	bool gl_nodes;
-
 	// when these two are false, they create an empty lump
 	bool do_blockmap;
 	bool do_reject;
 
-	bool force_v5;
-	bool force_xnod;
-	bool ssect_xgl3;
+	node_type_t node_type;
 
 	// NOTE: this only supported when HAVE_ZLIB is defined
 	bool force_compress;
@@ -67,14 +75,10 @@ public:
 	buildinfo_t() :
 		fast(false),
 
-		gl_nodes(true),
-
 		do_blockmap(true),
 		do_reject  (true),
 
-		force_v5(false),
-		force_xnod(false),
-		force_compress(false),
+		node_type(Node_DOOM),
 
 		cancelled(false),
 
@@ -110,7 +114,7 @@ typedef enum
 build_result_e;
 
 
-namespace ajbsp
+namespace elfbsp
 {
 
 // set the build information.  must be done before anything else.
@@ -122,10 +126,6 @@ void OpenWad(const char *filename);
 
 // close a previously opened wad.
 void CloseWad();
-
-// create/finish an XWA file
-void CreateXWA(const char *filename);
-void FinishXWA();
 
 // give the number of levels detected in the wad.
 int LevelsInWad();
@@ -140,10 +140,10 @@ const char *GetLevelName(int lev_idx);
 build_result_e BuildLevel(int lev_idx);
 
 
-}  // namespace ajbsp
+}  // namespace elfbsp
 
 
-#endif /* __AJBSP_BSP_H__ */
+#endif /* __ELFBSP_BSP_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

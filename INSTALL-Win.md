@@ -1,4 +1,4 @@
-Compiling AJBSP for Windows
+Compiling ELFBSP for Windows
 ===========================
 
 Build Preface
@@ -18,12 +18,12 @@ Pre-Requisites
 2. [Visual Studio Community 2015/2017](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)
 
 
-Configuring AJBSP (CMakeLists.txt)
+Configuring ELFBSP (CMakeLists.txt)
 ----------------------------------
 
 1. Open CMake-GUI.
 
-2. Set the source code directory to your AJBSP source folder and the build
+2. Set the source code directory to your ELFBSP source folder and the build
    directory to a subdirectory called `build` (or however you choose to name
    these).
 
@@ -55,17 +55,17 @@ Configuring AJBSP (CMakeLists.txt)
      toolchain is not explicitly specified).
 
 5. Once Configure completes successfully, click **Generate** and then you'll
-   get a file called `ajbsp.sln` in the build folder, which you can use to
-   compile AJBSP with Visual Studio Community 2015 or 2017 (other VS versions
+   get a file called `elfbsp.sln` in the build folder, which you can use to
+   compile ELFBSP with Visual Studio Community 2015 or 2017 (other VS versions
    are untested, but should work in theory).
 
 
-Building AJBSP (Visual Studio Community)
+Building ELFBSP (Visual Studio Community)
 ----------------------------------------
 
 1. Go to the directory where Cmake-GUI set your Build directory.
-2. Open up `ajbsp.sln` (solution project).
+2. Open up `elfbsp.sln` (solution project).
 3. Right click the entire solution, and then 'Build Solution'.
 4. Depending on what you are building with (Debug, Release, RelWithDebInfo),
    you will find it in the appropriate folder in the VS Build directory you
-   specified (named `ajbsp.exe`).
+   specified (named `elfbsp.exe`).

@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -18,12 +19,15 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_LOCAL_H__
-#define __AJBSP_LOCAL_H__
+#ifndef __ELFBSP_LOCAL_H__
+#define __ELFBSP_LOCAL_H__
 
-#include "bsp.h"
+#include <algorithm>
+#include <vector>
 
-namespace ajbsp
+#include "elfbsp.hpp"
+
+namespace elfbsp
 {
 
 class Lump_c;
@@ -481,7 +485,6 @@ subsec_t  *NewSubsec();
 node_t    *NewNode();
 walltip_t *NewWallTip();
 
-Lump_c * CreateGLMarker();
 Lump_c * CreateLevelLump(const char *name, int max_size = -1);
 Lump_c * FindLevelLump(const char *name);
 
@@ -499,12 +502,6 @@ void ZLibFinishLump(void);
 #define LIMIT_SEGS         0x000010
 #define LIMIT_SSECTORS     0x000020
 #define LIMIT_NODES        0x000040
-
-#define LIMIT_GL_VERT      0x000100
-#define LIMIT_GL_SEGS      0x000200
-#define LIMIT_GL_SSECT     0x000400
-#define LIMIT_GL_NODES     0x000800
-
 
 //------------------------------------------------------------------------
 // ANALYZE : Analyzing level structures
@@ -626,7 +623,7 @@ void FreeIntersections(void);
 
 // scan all the linedef of the level and convert each sidedef into a
 // seg (or seg pair).  Returns the list of segs.
-seg_t *CreateSegs(void);
+seg_t *CreateSegs();
 
 quadtree_c *TreeFromSegList(seg_t *list);
 
@@ -661,10 +658,10 @@ void NormaliseBspTree();
 // rounded coordinates degenerate to the same point).
 void RoundOffBspTree();
 
-}  // namespace ajbsp
+}  // namespace elfbsp
 
 
-#endif /* __AJBSP_LOCAL_H__ */
+#endif /* __ELFBSP_LOCAL_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

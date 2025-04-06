@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2000-2018  Andrew Apted, et al
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2000-2018  Andrew Apted, et al
 //          Copyright (C) 1994-1998  Colin Reed
 //          Copyright (C) 1997-1998  Lee Killough
 //
@@ -18,10 +19,10 @@
 //
 //------------------------------------------------------------------------
 
-#include "system.h"
-#include "local.h"
-#include "raw_def.h"
-#include "utility.h"
+#include "local.hpp"
+#include "raw_def.hpp"
+#include "system.hpp"
+#include "utility.hpp"
 
 
 #define DEBUG_WALLTIPS   0
@@ -30,7 +31,7 @@
 #define DEBUG_OVERLAPS   0
 
 
-namespace ajbsp
+namespace elfbsp
 {
 
 #define SYS_MSG_BUFLEN  4000
@@ -703,7 +704,7 @@ bool vertex_t::CheckOpen(double dx, double dy) const
 }
 
 
-}  // namespace ajbsp
+}  // namespace elfbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

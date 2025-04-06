@@ -1,13 +1,13 @@
-.TH AJBSP 6 "September 2022"
+.TH ELFBSP 6 "September 2022"
 .SH NAME
-ajbsp \- a nodes builder for modern DOOM source ports
+elfbsp \- a nodes builder for modern DOOM source ports
 .SH SYNOPSIS
-.B ajbsp
+.B elfbsp
 [\fI\,OPTION\/\fR]... \fI\,FILE\/\fR...
 .SH DESCRIPTION
-.B AJBSP
+.B ELFBSP
 is a simple nodes builder for modern DOOM source ports.
-It can build standard DOOM nodes, GL-Nodes, and XNOD format nodes.
+It can build standard DOOM nodes and Extended ZDoom format nodes.
 Multiple wad files can be processed, and each file is modified in-place.
 There is an option to backup files before processing them.
 .SH OPTIONS
@@ -45,11 +45,6 @@ The backup files will have the ".bak" extension
 (replacing the ".wad" extension).  If the backup
 file already exists, it will be silently overwritten.
 .TP
-.B \-f \-\-fast
-Enables a faster method for selecting partition lines.
-On large maps this can be significantly faster,
-however the BSP tree may not be as good.
-.TP
 .B \-m \-\-map NAME(s)
 Specifies one or more maps to process.
 All other maps will be skipped (not touched at all).
@@ -64,35 +59,19 @@ commas to separate them, such as "MAP01,MAP03,MAP05".
 
 NOTE: spaces cannot be used to separate map names.
 .TP
-.B \-n \-\-nogl
-Disables building of GL-Nodes, only the normal nodes
-are built.  Any existing GL-Nodes in a visited map
-will be removed.
-.TP
-.B \-g \-\-gl5
-Forces V5 format of GL-Nodes.  The normal behavior
-is to build V2 format, and only switch to V5 format
-when the level is too large (e.g. has too many segs).
+.B \-t \-\-type ##
+Forces a specific Node format version. Choices include:
+ \- 0 => plain Doom format nodes
+ \- 1 => DeepBSPv4
+ \- 2 => XNOD
+ \- 3 => XGLN
+ \- 4 => XGL2
+ \- 5 => XGL3
 
-Unless you are testing a source port, there is almost
-no need to use this option.
-.TP
-.B \-x \-\-xnod
-Forces XNOD (ZDoom extended) format of normal nodes.
-Without this option, normal nodes will be built using
-the standard DOOM format, and only switch to XNOD format
-when the level is too large (e.g. has too many segs).
-
-Using XNOD format can be better for source ports which
-support it, since it provides higher accuracy for seg
-splits.  However, it cannot be used with the original
-DOOM.EXE or with Chocolate-Doom.
-.TP
-.B \-s \-\-ssect
-Build XGL3 (extended GL-Nodes) format in the SSECTORS lump.
-This option will disable the building of normal nodes, leaving
-the NODES and SEGS lumps empty.  Although it can be used with
-the -x option to store XNOD format nodes in the NODES lump too.
+ELFBSP will automatically choose the minimum format needed when certain
+limits are reached, raising from Doom to XNOD and XGL3, as is needed.
+DeepBSPv4, XGLN and XGL2 are considered deprecated and are only made
+available for source port testing purposes.
 .TP
 .B \-c \-\-cost ##
 Sets the cost for making seg splits.
@@ -100,9 +79,6 @@ The value is a number between 1 and 32.
 Larger values try to reduce the number of seg splits,
 whereas smaller values produce more balanced BSP trees.
 The default value is 11.
-
-NOTE: this option has little effect when the \-\-fast
-option is enabled.
 .TP
 .B \-o \-\-output FILE
 This option is provided *only* for compatibility with
@@ -130,8 +106,8 @@ if one or more maps failed to build properly.
 3
 if a fatal error occurred.
 .SH COPYRIGHT
-AJBSP is Copyright \(co 2022 Andrew Apted, Colin Reed, and
-Lee Killough, et al.
+ELFBSP is Copyright \(co 2025 Guilherme Miranda, Andrew Apted,
+Colin Reed, and Lee Killough, et al.
 .PP
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -144,4 +120,4 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 .SH "SEE ALSO"
 .PP
-The AJBSP home page: https://gitlab.com/andwj/ajbsp
+The ELFBSP home page: https://github.com/elf-alchemist/elfbsp

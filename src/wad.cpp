@@ -2,7 +2,8 @@
 //  WAD Reading / Writing
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2001-2018  Andrew Apted
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2001-2018  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,15 +17,15 @@
 //
 //------------------------------------------------------------------------
 
-#include "system.h"
-#include "local.h"
-#include "raw_def.h"
-#include "utility.h"
-#include "wad.h"
+#include "local.hpp"
+#include "raw_def.hpp"
+#include "system.hpp"
+#include "utility.hpp"
+#include "wad.hpp"
 
 #define DEBUG_WAD  0
 
-namespace ajbsp
+namespace elfbsp
 {
 
 #if DEBUG_WAD
@@ -55,7 +56,7 @@ Lump_c::Lump_c(Wad_file *_par, const char *_name, int _start, int _len) :
 }
 
 
-Lump_c::Lump_c(Wad_file *_par, const struct raw_wad_entry_s *entry) :
+Lump_c::Lump_c(Wad_file *_par, const raw_wad_entry_t *entry) :
 	parent(_par), lumpname()
 {
 	// handle the entry name, which can lack a terminating NUL
@@ -81,7 +82,7 @@ Lump_c::~Lump_c()
 }
 
 
-void Lump_c::MakeEntry(struct raw_wad_entry_s *entry)
+void Lump_c::MakeEntry(raw_wad_entry_t *entry)
 {
 	// do a dance to avoid a compiler warning from strncpy(), *sigh*
 	memset(entry->name, 0, 8);
@@ -357,14 +358,6 @@ static bool IsLevelLump(const char *name)
 	return WhatLevelPart(name) != 0;
 }
 
-static bool IsGLNodeLump(const char *name)
-{
-	if (StringCaseCmpMax(name, "GL_", 3) == 0)
-		return true;
-
-	return false;
-}
-
 
 Lump_c * Wad_file::GetLump(int index)
 {
@@ -454,8 +447,7 @@ int Wad_file::LevelLastLump(int lev_num)
 	{
 		while (count < MAX_LUMPS_IN_A_LEVEL &&
 			   start+count < NumLumps() &&
-			   (IsLevelLump (directory[start+count]->Name()) ||
-				IsGLNodeLump(directory[start+count]->Name())) )
+			   IsLevelLump(directory[start+count]->Name()) )
 		{
 			count++;
 		}
@@ -895,33 +887,6 @@ void Wad_file::RemoveLevel(int lev_num)
 }
 
 
-void Wad_file::RemoveGLNodes(int lev_num)
-{
-	SYS_ASSERT(begun_write);
-	SYS_ASSERT(0 <= lev_num && lev_num < LevelCount());
-
-	int start  = LevelHeader(lev_num);
-	int finish = LevelLastLump(lev_num);
-
-	start++;
-
-	while (start <= finish && IsLevelLump(directory[start]->Name()))
-	{
-		start++;
-	}
-
-	int count = 0;
-
-	while (start+count <= finish && IsGLNodeLump(directory[start+count]->Name()))
-	{
-		count++;
-	}
-
-	if (count > 0)
-		RemoveLumps(start, count);
-}
-
-
 void Wad_file::RemoveZNodes(int lev_num)
 {
 	SYS_ASSERT(begun_write);
@@ -1270,7 +1235,7 @@ bool Wad_file::Backup(const char *new_filename)
 	return FileCopy(PathName(), new_filename);
 }
 
-} // namespace ajbsp
+} // namespace elfbsp
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------
 //
-//  AJ-BSP  Copyright (C) 2007-2018  Andrew Apted
+//  ELFBSP  Copyright (C) 2025       Guilherme Miranda
+//          Copyright (C) 2007-2018  Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -14,9 +15,11 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __AJBSP_RAW_DEF_H__
-#define __AJBSP_RAW_DEF_H__
+#ifndef __ELFBSP_RAW_DEF_H__
+#define __ELFBSP_RAW_DEF_H__
 
+#include "system.hpp"
+#include <cstdint>
 
 /* ----- The wad structures ---------------------- */
 
@@ -74,11 +77,11 @@ typedef struct raw_vertex_s
 
 } PACKEDATTR raw_vertex_t;
 
-typedef struct raw_v2_vertex_s
+typedef struct raw_zdoom_vertex_s
 {
 	int32_t x, y;
 
-} PACKEDATTR raw_v2_vertex_t;
+} PACKEDATTR raw_zdoom_vertex_t;
 
 
 typedef struct raw_linedef_s
@@ -163,6 +166,16 @@ typedef struct raw_hexen_thing_s
 
 /* ----- The BSP tree structures ----------------------- */
 
+constexpr const char *DEEP_MAGIC = "xNd4\0\0\0\0";
+constexpr const char *XNOD_MAGIC = "XNOD";
+constexpr const char *ZNOD_MAGIC = "ZNOD";
+constexpr const char *XGLN_MAGIC = "XGLN";
+constexpr const char *ZGLN_MAGIC = "ZGLN";
+constexpr const char *XGL2_MAGIC = "XGL2";
+constexpr const char *ZGL2_MAGIC = "ZGL2";
+constexpr const char *XGL3_MAGIC = "XGL3";
+constexpr const char *ZGL3_MAGIC = "ZGL3";
+
 typedef struct raw_seg_s
 {
 	uint16_t start;     // from this vertex...
@@ -173,28 +186,6 @@ typedef struct raw_seg_s
 	uint16_t dist;      // distance from starting point
 
 } PACKEDATTR raw_seg_t;
-
-
-typedef struct raw_gl_seg_s
-{
-	uint16_t start;      // from this vertex...
-	uint16_t end;        // ... to this vertex
-	uint16_t linedef;    // linedef that this seg goes along, or -1
-	uint16_t side;       // 0 if on right of linedef, 1 if on left
-	uint16_t partner;    // partner seg number, or -1
-
-} PACKEDATTR raw_gl_seg_t;
-
-
-typedef struct raw_v5_seg_s
-{
-	uint32_t start;      // from this vertex...
-	uint32_t end;        // ... to this vertex
-	uint16_t linedef;    // linedef that this seg goes along, or -1
-	uint16_t side;       // 0 if on right of linedef, 1 if on left
-	uint32_t partner;    // partner seg number, or -1
-
-} PACKEDATTR raw_v5_seg_t;
 
 
 typedef struct raw_zdoom_seg_s
@@ -233,14 +224,6 @@ typedef struct raw_subsec_s
 } PACKEDATTR raw_subsec_t;
 
 
-typedef struct raw_v5_subsec_s
-{
-	uint32_t num;     // number of Segs in this Sub-Sector
-	uint32_t first;   // first Seg
-
-} PACKEDATTR raw_v5_subsec_t;
-
-
 typedef struct raw_zdoom_subsec_s
 {
 	uint32_t segnum;
@@ -253,7 +236,7 @@ typedef struct raw_zdoom_subsec_s
 } PACKEDATTR raw_zdoom_subsec_t;
 
 
-typedef struct raw_v5_node_s
+typedef struct raw_zdoom_node_s
 {
 	// this structure used by ZDoom nodes too
 
@@ -262,7 +245,7 @@ typedef struct raw_v5_node_s
 	raw_bbox_t b1, b2;    // bounding rectangles
 	uint32_t right, left; // children: Node or SSector (if high bit is set)
 
-} PACKEDATTR raw_v5_node_t;
+} PACKEDATTR raw_zdoom_node_t;
 
 
 typedef struct raw_blockmap_header_s
@@ -358,16 +341,11 @@ typedef struct patch_s
 // LineDef attributes.
 //
 
-typedef enum
+typedef enum : uint16_t
 {
-	// solid, is an obstacle
-	MLF_Blocking = 0x0001,
-
-	// blocks monsters only
-	MLF_BlockMonsters = 0x0002,
-
-	// backside will not be present at all if not two sided
-	MLF_TwoSided = 0x0004,
+	MLF_Blocking      = 0x0001, // Solid, is an obstacle
+	MLF_BlockMonsters = 0x0002, // Blocks monsters only
+	MLF_TwoSided      = 0x0004, // Backside will not be present at all if not two sided
 
 	// If a texture is pegged, the texture will have
 	// the end exposed to air held constant at the
@@ -379,59 +357,32 @@ typedef enum
 	// the texture at the top pixel of the line for both
 	// top and bottom textures (use next to windows).
 
-	// upper texture unpegged
-	MLF_UpperUnpegged = 0x0008,
-
-	// lower texture unpegged
-	MLF_LowerUnpegged = 0x0010,
-
-	// in AutoMap: don't map as two sided: IT'S A SECRET!
-	MLF_Secret = 0x0020,
-
-	// sound rendering: don't let sound cross two of these
-	MLF_SoundBlock = 0x0040,
-
-	// don't draw on the automap at all
-	MLF_DontDraw = 0x0080,
-
-	// set as if already seen, thus drawn in automap
-	MLF_Mapped = 0x0100,
-
-	// -AJA- this one is from Boom. Allows multiple lines to
-	//       be pushed simultaneously.
-	MLF_Boom_PassThru = 0x0200,
+	MLF_UpperUnpegged = 0x0008, // Upper texture unpegged
+	MLF_LowerUnpegged = 0x0010, // Lower texture unpegged
+	MLF_Secret        = 0x0020, // In AutoMap: don't map as two sided: IT'S A SECRET!
+	MLF_SoundBlock    = 0x0040, // Sound rendering: don't let sound cross two of these
+	MLF_DontDraw      = 0x0080, // Don't draw on the automap at all
+	MLF_Mapped        = 0x0100, // Set as if already seen, thus drawn in automap
+	MLF_Boom_PassThru = 0x0200, // -AJA- this one is from Boom. Allows multiple lines to be pushed simultaneously.
+	MLF_3DMidTex      = 0x0400, // [EA] Solid middle texture
+	MLF_Reserved      = 0x0800, // [EA] MBF21's comp_reservedlineflag
+	MLF_BlockGrounded = 0x1000, // [EA] MBF21's Block Grounded Monster
+	MLF_BlockPlayers  = 0x2000, // [EA] MBF21's Block Players Only
 }
-lineflag_e;
+compatible_lineflag_e;
 
 
-typedef enum
-{
-	MLF_Eternity_3DMidTex = 0x0400,
-}
-eternity_lineflag_e;
-
-
-typedef enum
-{
-	// -AJA- these three are from XDoom
-	MLF_XDoom_Translucent = 0x0400,
-	MLF_XDoom_ShootBlock  = 0x0800,
-	MLF_XDoom_SightBlock  = 0x1000,
-}
-xdoom_lineflag_e;
-
-
-typedef enum
+typedef enum : uint16_t
 {
 	// flags 0x001 .. 0x200 are same as DOOM above
 
-	MLF_Repeatable = 0x0200,
-	MLF_Activation = 0x1c00,
+	MLF_Hexen_Repeatable = 0x0200,
+	MLF_Hexen_Activation = 0x1c00,
 }
 hexen_lineflag_e;
 
 
-typedef enum
+typedef enum : uint16_t
 {
 	// these are supported by ZDoom (and derived ports)
 	MLF_ZDoom_MonCanActivate  = 0x2000,
@@ -463,7 +414,7 @@ hexen_activation_e;
 // Sector attributes.
 //
 
-typedef enum
+typedef enum : uint16_t
 {
 	BoomSF_TypeMask   = 0x001F,
 	BoomSF_DamageMask = 0x0060,
@@ -472,9 +423,12 @@ typedef enum
 	BoomSF_Friction   = 0x0100,
 	BoomSF_Wind       = 0x0200,
 	BoomSF_NoSounds   = 0x0400,
-	BoomSF_QuietPlane = 0x0800
+	BoomSF_QuietPlane = 0x0800,
+
+	MBF21SF_AltDeathMode = 0x1000,
+	MBF21SF_MonsterDeath = 0x2000,
 }
-boom_sectorflag_e;
+compatible_sectorflag_e;
 
 #define MSF_BoomFlags  0x0FE0
 
@@ -483,37 +437,38 @@ boom_sectorflag_e;
 // Thing attributes.
 //
 
-typedef enum
+typedef enum : uint16_t
 {
-	// these four used in Hexen too
-	MTF_Easy      = 1,
-	MTF_Medium    = 2,
-	MTF_Hard      = 4,
-	MTF_Ambush    = 8,
+	MTF_Easy      = 0x0001,
+	MTF_Medium    = 0x0002,
+	MTF_Hard      = 0x0004,
+	MTF_Ambush    = 0x0008,
 
-	MTF_Not_SP    = 16,
-	MTF_Not_DM    = 32,
-	MTF_Not_COOP  = 64,
-
-	MTF_Friend    = 128,
-	MTF_Reserved  = 256,
+	MTF_Not_SP    = 0x0010,
+	MTF_Not_DM    = 0x0020,
+	MTF_Not_COOP  = 0x0040,
+	MTF_Friend    = 0x0080,
 }
 thing_option_e;
 
 #define MTF_EXFLOOR_MASK    0x3C00
 #define MTF_EXFLOOR_SHIFT   10
 
-typedef enum
+typedef enum : uint16_t
 {
-	MTF_Hexen_Dormant	= 16,
+	MTF_Hexen_Easy    = 0x0001,
+	MTF_Hexen_Medium  = 0x0002,
+	MTF_Hexen_Hard    = 0x0004,
+	MTF_Hexen_Ambush  = 0x0008,
 
-	MTF_Hexen_Fighter	= 32,
-	MTF_Hexen_Cleric	= 64,
-	MTF_Hexen_Mage		= 128,
+	MTF_Hexen_Dormant = 0x0010,
+	MTF_Hexen_Fighter = 0x0020,
+	MTF_Hexen_Cleric  = 0x0040,
+	MTF_Hexen_Mage    = 0x0080,
 
-	MTF_Hexen_SP		= 256,
-	MTF_Hexen_COOP		= 512,
-	MTF_Hexen_DM		= 1024,
+	MTF_Hexen_SP      = 0x0100,
+	MTF_Hexen_COOP    = 0x0200,
+	MTF_Hexen_DM      = 0x0400,
 }
 hexen_option_e;
 
@@ -535,7 +490,7 @@ hexen_option_e;
 #define ZDOOM_PO_SPAWNCRUSH_TYPE  9302
 
 
-#endif  /* __AJBSP_RAW_DEF_H__ */
+#endif  /* __ELFBSP_RAW_DEF_H__ */
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab
