@@ -22,7 +22,6 @@
 #include "local.h"
 #include "raw_def.h"
 #include "utility.h"
-#include "wad.h"
 
 
 #define DEBUG_WALLTIPS   0

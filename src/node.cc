@@ -21,7 +21,6 @@
 #include "system.h"
 #include "local.h"
 #include "utility.h"
-#include "wad.h"
 
 
 #define DEBUG_PICKNODE  0
