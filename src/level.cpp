@@ -2383,6 +2383,10 @@ build_result_e SaveUDMF(node_t *root_node)
 
 	Lump_c *lump = CreateLevelLump("ZNODES", -1);
 
+	// [EA] Ensure needed lumps exist
+	AddMissingLump("REJECT",   "ZNODES");
+	AddMissingLump("BLOCKMAP", "REJECT");
+
 	if (num_real_lines == 0)
 	{
 		lump->Finish();
@@ -2391,6 +2395,10 @@ build_result_e SaveUDMF(node_t *root_node)
 	{
 		SaveXGL3Format(lump, root_node);
 	}
+
+	// [EA]
+	PutBlockmap();
+	PutReject();
 
 	cur_wad->EndWrite();
 
