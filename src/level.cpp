@@ -27,10 +27,6 @@
 #include "utility.hpp"
 #include "wad.hpp"
 
-#ifdef HAVE_ZLIB
-#include <zlib.h>
-#endif
-
 #define DEBUG_BLOCKMAP  0
 #define DEBUG_REJECT    0
 
@@ -2132,15 +2128,6 @@ static int CalcZDoomNodesSize()
 	size += 4 + num_segs     * 11;
 	size += 4 + num_nodes    * sizeof(raw_zdoom_node_t);
 
-	if (cur_info->force_compress)
-	{
-		// according to RFC1951, the zlib compression worst-case
-		// scenario is 5 extra bytes per 32KB (0.015% increase).
-		// we are significantly more conservative!
-
-		size += ((size + 255) >> 5);
-	}
-
 	return size;
 }
 
@@ -2153,12 +2140,8 @@ void SaveZDFormat(node_t *root_node)
 
 	Lump_c *lump = CreateLevelLump("NODES", max_size);
 
-	if (cur_info->force_compress)
-		lump->Write(ZNOD_MAGIC, 4);
-	else
-		lump->Write(XNOD_MAGIC, 4);
+	lump->Write(XNOD_MAGIC, 4);
 
-	// the ZLibXXX functions do no compression for XNOD format
 	ZLibBeginLump(lump);
 
 	PutZVertices();
@@ -2178,10 +2161,6 @@ void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 
 	lump->Write(XGL3_MAGIC, 4);
 
-	// disable compression
-	bool force_compress = cur_info->force_compress;
-	cur_info->force_compress = false;
-
 	ZLibBeginLump(lump);
 
 	PutZVertices();
@@ -2190,8 +2169,6 @@ void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 	PutZNodes(root_node, true);
 
 	ZLibFinishLump();
-
-	cur_info->force_compress = force_compress;
 }
 
 
@@ -2414,32 +2391,12 @@ build_result_e SaveUDMF(node_t *root_node)
 
 static Lump_c  *zout_lump;
 
-#ifdef HAVE_ZLIB
-static z_stream zout_stream;
-static Bytef    zout_buffer[1024];
-#endif
-
-
 void ZLibBeginLump(Lump_c *lump)
 {
 	zout_lump = lump;
 
-	if (! cur_info->force_compress)
+	if (true)
 		return;
-
-#ifndef HAVE_ZLIB
-	cur_info->FatalError("No zlib!\n");
-#else
-	zout_stream.zalloc = (alloc_func)0;
-	zout_stream.zfree  = (free_func)0;
-	zout_stream.opaque = (voidpf)0;
-
-	if (Z_OK != deflateInit(&zout_stream, Z_DEFAULT_COMPRESSION))
-		cur_info->FatalError("Trouble setting up zlib compression\n");
-
-	zout_stream.next_out  = zout_buffer;
-	zout_stream.avail_out = sizeof(zout_buffer);
-#endif
 }
 
 
@@ -2448,85 +2405,22 @@ void ZLibAppendLump(const void *data, int length)
 	// ASSERT(zout_lump)
 	// ASSERT(length > 0)
 
-	if (! cur_info->force_compress)
+	if (true)
 	{
 		zout_lump->Write(data, length);
 		return;
 	}
-
-#ifndef HAVE_ZLIB
-	cur_info->FatalError("No zlib!\n");
-#else
-	zout_stream.next_in  = (Bytef*)data;   // const override
-	zout_stream.avail_in = length;
-
-	while (zout_stream.avail_in > 0)
-	{
-		int err = deflate(&zout_stream, Z_NO_FLUSH);
-
-		if (err != Z_OK)
-			cur_info->FatalError("Trouble compressing %d bytes (zlib)\n", length);
-
-		if (zout_stream.avail_out == 0)
-		{
-			zout_lump->Write(zout_buffer, sizeof(zout_buffer));
-
-			zout_stream.next_out  = zout_buffer;
-			zout_stream.avail_out = sizeof(zout_buffer);
-		}
-	}
-#endif
 }
 
 
 void ZLibFinishLump(void)
 {
-	if (! cur_info->force_compress)
+	if (true)
 	{
 		zout_lump->Finish();
 		zout_lump = NULL;
 		return;
 	}
-
-#ifndef HAVE_ZLIB
-	cur_info->FatalError("No zlib!\n");
-#else
-	int left_over;
-
-	// ASSERT(zout_stream.avail_out > 0)
-
-	zout_stream.next_in  = Z_NULL;
-	zout_stream.avail_in = 0;
-
-	for (;;)
-	{
-		int err = deflate(&zout_stream, Z_FINISH);
-
-		if (err == Z_STREAM_END)
-			break;
-
-		if (err != Z_OK)
-			cur_info->FatalError("Trouble finishing compression (zlib)\n");
-
-		if (zout_stream.avail_out == 0)
-		{
-			zout_lump->Write(zout_buffer, sizeof(zout_buffer));
-
-			zout_stream.next_out  = zout_buffer;
-			zout_stream.avail_out = sizeof(zout_buffer);
-		}
-	}
-
-	left_over = sizeof(zout_buffer) - zout_stream.avail_out;
-
-	if (left_over > 0)
-		zout_lump->Write(zout_buffer, left_over);
-
-	deflateEnd(&zout_stream);
-
-	zout_lump->Finish();
-	zout_lump = NULL;
-#endif
 }
 
 

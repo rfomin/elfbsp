@@ -42,9 +42,6 @@ public:
 	bool force_xnod;
 	bool ssect_xgl3;
 
-	// NOTE: this only supported when HAVE_ZLIB is defined
-	bool force_compress;
-
 	// the GUI can set this to tell the node builder to stop
 	bool cancelled;
 
@@ -65,7 +62,6 @@ public:
 		do_reject  (true),
 
 		force_xnod(false),
-		force_compress(false),
 
 		cancelled(false),
 

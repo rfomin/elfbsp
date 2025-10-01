@@ -681,7 +681,8 @@ void ParseCommandLine(int argc, char *argv[])
 		if (strcmp(arg, "-c") == 0) arg = "--cost";
 		if (strcmp(arg, "-m") == 0) arg = "--map";
 		if (strcmp(arg, "-o") == 0) arg = "--output";
-		if (strcmp(arg, "-t") == 0) arg = "--type";
+		if (strcmp(arg, "-x") == 0) arg = "--xnod";
+		if (strcmp(arg, "-s") == 0) arg = "--ssect";
 
 		if (arg[1] != '-')
 		{

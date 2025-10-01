@@ -488,7 +488,6 @@ walltip_t *NewWallTip();
 Lump_c * CreateLevelLump(const char *name, int max_size = -1);
 Lump_c * FindLevelLump(const char *name);
 
-// Zlib compression support
 void ZLibBeginLump(Lump_c *lump);
 void ZLibAppendLump(const void *data, int length);
 void ZLibFinishLump(void);

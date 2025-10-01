@@ -17,8 +17,6 @@ set(PROJECT_COPYRIGHT "Copyright (C) 1994-2025")
 set(PROJECT_LICENSE "GNU General Public License, version 2")
 set(PROJECT_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
 
-check_include_file("zlib.h" HAVE_ZLIB)
-
 configure_file(config.h.in config.h)
 
 add_compile_options(
@@ -56,4 +54,3 @@ else()
     install(FILES doc/elfbsp.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
     install(TARGETS elfbsp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
-
