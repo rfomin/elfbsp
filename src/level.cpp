@@ -811,6 +811,7 @@ int lev_current_idx;
 int lev_current_start;
 
 map_format_e lev_format;
+bool lev_force_xnod;
 
 bool lev_long_name;
 bool lev_overflows;
@@ -1862,7 +1863,7 @@ void CheckLimits()
 		MarkOverflow(LIMIT_LINEDEFS);
 	}
 
-	if ((cur_info->node_type < Node_XNOD))
+	if (! (cur_info->force_xnod || cur_info->ssect_xgl3))
 	{
 		if (num_old_vert > 32767 ||
 			num_new_vert > 32767 ||
@@ -1870,7 +1871,7 @@ void CheckLimits()
 			num_nodes    > 32767)
 		{
 			Warning("Forcing XNOD format nodes due to overflows.\n");
-			cur_info->node_type = Node_XNOD;
+			lev_force_xnod = true;
 		}
 	}
 }
@@ -2302,6 +2303,9 @@ build_result_e SaveLevel(node_t *root_node)
 	AddMissingLump("REJECT",   "SECTORS");
 	AddMissingLump("BLOCKMAP", "REJECT");
 
+	// user preferences
+	lev_force_xnod = cur_info->force_xnod;
+
 	// check for overflows...
 	// this sets the force_xxx vars if certain limits are breached
 	CheckLimits();
@@ -2309,12 +2313,12 @@ build_result_e SaveLevel(node_t *root_node)
 
 	/* --- Normal nodes --- */
 
-	if ((cur_info->node_type >= Node_XNOD) && num_real_lines > 0)
+	if ((lev_force_xnod || cur_info->ssect_xgl3) && num_real_lines > 0)
 	{
 		// leave SEGS empty
 		CreateLevelLump("SEGS")->Finish();
 
-		if (cur_info->node_type == Node_XGL3)
+		if (cur_info->ssect_xgl3)
 		{
 			Lump_c *lump = CreateLevelLump("SSECTORS");
 			SaveXGL3Format(lump, root_node);
@@ -2324,7 +2328,7 @@ build_result_e SaveLevel(node_t *root_node)
 			CreateLevelLump("SSECTORS")->Finish();
 		}
 
-		if (cur_info->node_type == Node_XNOD)
+		if (lev_force_xnod)
 		{
 			// remove all the mini-segs from subsectors
 			NormaliseBspTree();

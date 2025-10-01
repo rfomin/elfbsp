@@ -4,7 +4,7 @@
 //
 //  Copyright (C) 2025      Guilherme Miranda
 //  Copyright (C) 2001-2018 Andrew Apted
-//  Copyright (C) 1997-2003 AndrÃ© Majorel et al
+//  Copyright (C) 1997-2003 André Majorel et al
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

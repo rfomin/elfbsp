@@ -30,21 +30,6 @@
 #define SPLIT_COST_DEFAULT  11
 #define SPLIT_COST_MAX      32
 
-typedef enum node_type_e
-{
-	Node_DOOM,
-	Node_DEEP,
-
-	Node_XNOD, // also ZNOD
-	Node_XGLN, // also ZGLN
-	Node_XGL2, // also ZGL2
-	Node_XGL3, // also ZGL3
-
-	Node_Minimum = Node_DOOM,
-	Node_Maximum = Node_XGL3,
-
-} node_type_t;
-
 class buildinfo_t
 {
 public:
@@ -54,7 +39,8 @@ public:
 	bool do_blockmap;
 	bool do_reject;
 
-	node_type_t node_type;
+	bool force_xnod;
+	bool ssect_xgl3;
 
 	// NOTE: this only supported when HAVE_ZLIB is defined
 	bool force_compress;
@@ -78,7 +64,8 @@ public:
 		do_blockmap(true),
 		do_reject  (true),
 
-		node_type(Node_DOOM),
+		force_xnod(false),
+		force_compress(false),
 
 		cancelled(false),
 

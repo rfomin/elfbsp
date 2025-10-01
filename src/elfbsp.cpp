@@ -596,19 +596,13 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 
 		used = 1;
 	}
-	else if (strcmp(name, "--type") == 0)
+	else if (strcmp(name, "--xnod") == 0)
 	{
-		if (argc < 1 || ! isdigit(argv[0][0]))
-			config.FatalError("missing value for '--type' option\n");
-
-		int val = atoi(argv[0]);
-
-		if (val < Node_Minimum || val > Node_Maximum)
-			config.FatalError("illegal value for '--type' option\n");
-
-		config.node_type = (node_type_t)(val);
-
-		used = 1;
+		config.force_xnod = true;
+	}
+	else if (strcmp(name, "--ssect") == 0)
+	{
+		config.ssect_xgl3 = true;
 	}
 	else if (strcmp(name, "--cost") == 0)
 	{
