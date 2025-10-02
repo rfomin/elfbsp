@@ -1336,13 +1336,25 @@ static inline int VanillaSegAngle(const seg_t *seg)
 	int16_t result = (int16_t) floor(angle * 65536.0 / 360.0 + 0.5);
 
 	// [EA] ZokumBSP
+	// 1080 => Additive degrees stored in tag
+	// 1081 => Set to degrees stored in tag
+	// 1082 => Additive BAM stored in tag
+	// 1083 => Set to BAM stored in tag
 	if (seg->linedef->special == Special_RotateDegrees)
 	{
 		result += DegreesToShortBAM(seg->linedef->tag);
 	}
+	else if (seg->linedef->special == Special_RotateDegreesHard)
+	{
+		result = DegreesToShortBAM(seg->linedef->tag);
+	}
 	else if (seg->linedef->special == Special_RotateAngleT)
 	{
 		result += (int16_t)seg->linedef->tag;
+	}
+	else if (seg->linedef->special == Special_RotateAngleTHard)
+	{
+		result = (int16_t)seg->linedef->tag;
 	}
 
 	return result;
