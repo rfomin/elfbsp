@@ -364,25 +364,7 @@ void VisitFile(unsigned int idx, const char *filename)
 
 void ShowHelp()
 {
-	printf("\n");
-
-	printf( "Usage: elfbsp [options...] FILE...\n"
-			"\n"
-			"Available options are:\n"
-			"    -v --verbose       Verbose output, show all warnings\n"
-			"    -b --backup        Backup input files (.bak extension)\n"
-			"    -m --map   XXXX    Control which map(s) are built\n"
-			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
-			"\n"
-			"    -x --xnod          Use XNOD format in NODES lump\n"
-			"    -s --ssect         Use XGL3 format in SSECTORS lump\n"
-			"\n"
-			"Short options may be mixed, for example: -fbv\n"
-			"Long options must always begin with a double hyphen\n"
-			"\n"
-			"Map names should be full, like E1M3 or MAP24, but a list\n"
-			"and/or ranges can be specified: MAP01,MAP04-MAP07,MAP12\n"
-	);
+	printf(PRINT_HELP);
 
 	fflush(stdout);
 }
