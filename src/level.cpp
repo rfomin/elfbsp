@@ -1229,12 +1229,12 @@ void GetLinedefs()
 			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
-		line->special  = LE_U16(raw.special);
-		uint16_t flags = LE_U16(raw.flags);
-		int16_t tag    = LE_S16(raw.tag);
+		line->special = LE_U16(raw.special);
+		line->tag     = LE_S16(raw.tag);
+		line->flags   = LE_U16(raw.flags);
 
-		line->two_sided   = (flags & MLF_TwoSided) != 0;
-		line->is_precious = (tag >= 900 && tag < 1000);
+		line->two_sided   = (line->flags & MLF_TwoSided) != 0;
+		line->is_precious = (line->tag >= 900 && line->tag < 1000);
 
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
@@ -1333,9 +1333,19 @@ static inline int VanillaSegAngle(const seg_t *seg)
 	if (angle < 0)
 		angle += 360.0;
 
-	int result = (int) floor(angle * 65536.0 / 360.0 + 0.5);
+	int16_t result = (int16_t) floor(angle * 65536.0 / 360.0 + 0.5);
 
-	return (result & 0xFFFF);
+	// [EA] ZokumBSP
+	if (seg->linedef->special == Special_RotateDegrees)
+	{
+		result += DegreesToShortBAM(seg->linedef->tag);
+	}
+	else if (seg->linedef->special == Special_RotateAngleT)
+	{
+		result += (int16_t)seg->linedef->tag;
+	}
+
+	return result;
 }
 
 

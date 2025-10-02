@@ -204,6 +204,8 @@ public:
 	sidedef_t *left;    // left sidede, or NULL if none
 
 	int special;
+	int tag;
+	int flags;
 
 	// line is marked two-sided
 	bool two_sided;

@@ -430,6 +430,10 @@ typedef enum zokumbsp_specials_e : uint32_t
 } zokumbsp_specials_t;
 
 
+#define ANG45        0x20000000
+#define DegreesToLongBAM(x)   (ANG45 * (x / 45))
+#define DegreesToShortBAM(x) ((ANG45 * (x / 45)) >> 16)
+
 //
 // Sector attributes.
 //
