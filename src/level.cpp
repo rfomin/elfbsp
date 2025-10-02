@@ -1902,15 +1902,15 @@ void SortSegs()
 
 /* ----- ZDoom format writing --------------------------- */
 
-void PutZVertices()
+void PutZVertices(Lump_c *lump)
 {
 	int count, i;
 
 	uint32_t orgverts = LE_U32(num_old_vert);
 	uint32_t newverts = LE_U32(num_new_vert);
 
-	ZLibAppendLump(&orgverts, 4);
-	ZLibAppendLump(&newverts, 4);
+	lump->Write(&orgverts, 4);
+	lump->Write(&newverts, 4);
 
 	for (i=0, count=0 ; i < num_vertices ; i++)
 	{
@@ -1924,7 +1924,7 @@ void PutZVertices()
 		raw.x = LE_S32(I_ROUND(vert->x * 65536.0));
 		raw.y = LE_S32(I_ROUND(vert->y * 65536.0));
 
-		ZLibAppendLump(&raw, sizeof(raw));
+		lump->Write(&raw, sizeof(raw));
 
 		count++;
 	}
@@ -1934,10 +1934,10 @@ void PutZVertices()
 }
 
 
-void PutZSubsecs()
+void PutZSubsecs(Lump_c *lump)
 {
 	uint32_t raw_num = LE_U32(num_subsecs);
-	ZLibAppendLump(&raw_num, 4);
+	lump->Write(&raw_num, 4);
 
 	int cur_seg_index = 0;
 
@@ -1946,7 +1946,7 @@ void PutZSubsecs()
 		const subsec_t *sub = lev_subsecs[i];
 
 		raw_num = LE_U32(sub->seg_count);
-		ZLibAppendLump(&raw_num, 4);
+		lump->Write(&raw_num, 4);
 
 		// sanity check the seg index values
 		int count = 0;
@@ -1969,10 +1969,10 @@ void PutZSubsecs()
 }
 
 
-void PutZSegs()
+void PutZSegs(Lump_c *lump)
 {
 	uint32_t raw_num = LE_U32(num_segs);
-	ZLibAppendLump(&raw_num, 4);
+	lump->Write(&raw_num, 4);
 
 	for (int i=0 ; i < num_segs ; i++)
 	{
@@ -1987,18 +1987,18 @@ void PutZSegs()
 		uint16_t line = LE_U16(seg->linedef->index);
 		uint8_t  side = (uint8_t) seg->side;
 
-		ZLibAppendLump(&v1,   4);
-		ZLibAppendLump(&v2,   4);
-		ZLibAppendLump(&line, 2);
-		ZLibAppendLump(&side, 1);
+		lump->Write(&v1,   4);
+		lump->Write(&v2,   4);
+		lump->Write(&line, 2);
+		lump->Write(&side, 1);
 	}
 }
 
 
-void PutXGL3Segs()
+void PutXGL3Segs(Lump_c *lump)
 {
 	uint32_t raw_num = LE_U32(num_segs);
-	ZLibAppendLump(&raw_num, 4);
+	lump->Write(&raw_num, 4);
 
 	for (int i=0 ; i < num_segs ; i++)
 	{
@@ -2012,10 +2012,10 @@ void PutXGL3Segs()
 		uint32_t line    = LE_U32(seg->linedef ? seg->linedef->index : -1);
 		uint8_t  side    = (uint8_t) seg->side;
 
-		ZLibAppendLump(&v1,      4);
-		ZLibAppendLump(&partner, 4);
-		ZLibAppendLump(&line,    4);
-		ZLibAppendLump(&side,    1);
+		lump->Write(&v1,      4);
+		lump->Write(&partner, 4);
+		lump->Write(&line,    4);
+		lump->Write(&side,    1);
 
 #if DEBUG_BSP
 		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
@@ -2024,15 +2024,15 @@ void PutXGL3Segs()
 }
 
 
-static void PutOneZNode(node_t *node, bool xgl3)
+static void PutOneZNode(Lump_c *lump, node_t *node, bool xgl3)
 {
 	raw_zdoom_node_t raw;
 
 	if (node->r.node)
-		PutOneZNode(node->r.node, xgl3);
+		PutOneZNode(lump, node->r.node, xgl3);
 
 	if (node->l.node)
-		PutOneZNode(node->l.node, xgl3);
+		PutOneZNode(lump, node->l.node, xgl3);
 
 	node->index = node_cur_index++;
 
@@ -2043,10 +2043,10 @@ static void PutOneZNode(node_t *node, bool xgl3)
 		uint32_t dx = LE_S32(I_ROUND(node->dx * 65536.0));
 		uint32_t dy = LE_S32(I_ROUND(node->dy * 65536.0));
 
-		ZLibAppendLump(&x,  4);
-		ZLibAppendLump(&y,  4);
-		ZLibAppendLump(&dx, 4);
-		ZLibAppendLump(&dy, 4);
+		lump->Write(&x,  4);
+		lump->Write(&y,  4);
+		lump->Write(&dx, 4);
+		lump->Write(&dy, 4);
 	}
 	else
 	{
@@ -2055,10 +2055,10 @@ static void PutOneZNode(node_t *node, bool xgl3)
 		raw.dx = LE_S16(I_ROUND(node->dx));
 		raw.dy = LE_S16(I_ROUND(node->dy));
 
-		ZLibAppendLump(&raw.x,  2);
-		ZLibAppendLump(&raw.y,  2);
-		ZLibAppendLump(&raw.dx, 2);
-		ZLibAppendLump(&raw.dy, 2);
+		lump->Write(&raw.x,  2);
+		lump->Write(&raw.y,  2);
+		lump->Write(&raw.dx, 2);
+		lump->Write(&raw.dy, 2);
 	}
 
 	raw.b1.minx = LE_S16(node->r.bounds.minx);
@@ -2071,8 +2071,8 @@ static void PutOneZNode(node_t *node, bool xgl3)
 	raw.b2.maxx = LE_S16(node->l.bounds.maxx);
 	raw.b2.maxy = LE_S16(node->l.bounds.maxy);
 
-	ZLibAppendLump(&raw.b1, sizeof(raw.b1));
-	ZLibAppendLump(&raw.b2, sizeof(raw.b2));
+	lump->Write(&raw.b1, sizeof(raw.b1));
+	lump->Write(&raw.b2, sizeof(raw.b2));
 
 	if (node->r.node)
 		raw.right = LE_U32(node->r.node->index);
@@ -2088,8 +2088,8 @@ static void PutOneZNode(node_t *node, bool xgl3)
 	else
 		BugError("Bad left child in ZDoom node %d\n", node->index);
 
-	ZLibAppendLump(&raw.right, 4);
-	ZLibAppendLump(&raw.left,  4);
+	lump->Write(&raw.right, 4);
+	lump->Write(&raw.left,  4);
 
 #if DEBUG_BSP
 	cur_info->Debug("PUT Z NODE %08X  Left %08X  Right %08X  "
@@ -2100,15 +2100,15 @@ static void PutOneZNode(node_t *node, bool xgl3)
 }
 
 
-void PutZNodes(node_t *root, bool xgl3)
+void PutZNodes(Lump_c *lump, node_t *root, bool xgl3)
 {
 	uint32_t raw_num = LE_U32(num_nodes);
-	ZLibAppendLump(&raw_num, 4);
+	lump->Write(&raw_num, 4);
 
 	node_cur_index = 0;
 
 	if (root)
-		PutOneZNode(root, xgl3);
+		PutOneZNode(lump, root, xgl3);
 
 	if (node_cur_index != num_nodes)
 		BugError("PutZNodes miscounted (%d != %d)\n", node_cur_index, num_nodes);
@@ -2142,14 +2142,13 @@ void SaveZDFormat(node_t *root_node)
 
 	lump->Write(XNOD_MAGIC, 4);
 
-	ZLibBeginLump(lump);
+	PutZVertices(lump);
+	PutZSubsecs(lump);
+	PutZSegs(lump);
+	PutZNodes(lump, root_node, false);
 
-	PutZVertices();
-	PutZSubsecs();
-	PutZSegs();
-	PutZNodes(root_node, false);
-
-	ZLibFinishLump();
+	lump->Finish();
+	lump = NULL;
 }
 
 
@@ -2161,14 +2160,13 @@ void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 
 	lump->Write(XGL3_MAGIC, 4);
 
-	ZLibBeginLump(lump);
+	PutZVertices(lump);
+	PutZSubsecs(lump);
+	PutXGL3Segs(lump);
+	PutZNodes(lump, root_node, true);
 
-	PutZVertices();
-	PutZSubsecs();
-	PutXGL3Segs();
-	PutZNodes(root_node, true);
-
-	ZLibFinishLump();
+	lump->Finish();
+	lump = NULL;
 }
 
 
@@ -2384,43 +2382,6 @@ build_result_e SaveUDMF(node_t *root_node)
 	cur_wad->EndWrite();
 
 	return BUILD_OK;
-}
-
-
-//----------------------------------------------------------------------
-
-static Lump_c  *zout_lump;
-
-void ZLibBeginLump(Lump_c *lump)
-{
-	zout_lump = lump;
-
-	if (true)
-		return;
-}
-
-
-void ZLibAppendLump(const void *data, int length)
-{
-	// ASSERT(zout_lump)
-	// ASSERT(length > 0)
-
-	if (true)
-	{
-		zout_lump->Write(data, length);
-		return;
-	}
-}
-
-
-void ZLibFinishLump(void)
-{
-	if (true)
-	{
-		zout_lump->Finish();
-		zout_lump = NULL;
-		return;
-	}
 }
 
 
