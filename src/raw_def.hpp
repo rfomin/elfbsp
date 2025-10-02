@@ -198,6 +198,15 @@ typedef struct raw_zdoom_seg_s
 } PACKEDATTR raw_zdoom_seg_t;
 
 
+typedef struct raw_xgl2_seg_s
+{
+	uint32_t vertex;     // from this vertex...
+	uint32_t partner;    // ... to this vertex
+	uint32_t linedef;    // linedef that this seg goes along, or -1
+	uint8_t  side;       // 0 if on right of linedef, 1 if on left
+} PACKEDATTR raw_xgl2_seg_t;
+
+
 typedef struct raw_bbox_s
 {
 	int16_t maxy, miny;

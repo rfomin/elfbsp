@@ -1720,6 +1720,17 @@ void PutSegs()
 		raw.flip    = LE_U16(seg->side);
 		raw.dist    = LE_U16(VanillaSegDist(seg));
 
+		// [EA] ZokumBSP
+		// 1084 => Do not render back seg
+		// 1085 => Do not render front seg
+		// 1086 => Do not render any seg
+		if ((seg->linedef->special == Special_DoNotRenderBackSeg && seg->side)
+			|| (seg->linedef->special == Special_DoNotRenderFrontSeg && !seg->side)
+			|| (seg->linedef->special == Special_DoNotRenderAnySeg))
+		{
+			raw = {};
+		}
+
 		lump->Write(&raw, sizeof(raw));
 
 #if DEBUG_BSP
@@ -2006,16 +2017,25 @@ void PutZSegs(Lump_c *lump)
 		if (seg->index != i)
 			BugError("PutZSegs: seg index mismatch (%d != %d)\n", seg->index, i);
 
-		uint32_t v1 = LE_U32(VertexIndex_XNOD(seg->start));
-		uint32_t v2 = LE_U32(VertexIndex_XNOD(seg->end));
+		raw_zdoom_seg_t raw = {};
 
-		uint16_t line = LE_U16(seg->linedef->index);
-		uint8_t  side = (uint8_t) seg->side;
+		raw.start   = LE_U32(VertexIndex_XNOD(seg->start));
+		raw.end     = LE_U32(VertexIndex_XNOD(seg->end));
+		raw.linedef = LE_U16(seg->linedef->index);
+		raw.side    = (uint8_t) seg->side;
 
-		lump->Write(&v1,   4);
-		lump->Write(&v2,   4);
-		lump->Write(&line, 2);
-		lump->Write(&side, 1);
+		// [EA] ZokumBSP
+		// 1084 => Do not render back seg
+		// 1085 => Do not render front seg
+		// 1086 => Do not render any seg
+		if ((seg->linedef->special == Special_DoNotRenderBackSeg && seg->side)
+			|| (seg->linedef->special == Special_DoNotRenderFrontSeg && !seg->side)
+			|| (seg->linedef->special == Special_DoNotRenderAnySeg))
+		{
+			raw = {};
+		}
+
+		lump->Write(&raw, sizeof(raw));
 	}
 }
 
@@ -2032,15 +2052,14 @@ void PutXGL3Segs(Lump_c *lump)
 		if (seg->index != i)
 			BugError("PutXGL3Segs: seg index mismatch (%d != %d)\n", seg->index, i);
 
-		uint32_t v1      = LE_U32(VertexIndex_XNOD(seg->start));
-		uint32_t partner = LE_U32(seg->partner ? seg->partner->index : -1);
-		uint32_t line    = LE_U32(seg->linedef ? seg->linedef->index : -1);
-		uint8_t  side    = (uint8_t) seg->side;
+		raw_xgl2_seg_t raw = {};
 
-		lump->Write(&v1,      4);
-		lump->Write(&partner, 4);
-		lump->Write(&line,    4);
-		lump->Write(&side,    1);
+		raw.vertex  = LE_U32(VertexIndex_XNOD(seg->start));
+		raw.partner = LE_U32(seg->partner ? seg->partner->index : -1);
+		raw.linedef = LE_U32(seg->linedef ? seg->linedef->index : -1);
+		raw.side    = (uint8_t) seg->side;
+
+		lump->Write(&raw, sizeof(raw));
 
 #if DEBUG_BSP
 		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
