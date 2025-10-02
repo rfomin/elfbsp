@@ -265,6 +265,9 @@ static void CreateBlockmap(void)
 		if (L->zero_len)
 			continue;
 
+		if (L->special == Special_NoBlockmap)
+			continue;
+
 		BlockAddLine(L);
 	}
 }
@@ -1226,7 +1229,7 @@ void GetLinedefs()
 			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
-		line->type     = LE_U16(raw.type);
+		line->special  = LE_U16(raw.special);
 		uint16_t flags = LE_U16(raw.flags);
 		int16_t tag    = LE_S16(raw.tag);
 
@@ -1289,7 +1292,7 @@ void GetLinedefsHexen()
 			(fabs(start->x - end->x) < DIST_EPSILON) &&
 			(fabs(start->y - end->y) < DIST_EPSILON);
 
-		line->type     = (uint8_t) raw.type;
+		line->special  = (uint8_t) raw.special;
 		uint16_t flags = LE_U16(raw.flags);
 
 		// -JL- Added missing twosided flag handling that caused a broken reject
@@ -1396,7 +1399,7 @@ void ParseLinedefField(linedef_t *line, const std::string& key, token_kind_e kin
 		line->end = SafeLookupVertex(LEX_Int(value));
 
 	if (key == "special")
-		line->type = LEX_Int(value);
+		line->special = LEX_Int(value);
 
 	if (key == "twosided")
 		line->two_sided = LEX_Boolean(value);

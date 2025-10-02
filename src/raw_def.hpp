@@ -89,7 +89,7 @@ typedef struct raw_linedef_s
 	uint16_t start;    // from this vertex...
 	uint16_t end;      // ... to this vertex
 	uint16_t flags;    // linedef flags (impassible, etc)
-	uint16_t type;     // special type (0 for none, 97 for teleporter, etc)
+	uint16_t special;  // special type (0 for none, 97 for teleporter, etc)
 	int16_t  tag;      // this linedef activates the sector with same tag
 	uint16_t right;    // right sidedef
 	uint16_t left;     // left sidedef (only if this line adjoins 2 sectors)
@@ -101,7 +101,7 @@ typedef struct raw_hexen_linedef_s
 	uint16_t start;      // from this vertex...
 	uint16_t end;        // ... to this vertex
 	uint16_t flags;      // linedef flags (impassible, etc)
-	uint8_t  type;       // special type
+	uint8_t  special;    // special type
 	uint8_t  args[5];    // special arguments
 	uint16_t right;      // right sidedef
 	uint16_t left;       // left sidedef
@@ -408,6 +408,26 @@ typedef enum
 	SPAC_PCross  = 5,	// when projectile crosses the line
 }
 hexen_activation_e;
+
+
+// The power of node building manipulation!
+typedef enum zokumbsp_specials_e : uint32_t
+{
+	Special_DoNotRender = 998,
+	Special_NoBlockmap = 999,
+
+	Special_RemoteScroll = 1048,
+
+	Special_ChangeStartVertex = 1078,
+	Special_ChangeEndVertex,
+	Special_RotateDegrees,
+	Special_RotateDegreesHard,
+	Special_RotateAngleT,
+	Special_RotateAngleTHard,
+	Special_DoNotRenderBackSeg,
+	Special_DoNotRenderFrontSeg,
+	Special_DoNotRenderAnySeg,
+} zokumbsp_specials_t;
 
 
 //

@@ -273,7 +273,7 @@ void DetectPolyobjSectors(bool is_udmf)
 	{
 		linedef_t *L = lev_linedefs[i];
 
-		if (L->type == HEXTYPE_POLY_START || L->type == HEXTYPE_POLY_EXPLICIT)
+		if (L->special == HEXTYPE_POLY_START || L->special == HEXTYPE_POLY_EXPLICIT)
 			break;
 	}
 

@@ -203,7 +203,7 @@ public:
 	sidedef_t *right;   // right sidedef
 	sidedef_t *left;    // left sidede, or NULL if none
 
-	int type;
+	int special;
 
 	// line is marked two-sided
 	bool two_sided;
