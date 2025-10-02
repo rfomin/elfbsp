@@ -59,16 +59,22 @@ commas to separate them, such as "MAP01,MAP03,MAP05".
 
 NOTE: spaces cannot be used to separate map names.
 .TP
-.B \-t \-\-type ##
-Forces a specific Node format version. Choices include:
- \- 0 => plain Doom format nodes
- \- 2 => XNOD
- \- 5 => XGL3
+.B \-x \-\-xnod
+Forces XNOD (ZDoom extended) format of normal nodes.
+Without this option, normal nodes will be built using
+the standard DOOM format, and only switch to XNOD format
+when the level is too large (e.g. has too many segs).
 
-ELFBSP will automatically choose the minimum format needed when certain
-limits are reached, raising from Doom to XNOD and XGL3, as is needed.
-DeepBSPv4, XGLN and XGL2 are considered deprecated and are only made
-available for source port testing purposes.
+Using XNOD format can be better for source ports which
+support it, since it provides higher accuracy for seg
+splits.  However, it cannot be used with the original
+DOOM.EXE or with Chocolate-Doom.
+.TP
+.B \-s \-\-ssect
+Build XGL3 (extended GL-Nodes) format in the SSECTORS lump.
+This option will disable the building of normal nodes, leaving
+the NODES and SEGS lumps empty.  Although it can be used with
+the -x option to store XNOD format nodes in the NODES lump too.
 .TP
 .B \-c \-\-cost ##
 Sets the cost for making seg splits.

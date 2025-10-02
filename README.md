@@ -90,26 +90,26 @@ some help text, including a summary of all available options.
 Option List
 -----------
 
-`-v --verbose`  
+`-v --verbose`
 Produces more verbose output to the terminal.
 Some warnings which are normally hidden (except for a final
 tally) will be shown when enabled.
 
-`-vv --very-verbose`  
+`-vv --very-verbose`
 This is equivalent to using --verbose twice, and causes lots of
 wonderfully useless information about each level to be displayed.
 
-`-vvv --super-verbose`  
+`-vvv --super-verbose`
 This is the same as using --verbose three times, and enables
 the display of all the minor issues (such as unclosed subsectors).
 
-`-b --backup`  
+`-b --backup`
 Backs up each input file before processing it.
 The backup files will have the ".bak" extension
 (replacing the ".wad" extension).  If the backup
 file already exists, it will be silently overwritten.
 
-`-m --map  NAME(s)`  
+`-m --map  NAME(s)`
 Specifies one or more maps to process.
 All other maps will be skipped (not touched at all).
 The same set of maps applies to every given wad file.
@@ -123,35 +123,42 @@ commas to separate them, such as "MAP01,MAP03,MAP05".
 
 NOTE: spaces cannot be used to separate map names.
 
-`-t --type  ##`  
-Forces a specific Node format version. Choices include:
- - 0 => plain Doom format nodes
- - 2 => XNOD
- - 5 => XGL3
+`-x --xnod`
+Forces XNOD (ZDoom extended) format of normal nodes.
+Without this option, normal nodes will be built using
+the standard DOOM format, and only switch to XNOD format
+when the level is too large (e.g. has too many segs).
 
-ELFBSP will automatically choose the minimum format needed when certain
-limits are reached, raising from Doom to XNOD and XGL3, as is needed.
-DeepBSPv4, XGLN and XGL2 are considered deprecated and are only made
-available for source port testing purposes.
+Using XNOD format can be better for source ports which
+support it, since it provides higher accuracy for seg
+splits.  However, it cannot be used with the original
+DOOM.EXE or with Chocolate-Doom.
 
-`-c --cost  ##`  
+`-s --ssect`
+Build XGL3 (extended Nodes) format in the SSECTORS lump.
+This option will disable the building of normal nodes, leaving
+the NODES and SEGS lumps empty.  Although it can be used with
+the `-x` option to store XNOD format nodes in the NODES lump
+as well.
+
+`-c --cost  ##`
 Sets the cost for making seg splits.
 The value is a number between 1 and 32.
 Larger values try to reduce the number of seg splits,
 whereas smaller values produce more balanced BSP trees.
 The default value is 11.
 
-`-o --output  FILE`  
+`-o --output  FILE`
 This option is provided *only* for compatibility with
 existing node builders.  It causes the input file to be
 copied to the specified file, and that file is the one
 processed.  This option *cannot* be used with multiple
 input files, or with the --backup option.
 
-`-h --help`  
+`-h --help`
 Displays a brief help screen, then exits.
 
-`--version`  
+`--version`
 Displays the version of ELFBSP, then exits.
 
 

@@ -374,10 +374,8 @@ void ShowHelp()
 			"    -m --map   XXXX    Control which map(s) are built\n"
 			"    -c --cost  ##      Cost assigned to seg splits (1-32)\n"
 			"\n"
-			"    -t --type  ##      Force a specific node format, automatic otherwise\n"
-			"                         0 = Doom\n"
-			"                         2 = XNOD\n"
-			"                         5 = XGL3\n"
+			"    -x --xnod          Use XNOD format in NODES lump\n"
+			"    -s --ssect         Use XGL3 format in SSECTORS lump\n"
 			"\n"
 			"Short options may be mixed, for example: -fbv\n"
 			"Long options must always begin with a double hyphen\n"
@@ -521,6 +519,9 @@ void ParseShortArgument(const char *arg)
 			case 'b': opt_backup = true; continue;
 
 			case 'v': config.verbosity += 1; continue;
+			case 'f': config.fast = true; continue;
+			case 'x': config.force_xnod = true; continue;
+			case 's': config.ssect_xgl3 = true; continue;
 
 			case 'm':
 			case 'o':
@@ -681,8 +682,6 @@ void ParseCommandLine(int argc, char *argv[])
 		if (strcmp(arg, "-c") == 0) arg = "--cost";
 		if (strcmp(arg, "-m") == 0) arg = "--map";
 		if (strcmp(arg, "-o") == 0) arg = "--output";
-		if (strcmp(arg, "-x") == 0) arg = "--xnod";
-		if (strcmp(arg, "-s") == 0) arg = "--ssect";
 
 		if (arg[1] != '-')
 		{

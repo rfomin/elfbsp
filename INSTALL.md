@@ -76,4 +76,3 @@ To build the program, type:
 The executable can be made smaller using the following:
 
     make -f Makefile.xming stripped
-
