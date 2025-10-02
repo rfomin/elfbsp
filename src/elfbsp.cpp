@@ -594,6 +594,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	{
 		opt_backup = true;
 	}
+	else if (strcmp(name, "--fast") == 0)
+	{
+		config.fast = true;
+	}
 	else if (strcmp(name, "--map") == 0 || strcmp(name, "--maps") == 0)
 	{
 		if (argc < 1 || argv[0][0] == '-')
