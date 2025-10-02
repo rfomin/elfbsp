@@ -710,42 +710,10 @@ void ParseCommandLine(int argc, char *argv[])
 }
 
 
-//
-// sanity checks for the sizes and properties of certain types.
-// useful when porting.
-//
-#define assert_size(type,size)  \
-    do {  \
-        if (sizeof (type) != size)  \
-            config.FatalError("sizeof " #type " is %d (should be " #size ")\n", (int)sizeof(type));  \
-    } while (0)
-
-void CheckTypeSizes()
-{
-	assert_size(uint8_t,  1);
-	assert_size(int8_t,   1);
-	assert_size(uint16_t, 2);
-	assert_size(int16_t,  2);
-	assert_size(uint32_t, 4);
-	assert_size(int32_t,  4);
-	assert_size(uint64_t, 8);
-	assert_size(int64_t,  8);
-
-	assert_size(raw_linedef_t, 14);
-	assert_size(raw_sector_s,  26);
-	assert_size(raw_sidedef_t, 30);
-	assert_size(raw_thing_t,   10);
-	assert_size(raw_vertex_t,   4);
-}
-
-
 int main(int argc, char *argv[])
 {
 	// need this early, especially for fatal errors in utility/wad code
 	elfbsp::SetInfo(&config);
-
-	// sanity check on type sizes (useful when porting)
-	CheckTypeSizes();
 
 	ParseCommandLine(argc, argv);
 
