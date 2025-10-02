@@ -55,18 +55,10 @@ elfbsp example1.wad --output example2.wad
 
 To build only certain maps' nodes, the following option is available:
 ```bash
-elfbsp example.wad --maps MAP01
-elfbsp example.wad --maps MAP01,MAP03,MAP07 # multiple maps can be provided via comma-separation
-elfbsp example.wad --maps MAP10-MAP11       # or via a hyphen-separated range
-elfbsp example.wad --maps MAP04,MAP22-MAP25 # or you may combine both
-```
-
-You may optionally force the use of an advanced node type with the following parameters.
-Otherwise, ELFBSP will automatically promote to the advanced Node types depending on map complexity.
-```bash
-elfbsp example.wad         # vanilla nodes
-elfbsp example.wad --xnod  # forces the use of XNOD, leaves SEGS and SSECTORS empty, using only the NODES lump
-elfbsp example.wad --ssect # forces the use of XGL3, leaves SEGS and NODES empty, using only the SSECTORS lump
+elfbsp example.wad --map MAP01
+elfbsp example.wad --map MAP01,MAP03,MAP07 # multiple maps can be provided via comma-separation
+elfbsp example.wad --map MAP10-MAP11       # or via a hyphen-separated range
+elfbsp example.wad --map MAP04,MAP22-MAP25 # or you may combine both
 ```
 
 For a basic explanation of the main options, type:
