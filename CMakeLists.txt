@@ -7,7 +7,7 @@ project(elfbsp
 include(CheckIncludeFile)
 include(GNUInstallDirs)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -42,7 +42,6 @@ add_executable(elfbsp
 )
 
 target_include_directories(elfbsp PRIVATE ${CMAKE_BINARY_DIR})
-target_link_libraries(elfbsp PRIVATE z)
 
 if(WIN32)
     install(FILES LICENSE.txt DESTINATION .)

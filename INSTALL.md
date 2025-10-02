@@ -22,6 +22,7 @@ On Debian linux, you will need the following packages:
 
 - g++
 - binutils
+- cmake
 - make
 
 It is a good idea to open the Makefile in a text editor and
@@ -30,18 +31,11 @@ the `PREFIX` variable, or set `CXX` to a specific C++ compiler.
 
 To build the program, type:
 
-    make
+    cmake -B build && make all -C build
 
-To install ELFBSP, become root and type:
+To install ELFBSP, for which you will need root priveliges, type:
 
-    make install
-
-NOTE: on BSD systems the manual page may be installed into
-the wrong directory (and not be found *just* when you want to
-read it).  To fix this, edit the Makefile, find the `MANDIR`
-variable (it is near the top) and change it to this:
-
-    MANDIR=$(PREFIX)/man
+    cmake -B build && sudo make install -C build
 
 
 Windows
