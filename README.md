@@ -11,7 +11,7 @@ ELFBSP 1.7
 [![Downloads (latest)](https://img.shields.io/github/downloads/elf-alchemist/elfbsp/latest/total.svg)](https://github.com/elf-alchemist/elfbsp/releases/latest)
 [![Commits](https://img.shields.io/github/commits-since/elf-alchemist/elfbsp/latest.svg)](https://github.com/elf-alchemist/elfbsp/commits/master)
 [![Last Commit](https://img.shields.io/github/last-commit/elf-alchemist/elfbsp.svg)](https://github.com/elf-alchemist/elfbsp/commits/master)
-[![Build Status](https://github.com/elf-alchemist/elfbsp/actions/workflows/main.yml/badge.svg)](https://github.com/elf-alchemist/elfbsp/actions/workflows/main.yml)
+<!--[![Build Status](https://github.com/elf-alchemist/elfbsp/actions/workflows/main.yml/badge.svg)](https://github.com/elf-alchemist/elfbsp/actions/workflows/main.yml)-->
 
 by Guilherme Miranda, 2025 -- based on AJBSP, by Andrew Apted, 2022.
 
