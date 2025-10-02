@@ -3,7 +3,7 @@ ELFBSP 1.7
 ==========
 
 by Guilherme Miranda, 2025.
-AJBSP by Andrew Apted, 2022.
+based on AJBSP, by Andrew Apted, 2022.
 
 
 About
@@ -57,109 +57,41 @@ Please see the [INSTALL.md](INSTALL.md) document.
 Usage
 -----
 
-ELFBSP must be run from a terminal (Linux) or the command shell
-(cmd.exe in Win32).  The command-line arguments are either files
-to process or options.  Where options are placed does not matter,
-the set of given options is applied to every given file.
+The simplest possible operation will rebuild all of the nodes in a provided WAD:
+```bash
+elfbsp example.wad
+```
 
-Short options always begin with a hyphen ('-'), followed by one
-or more letters, where each letter is a distinct option (i.e. short
-options may be mixed).  Long options begin with two hyphens ('--')
-followed by a whole word.
+The will rebuild all of the nodes in a seperate copy of the provided WAD:
+```bash
+elfbsp example1.wad --output example2.wad
+```
 
-When an option needs a value, it should be placed in the next argument,
-i.e. separated by the option name by a space.  For short options which
-take a number, like '-c', the number can be mixed in immediately
-after the letter, such as '-c23'.
+To build only certain maps' nodes, the following option is available:
+```bash
+elfbsp example.wad --maps MAP01
+elfbsp example.wad --maps MAP01,MAP03,MAP07 # multiple maps can be provided via comma-separation
+elfbsp example.wad --maps MAP10-MAP11       # or via a hyphen-separated range
+elfbsp example.wad --maps MAP04,MAP22-MAP25 # or you may combine both
+```
 
-The special option '--' causes all following arguments to be
-interpreted as filenames.  This allows specifying a file which
-begins with a hyphen.
+You may optionally force the use of an advanced node type with the following parameters.
+Otherwise, ELFBSP will automatically promote to the advanced Node types depending on map complexity.
+```bash
+elfbsp example.wad         # vanilla nodes
+elfbsp example.wad --xnod  # forces the use of XNOD, leaves SEGS and SSECTORS empty, using only the NODES lump
+elfbsp example.wad --ssect # forces the use of XGL3, leaves SEGS and NODES empty, using only the SSECTORS lump
+```
 
-Once invoked, ELFBSP will process each wad file.  All the maps in the
-file have their nodes rebuilt, unless the --map option is used to
-limit which maps are visited.  The normal behavior is to keep the
-output to the terminal fairly terse, only showing the name of each
-map as it being processed, and a simple summary of each file.
-More verbose output can be enabled by the --verbose option.
+For a basic explanation of the main options, type:
+```bash
+elfbsp --help
+```
 
-Running ELFBSP with no options, or the --help option, will show
-some help text, including a summary of all available options.
-
-
-Option List
------------
-
-`-v --verbose`
-Produces more verbose output to the terminal.
-Some warnings which are normally hidden (except for a final
-tally) will be shown when enabled.
-
-`-vv --very-verbose`
-This is equivalent to using --verbose twice, and causes lots of
-wonderfully useless information about each level to be displayed.
-
-`-vvv --super-verbose`
-This is the same as using --verbose three times, and enables
-the display of all the minor issues (such as unclosed subsectors).
-
-`-b --backup`
-Backs up each input file before processing it.
-The backup files will have the ".bak" extension
-(replacing the ".wad" extension).  If the backup
-file already exists, it will be silently overwritten.
-
-`-m --map  NAME(s)`
-Specifies one or more maps to process.
-All other maps will be skipped (not touched at all).
-The same set of maps applies to every given wad file.
-The default behavior is to process every map in the wad.
-
-Map names must be the lump name, like "MAP01" or "E2M3",
-and cannot be abbreviated.  A range of maps can be
-specified using a hyphen, such as "MAP04-MAP07".
-Several map names and/or ranges can be given, using
-commas to separate them, such as "MAP01,MAP03,MAP05".
-
-NOTE: spaces cannot be used to separate map names.
-
-`-x --xnod`
-Forces XNOD (ZDoom extended) format of normal nodes.
-Without this option, normal nodes will be built using
-the standard DOOM format, and only switch to XNOD format
-when the level is too large (e.g. has too many segs).
-
-Using XNOD format can be better for source ports which
-support it, since it provides higher accuracy for seg
-splits.  However, it cannot be used with the original
-DOOM.EXE or with Chocolate-Doom.
-
-`-s --ssect`
-Build XGL3 (extended Nodes) format in the SSECTORS lump.
-This option will disable the building of normal nodes, leaving
-the NODES and SEGS lumps empty.  Although it can be used with
-the `-x` option to store XNOD format nodes in the NODES lump
-as well.
-
-`-c --cost  ##`
-Sets the cost for making seg splits.
-The value is a number between 1 and 32.
-Larger values try to reduce the number of seg splits,
-whereas smaller values produce more balanced BSP trees.
-The default value is 11.
-
-`-o --output  FILE`
-This option is provided *only* for compatibility with
-existing node builders.  It causes the input file to be
-copied to the specified file, and that file is the one
-processed.  This option *cannot* be used with multiple
-input files, or with the --backup option.
-
-`-h --help`
-Displays a brief help screen, then exits.
-
-`--version`
-Displays the version of ELFBSP, then exits.
+For a complete options list and documentation for each, type:
+```bash
+elfbsp --doc
+```
 
 
 Exit Codes

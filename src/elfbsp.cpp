@@ -27,6 +27,7 @@
 
 bool opt_backup   = false;
 bool opt_help     = false;
+bool opt_doc      = false;
 bool opt_version  = false;
 
 std::string opt_output;
@@ -362,6 +363,13 @@ void VisitFile(unsigned int idx, const char *filename)
 
 // ----- user information -----------------------------
 
+void ShowDoc()
+{
+	printf(PRINT_DOC);
+
+	fflush(stdout);
+}
+
 void ShowHelp()
 {
 	printf(PRINT_HELP);
@@ -498,6 +506,7 @@ void ParseShortArgument(const char *arg)
 		switch (c)
 		{
 			case 'h': opt_help = true; continue;
+			case 'd': opt_doc = true; continue;
 			case 'b': opt_backup = true; continue;
 
 			case 'v': config.verbosity += 1; continue;
@@ -549,6 +558,10 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	if (strcmp(name, "--help") == 0)
 	{
 		opt_help = true;
+	}
+	else if (strcmp(name, "--doc") == 0)
+	{
+		opt_doc = true;
 	}
 	else if (strcmp(name, "--version") == 0)
 	{
@@ -731,6 +744,13 @@ int main(int argc, char *argv[])
 	{
 		ShowBanner();
 		ShowHelp();
+		return 0;
+	}
+
+	if (opt_doc)
+	{
+		ShowBanner();
+		ShowDoc();
 		return 0;
 	}
 
