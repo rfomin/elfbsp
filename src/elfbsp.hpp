@@ -48,7 +48,7 @@ public:
 	int split_cost;
 
 	// this affects how some messages are shown
-	int verbosity;
+	bool verbose;
 
 	// from here on, various bits of internal state
 	int total_warnings;
@@ -66,7 +66,7 @@ public:
 		cancelled(false),
 
 		split_cost(SPLIT_COST_DEFAULT),
-		verbosity(0),
+		verbose(false),
 
 		total_warnings(0),
 		total_minor_issues(0)
@@ -76,7 +76,8 @@ public:
 	{ }
 
 public:
-	virtual void Print(int level, const char *msg, ...) = 0;
+	virtual void Print(const char *msg, ...) = 0;
+	virtual void Print_Verbose(const char *fmt, ...) = 0;
 	virtual void Debug(const char *msg, ...) = 0;
 	virtual void ShowMap(const char *name) = 0;
 	virtual void FatalError(const char *fmt, ...) = 0;

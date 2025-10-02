@@ -17,6 +17,7 @@
 //
 //------------------------------------------------------------------------
 
+#include <cstdarg>
 #include <string>
 #include <vector>
 
@@ -67,9 +68,27 @@ void StopHanging()
 class mybuildinfo_t : public buildinfo_t
 {
 public:
-	void Print(int level, const char *fmt, ...)
+	void Print(const char *fmt, ...)
 	{
-		if (level > verbosity)
+		va_list arg_ptr;
+
+		static char buffer[MSG_BUF_LEN];
+
+		va_start(arg_ptr, fmt);
+		vsnprintf(buffer, MSG_BUF_LEN-1, fmt, arg_ptr);
+		va_end(arg_ptr);
+
+		buffer[MSG_BUF_LEN-1] = 0;
+
+		StopHanging();
+
+		printf("%s", buffer);
+		fflush(stdout);
+	}
+
+	void Print_Verbose(const char *fmt, ...)
+	{
+		if (!verbose)
 			return;
 
 		va_list arg_ptr;
@@ -103,9 +122,9 @@ public:
 
 	void ShowMap(const char *name)
 	{
-		if (verbosity >= 1)
+		if (verbose)
 		{
-			Print(0, "  %s\n", name);
+			Print("  %s\n", name);
 			return;
 		}
 
@@ -193,7 +212,7 @@ build_result_e BuildFile()
 
 	if (num_levels == 0)
 	{
-		config.Print(0, "  No levels in wad\n");
+		config.Print("  No levels in wad\n");
 		total_empty_files += 1;
 		return BUILD_OK;
 	}
@@ -211,8 +230,8 @@ build_result_e BuildFile()
 
 		visited += 1;
 
-		if (n > 0 && config.verbosity >= 2)
-			config.Print(0, "\n");
+		if (n > 0)
+			config.Print_Verbose("\n");
 
 		res = elfbsp::BuildLevel(n);
 
@@ -237,18 +256,18 @@ build_result_e BuildFile()
 
 	if (visited == 0)
 	{
-		config.Print(0, "  No matching levels\n");
+		config.Print("  No matching levels\n");
 		total_empty_files += 1;
 		return BUILD_OK;
 	}
 
-	config.Print(0, "\n");
+	config.Print("\n");
 
 	total_failed_maps += failures;
 
 	if (failures > 0)
 	{
-		config.Print(0, "  Failed maps: %d (out of %d)\n", failures, visited);
+		config.Print("  Failed maps: %d (out of %d)\n", failures, visited);
 
 		// allow building other files
 		total_failed_files += 1;
@@ -256,12 +275,12 @@ build_result_e BuildFile()
 
 	if (true)
 	{
-		config.Print(0, "  Serious warnings: %d\n", config.total_warnings);
+		config.Print("  Serious warnings: %d\n", config.total_warnings);
 	}
 
-	if (config.verbosity >= 1)
+	if (config.verbose)
 	{
-		config.Print(0, "  Minor issues: %d\n", config.total_minor_issues);
+		config.Print("  Minor issues: %d\n", config.total_minor_issues);
 	}
 
 	return BUILD_OK;
@@ -326,7 +345,7 @@ void BackupFile(const char *filename)
 	if (! elfbsp::FileCopy(filename, dest_name.c_str()))
 		config.FatalError("failed to create backup: %s\n", dest_name.c_str());
 
-	config.Print(0, "\nCreated backup: %s\n", dest_name.c_str());
+	config.Print("\nCreated backup: %s\n", dest_name.c_str());
 }
 
 
@@ -338,7 +357,7 @@ void VisitFile(unsigned int idx, const char *filename)
 		if (! elfbsp::FileCopy(filename, opt_output.c_str()))
 			config.FatalError("failed to create output file: %s\n", opt_output.c_str());
 
-		config.Print(0, "\nCopied input file: %s\n", filename);
+		config.Print("\nCopied input file: %s\n", filename);
 
 		filename = opt_output.c_str();
 	}
@@ -346,8 +365,8 @@ void VisitFile(unsigned int idx, const char *filename)
 	if (opt_backup)
 		BackupFile(filename);
 
-	config.Print(0, "\n");
-	config.Print(0, "Building %s\n", filename);
+	config.Print("\n");
+	config.Print("Building %s\n", filename);
 
 	// this will fatal error if it fails
 	elfbsp::OpenWad(filename);
@@ -509,7 +528,7 @@ void ParseShortArgument(const char *arg)
 			case 'd': opt_doc = true; continue;
 			case 'b': opt_backup = true; continue;
 
-			case 'v': config.verbosity += 1; continue;
+			case 'v': config.verbose = true; continue;
 			case 'f': config.fast = true; continue;
 			case 'x': config.force_xnod = true; continue;
 			case 's': config.ssect_xgl3 = true; continue;
@@ -569,15 +588,7 @@ int ParseLongArgument(const char *name, int argc, char *argv[])
 	}
 	else if (strcmp(name, "--verbose") == 0)
 	{
-		config.verbosity += 1;
-	}
-	else if (strcmp(name, "--very-verbose") == 0)
-	{
-		config.verbosity += 2;
-	}
-	else if (strcmp(name, "--super-verbose") == 0)
-	{
-		config.verbosity += 3;
+		config.verbose = true;
 	}
 	else if (strcmp(name, "--backup") == 0 || strcmp(name, "--backups") == 0)
 	{
@@ -792,35 +803,35 @@ int main(int argc, char *argv[])
 		VisitFile(i, wad_list[i]);
 	}
 
-	config.Print(0, "\n");
+	config.Print("\n");
 
 	if (total_failed_files > 0)
 	{
-		config.Print(0, "FAILURES occurred on %d map%s in %d file%s.\n",
+		config.Print("FAILURES occurred on %d map%s in %d file%s.\n",
 				total_failed_maps,  total_failed_maps  == 1 ? "" : "s",
 				total_failed_files, total_failed_files == 1 ? "" : "s");
 
-		if (config.verbosity == 0)
-			config.Print(0, "Rerun with --verbose to see more details.\n");
+		if (!config.verbose)
+			config.Print("Rerun with --verbose to see more details.\n");
 
 		return 2;
 	}
 	else if (total_built_maps == 0)
 	{
-		config.Print(0, "NOTHING was built!\n");
+		config.Print("NOTHING was built!\n");
 
 		return 1;
 	}
 	else if (total_empty_files == 0)
 	{
-		config.Print(0, "Ok, built all files.\n");
+		config.Print("Ok, built all files.\n");
 	}
 	else
 	{
 		int built = total_files - total_empty_files;
 		int empty = total_empty_files;
 
-		config.Print(0, "Ok, built %d file%s, %d file%s empty.\n",
+		config.Print("Ok, built %d file%s, %d file%s empty.\n",
 				built, (built == 1 ? "" : "s"),
 				empty, (empty == 1 ? " was" : "s were"));
 	}

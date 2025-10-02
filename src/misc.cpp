@@ -47,7 +47,7 @@ void Failure(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	cur_info->Print(1, "    FAILURE: %s", message_buf);
+	cur_info->Print_Verbose("    FAILURE: %s", message_buf);
 }
 
 
@@ -59,7 +59,7 @@ void Warning(const char *fmt, ...)
 	vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 	va_end(args);
 
-	cur_info->Print(1, "    WARNING: %s", message_buf);
+	cur_info->Print_Verbose("    WARNING: %s", message_buf);
 
 	cur_info->total_warnings++;
 }
@@ -67,7 +67,7 @@ void Warning(const char *fmt, ...)
 
 void MinorIssue(const char *fmt, ...)
 {
-	if (cur_info->verbosity >= 3)
+	if (cur_info->verbose)
 	{
 		va_list args;
 
@@ -75,7 +75,7 @@ void MinorIssue(const char *fmt, ...)
 		vsnprintf(message_buf, sizeof(message_buf), fmt, args);
 		va_end(args);
 
-		cur_info->Print(1, "    ISSUE: %s", message_buf);
+		cur_info->Print_Verbose("    ISSUE: %s", message_buf);
 	}
 
 	cur_info->total_minor_issues++;
@@ -383,7 +383,7 @@ void DetectOverlappingVertices(void)
 				B->overlap = A->overlap ? A->overlap : A;
 
 #if DEBUG_OVERLAPS
-				cur_info->Print(0, "Overlap: #%d + #%d\n", array[i]->index, array[i+1]->index);
+				cur_info->Print("Overlap: #%d + #%d\n", array[i]->index, array[i+1]->index);
 #endif
 			}
 		}
@@ -433,7 +433,7 @@ void PruneVerticesAtEnd(void)
 
 	if (unused > 0)
 	{
-		cur_info->Print(2, "    Pruned %d unused vertices at end\n", unused);
+		cur_info->Print_Verbose("    Pruned %d unused vertices at end\n", unused);
 	}
 
 	num_old_vert = num_vertices;
@@ -494,7 +494,7 @@ void DetectOverlappingLines(void)
 
 	if (count > 0)
 	{
-		cur_info->Print(2, "    Detected %d overlapped linedefs\n", count);
+		cur_info->Print_Verbose("    Detected %d overlapped linedefs\n", count);
 	}
 }
 

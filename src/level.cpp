@@ -550,7 +550,7 @@ void InitBlockmap()
 	// find limits of linedefs, and store as map limits
 	FindBlockmapLimits(&map_bbox);
 
-	cur_info->Print(2, "    Map limits: (%d,%d) to (%d,%d)\n",
+	cur_info->Print_Verbose("    Map limits: (%d,%d) to (%d,%d)\n",
 			map_bbox.minx, map_bbox.miny,
 			map_bbox.maxx, map_bbox.maxy);
 
@@ -599,7 +599,7 @@ void PutBlockmap()
 	{
 		WriteBlockmap();
 
-		cur_info->Print(2, "    Blockmap size: %dx%d (compression: %d%%)\n",
+		cur_info->Print_Verbose("    Blockmap size: %dx%d (compression: %d%%)\n",
 				block_w, block_h, block_compression);
 	}
 
@@ -787,7 +787,7 @@ void PutReject()
 	Reject_WriteLump();
 	Reject_Free();
 
-	cur_info->Print(2, "    Reject size: %d\n", rej_total_size);
+	cur_info->Print_Verbose("    Reject size: %d\n", rej_total_size);
 }
 
 
@@ -2213,7 +2213,7 @@ void LoadLevel()
 		PruneVerticesAtEnd();
 	}
 
-	cur_info->Print(2, "    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
+	cur_info->Print_Verbose("    Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n",
 				num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
 	DetectOverlappingVertices();
@@ -2555,12 +2555,12 @@ build_result_e BuildLevel(int lev_idx)
 
 	if (ret == BUILD_OK)
 	{
-		cur_info->Print(2, "    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
+		cur_info->Print_Verbose("    Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
 				num_nodes, num_subsecs, num_segs, num_old_vert + num_new_vert);
 
 		if (root_node != NULL)
 		{
-			cur_info->Print(2, "    Heights of subtrees: %d / %d\n",
+			cur_info->Print_Verbose("    Heights of subtrees: %d / %d\n",
 					ComputeBspHeight(root_node->r.node),
 					ComputeBspHeight(root_node->l.node));
 		}

@@ -2,9 +2,7 @@
 ELFBSP 1.7
 ==========
 
-by Guilherme Miranda, 2025.
-based on AJBSP, by Andrew Apted, 2022.
-
+by Guilherme Miranda, 2025 -- based on AJBSP, by Andrew Apted, 2022.
 
 About
 -----
@@ -34,24 +32,19 @@ Binary Packages
 https://github.com/elf-alchemist/elfbsp/tags
 
 
-Legalese
---------
-
-ELFBSP is Copyright &copy; 2025 Guilherme Miranda, Andrew Apted,
-Colin Reed, and Lee Killough, et al.
-
-ELFBSP is Free Software, under the terms of the GNU General Public
-License, version 2 or (at your option) any later version.
-See the [LICENSE.txt](LICENSE.txt) file for the complete text.
-
-ELFBSP comes with NO WARRANTY of any kind, express or implied.
-Please read the license for full details.
-
-
 Compiling
 ---------
 
 Please see the [INSTALL.md](INSTALL.md) document.
+
+
+Exit Codes
+----------
+
+- 0 if OK.
+- 1 if nothing was built (no matching maps).
+- 2 if one or more maps failed to build properly.
+- 3 if a fatal error occurred.
 
 
 Usage
@@ -94,10 +87,15 @@ elfbsp --doc
 ```
 
 
-Exit Codes
-----------
+Legalese
+--------
 
-- 0 if OK.
-- 1 if nothing was built (no matching maps).
-- 2 if one or more maps failed to build properly.
-- 3 if a fatal error occurred.
+ELFBSP is Copyright &copy; 2025 Guilherme Miranda, Andrew Apted,
+Colin Reed, and Lee Killough, et al.
+
+ELFBSP is Free Software, under the terms of the GNU General Public
+License, version 2 or (at your option) any later version.
+See the [LICENSE.txt](LICENSE.txt) file for the complete text.
+
+ELFBSP comes with NO WARRANTY of any kind, express or implied.
+Please read the license for full details.
