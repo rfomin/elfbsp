@@ -424,8 +424,8 @@ typedef enum zokumbsp_specials_e : uint32_t
 {
 	Special_VanillaScroll = 48,
 
-	Special_DoNotRender = 998,
-	Special_NoBlockmap = 999,
+	Special_DoNotRender = 998, // in ZokumBSP, originally a tag :/
+	Special_NoBlockmap = 999,  // not gonna deal with that :v
 
 	Special_RemoteScroll = 1048,      // potentialy lossy? -- i.e alters user-provided lumps?
 
