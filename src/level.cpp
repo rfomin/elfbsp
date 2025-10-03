@@ -2063,7 +2063,7 @@ void PutXGL3Segs(Lump_c *lump)
 		lump->Write(&raw, sizeof(raw));
 
 #if DEBUG_BSP
-		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
+		fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", raw.vertex, raw.partner, raw.linedef, raw.side);
 #endif
 	}
 }
