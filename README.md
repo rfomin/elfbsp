@@ -43,12 +43,12 @@ Exit Codes
 Usage
 -----
 
-The simplest possible operation will rebuild all of the nodes in a provided WAD:
+The simplest possible operation will rebuild nodes in all of the maps in a provided WAD:
 ```bash
 elfbsp example.wad
 ```
 
-The will rebuild all of the nodes in a seperate copy of the provided WAD:
+The following will rebuild all of the nodes in a seperate copy of the provided WAD:
 ```bash
 elfbsp example1.wad --output example2.wad
 ```
@@ -66,7 +66,7 @@ For a basic explanation of the main options, type:
 elfbsp --help
 ```
 
-For a complete options list and documentation for each, type:
+For a complete options list, and documentation for each one, type:
 ```bash
 elfbsp --doc
 ```
