@@ -20,6 +20,7 @@
 //------------------------------------------------------------------------
 
 #include "local.hpp"
+#include "raw_def.hpp"
 #include "system.hpp"
 #include "utility.hpp"
 
@@ -1273,6 +1274,10 @@ seg_t *CreateSegs()
 
 		// ignore overlapping lines
 		if (line->overlap != NULL)
+			continue;
+
+		// [EA] ZokumBSP
+		if (line->dont_render)
 			continue;
 
 		// check for extremely long lines

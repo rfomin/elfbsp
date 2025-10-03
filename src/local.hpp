@@ -207,6 +207,10 @@ public:
 	int tag;
 	int flags;
 
+	bool dont_render;
+	bool dont_render_front;
+	bool dont_render_back;
+
 	// line is marked two-sided
 	bool two_sided;
 

@@ -511,6 +511,9 @@ static void FindBlockmapLimits(bbox_t *bbox)
 	{
 		const linedef_t *L = lev_linedefs[i];
 
+		if (L->special == Special_NoBlockmap)
+			continue;
+
 		if (! L->zero_len)
 		{
 			double x1 = L->start->x;
@@ -1236,6 +1239,14 @@ void GetLinedefs()
 		line->two_sided   = (line->flags & MLF_TwoSided) != 0;
 		line->is_precious = (line->tag >= 900 && line->tag < 1000);
 
+		line->dont_render = (line->special == Special_DoNotRender);
+
+		line->dont_render_front = (line->special == Special_DoNotRenderFrontSeg
+								|| line->special == Special_DoNotRenderAnySeg);
+
+		line->dont_render_back = (line->special == Special_DoNotRenderBackSeg
+								|| line->special == Special_DoNotRenderAnySeg);
+
 		line->right = SafeLookupSidedef(LE_U16(raw.right));
 		line->left  = SafeLookupSidedef(LE_U16(raw.left));
 
@@ -1721,12 +1732,7 @@ void PutSegs()
 		raw.dist    = LE_U16(VanillaSegDist(seg));
 
 		// [EA] ZokumBSP
-		// 1084 => Do not render back seg
-		// 1085 => Do not render front seg
-		// 1086 => Do not render any seg
-		if ((seg->linedef->special == Special_DoNotRenderBackSeg && seg->side)
-			|| (seg->linedef->special == Special_DoNotRenderFrontSeg && !seg->side)
-			|| (seg->linedef->special == Special_DoNotRenderAnySeg))
+		if ((seg->linedef->dont_render_back && seg->side) || (seg->linedef->dont_render_front && !seg->side))
 		{
 			raw = {};
 		}
@@ -2025,12 +2031,7 @@ void PutZSegs(Lump_c *lump)
 		raw.side    = (uint8_t) seg->side;
 
 		// [EA] ZokumBSP
-		// 1084 => Do not render back seg
-		// 1085 => Do not render front seg
-		// 1086 => Do not render any seg
-		if ((seg->linedef->special == Special_DoNotRenderBackSeg && seg->side)
-			|| (seg->linedef->special == Special_DoNotRenderFrontSeg && !seg->side)
-			|| (seg->linedef->special == Special_DoNotRenderAnySeg))
+		if ((seg->linedef->dont_render_back && seg->side) || (seg->linedef->dont_render_front && !seg->side))
 		{
 			raw = {};
 		}

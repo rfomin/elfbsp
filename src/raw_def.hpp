@@ -422,20 +422,27 @@ hexen_activation_e;
 // The power of node building manipulation!
 typedef enum zokumbsp_specials_e : uint32_t
 {
+	Special_VanillaScroll = 48,
+
 	Special_DoNotRender = 998,
 	Special_NoBlockmap = 999,
 
-	Special_RemoteScroll = 1048,
+	Special_RemoteScroll = 1048,      // potentialy lossy? -- i.e alters user-provided lumps?
 
 	Special_ChangeStartVertex = 1078,
 	Special_ChangeEndVertex,
-	Special_RotateDegrees,
-	Special_RotateDegreesHard,
-	Special_RotateAngleT,
-	Special_RotateAngleTHard,
-	Special_DoNotRenderBackSeg,
-	Special_DoNotRenderFrontSeg,
-	Special_DoNotRenderAnySeg,
+
+	Special_RotateDegrees,     // only vanilla segs encode angle
+	Special_RotateDegreesHard, //
+	Special_RotateAngleT,      //
+	Special_RotateAngleTHard,  //
+
+	Special_DoNotRenderBackSeg,  // not supported on SSECTORS' XGL nodes
+	Special_DoNotRenderFrontSeg, //
+	Special_DoNotRenderAnySeg,   //
+
+	Special_Unknown1, // related to splitting?
+	Special_Unknown2, // line tag value becomes seg's associated line index? why?
 } zokumbsp_specials_t;
 
 
