@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "elfbsp.hpp"
-#include "raw_def.hpp"
 #include "system.hpp"
 #include "utility.hpp"
 
